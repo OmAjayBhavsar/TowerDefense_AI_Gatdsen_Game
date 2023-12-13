@@ -141,27 +141,33 @@ test-util:
 prepare-release:
   stage: build
   only:
-    - main
+    refs:
+      - main
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /^Release/
   script:
     - gradle dist
+    - export FILE_NAME=$(ls desktop/build/libs)
+    - export VERSION=$(echo $FILE_NAME | grep -oP '(?<=-)\d+\.\d+\.\d+(?=\.)')
+  artifacts:
+    paths:
+      - desktop/build/libs/*.jar  # Ersetzen Sie dies durch den Pfad zu Ihrer Build-Datei
   cache:
     when: 'on_success'
     policy: push
     paths:
       - desktop/build/libs/*.jar
 
-
 create-release:
   stage: deploy
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
   only:
-    - main
+    refs:
+      - main
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /^Release/
   dependencies:
     - prepare-release
-  cache:
-    when: 'always'
-    policy: pull
-    paths:
-      - desktop/build/libs/*.jar
   script:
-    - ls
-
+    - |
+      release-cli create --name "$CI_PROJECT_NAME v$VERSION" --tag-name $VERSION --description "Release $VERSION" --assets-link "{\"name\":\"$FILE_NAME\", \"url\":\"$CI_JOB_URL/artifacts/download\"}"
