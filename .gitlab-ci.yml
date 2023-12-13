@@ -171,5 +171,7 @@ create-release:
   dependencies:
     - prepare-release
   script:
+    - echo $FILE_NAME
+    - echo $VERSION
     - |
       release-cli create --name "$CI_PROJECT_NAME v$VERSION" --tag-name $VERSION --description "Release $VERSION" --assets-link "{\"name\":\"$FILE_NAME\", \"url\":\"$CI_JOB_URL/artifacts/download\"}"
