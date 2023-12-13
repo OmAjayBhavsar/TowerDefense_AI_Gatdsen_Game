@@ -149,6 +149,8 @@ prepare-release:
     - gradle dist
     - export FILE_NAME=$(ls *.jar)
     - export VERSION=$(echo $FILE_NAME | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+    - echo $FILE_NAME
+    - echo $VERSION
   artifacts:
     paths:
       - '*.jar'
