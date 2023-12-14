@@ -173,15 +173,15 @@ create-release:
     # Der Job soll nur ausgeführt werden, wenn der Branch "main" ist und der Commit-Message mit "Release" beginnt
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^Release.*/i
   script:
-    # Erstellen des Releases in GitLab
+    # release-cli:   Erstellen des Releases in GitLab
+    # --name:        Der Releasename soll vom Format "[Projekt] v[Version]" sein, bspw. "GaTDsen v1.0.0"
+    # --tag-name:    Der Tag des Releases soll die Version als Namen haben, bspw. "1.0.0"
+    # --description: Die Beschreibung des Releases soll "Release [Version]" sein, bspw. "Release 1.0.0"
+    # --assets-link: Die JAR-Datei des Spiels, die im "prepare-release" Job erstellt wurde, soll dem
+    #                Release als Asset hinzugefügt werden
     - | 
-      release-cli create \
-    # Der Releasename soll vom Format "[Projekt] v[Version]" sein, bspw. "GaTDsen v1.0.0"
-      --name "$CI_PROJECT_TITLE v$JAR_FILE_VERSION" \
-    # Der Tag des Releases soll die Version als Namen haben, bspw. "1.0.0"
-      --tag-name $JAR_FILE_VERSION \
-    # Die Beschreibung des Releases soll "Release [Version]" sein, bspw. "Release 1.0.0"
-      --description "Release $JAR_FILE_VERSION" \
-    # Die JAR-Datei des Spiels, die im "prepare-release" Job erstellt wurde, soll dem Release als Asset
-    # hinzugefügt werden
+      release-cli create 
+      --name "$CI_PROJECT_TITLE v$JAR_FILE_VERSION"
+      --tag-name $JAR_FILE_VERSION
+      --description "Release $JAR_FILE_VERSION"
       --assets-link "{\"name\":\"$JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$JAR_FILE_NAME\"}"
