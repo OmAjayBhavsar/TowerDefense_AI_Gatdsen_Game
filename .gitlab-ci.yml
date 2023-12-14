@@ -19,7 +19,8 @@ prepare-release:
   script:
     - gradle dist
     - echo RELEASE_JOB_URL=$CI_JOB_URL >> variables.env
-    - echo JAR_FILE_NAME=$(ls *.jar) >> variables.env
+    - JAR_FILE_NAME=$(ls *.jar)
+    - echo JAR_FILE_NAME=$JAR_FILE_NAME >> variables.env
     - echo JAR_FILE_VERSION=$(echo $JAR_FILE_NAME | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+') >> variables.env
   artifacts:
     expire_in: 1 hour
