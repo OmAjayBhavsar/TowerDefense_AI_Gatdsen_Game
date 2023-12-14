@@ -12,18 +12,147 @@ before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
   - export GRADLE_USER_HOME
 
+debug:
+  stage: .pre
+  only:
+    - beta
+    - main
+    - merge_requests
+  script:
+    - echo $PWD
+
+debug-file-tree:
+  stage: .pre
+  only:
+    - beta
+    - main
+    - merge_requests
+  script:
+    - ls -R
+
+asset-pipeline:
+  stage: build
+  only:
+    - beta
+    - main
+    - merge_requests
+  script:
+    - gradle --build-cache pipeline:build
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - pipeline/build
+      - .gradle
+
+build-core:
+  stage: build
+  only:
+    - beta
+    - main
+    - merge_requests
+  script:
+    - echo $PWD
+    - gradle --build-cache core:assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+build-desktop:
+  stage: build
+  only:
+    - beta
+    - main
+    - merge_requests
+  script:
+    - gradle --build-cache desktop:assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
+
+test-core:
+  stage: test
+  only:
+    - beta
+    - main
+    - merge_requests
+  script:
+    - gradle core:check
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    expire_in: 1 week
+    when: always
+    reports:
+      junit: core/build/test-results/test/TEST-*.xml
+
+test-pipeline:
+  stage: test
+  only:
+    - beta
+    - main
+    - merge_requests
+  script:
+    - gradle pipeline:check
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    expire_in: 1 week
+    when: always
+    reports:
+      junit: pipeline/build/test-results/test/TEST-*.xml
+
+test-util:
+  stage: test
+  only:
+    - beta
+    - main
+    - merge_requests
+  script:
+    - gradle util:check
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    expire_in: 1 week
+    when: always
+    reports:
+      junit: util/build/test-results/test/TEST-*.xml
+
 prepare-release:
   stage: build
   rules:
+    # Der Job soll nur ausgeführt werden, wenn der Branch "main" ist und der Commit-Message mit "Release" beginnt
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^Release.*/i
   script:
+    # Erstellen der JAR-Datei des Spiels
     - gradle dist
+    # Speichern der URL des "prepare-release" Jobs in den Umgebungsvariablen
     - echo RELEASE_JOB_URL=$CI_JOB_URL >> variables.env
+    # Speichern des Namens der JAR-Datei des Spiels in den Umgebungsvariablen
     - JAR_FILE_NAME=$(ls *.jar)
     - echo JAR_FILE_NAME=$JAR_FILE_NAME >> variables.env
+    # Speichern der Version der JAR-Datei des Spiels in den Umgebungsvariablen
     - echo JAR_FILE_VERSION=$(echo $JAR_FILE_NAME | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+') >> variables.env
   artifacts:
-    expire_in: 1 hour
+    expire_in: never
     paths:
       - '*.jar'
     reports:
@@ -41,10 +170,17 @@ create-release:
     - job: prepare-release
       artifacts: true
   rules:
+    # Der Job soll nur ausgeführt werden, wenn der Branch "main" ist und der Commit-Message mit "Release" beginnt
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^Release.*/i
   script:
-    - echo $RELEASE_JOB_URL
-    - echo $JAR_FILE_NAME
-    - echo $JAR_FILE_VERSION
-    - |
-      release-cli create --name "$CI_PROJECT_TITLE v$JAR_FILE_VERSION" --tag-name $JAR_FILE_VERSION --description "Release $JAR_FILE_VERSION" --assets-link "{\"name\":\"$JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$JAR_FILE_NAME\"}"
+    # Erstellen des Releases in GitLab
+    - release-cli create \\
+    # Der Releasename soll vom Format "[Projekt] v[Version]" sein, bspw. "GaTDsen v1.0.0"
+    - --name "$CI_PROJECT_TITLE v$JAR_FILE_VERSION" \\
+    # Der Tag des Releases soll die Version als Namen haben, bspw. "1.0.0"
+    - --tag-name $JAR_FILE_VERSION \\
+    # Die Beschreibung des Releases soll "Release [Version]" sein, bspw. "Release 1.0.0"
+    - --description "Release $JAR_FILE_VERSION" \\
+    # Die JAR-Datei des Spiels, die im "prepare-release" Job erstellt wurde, soll dem Release als Asset
+    # hinzugefügt werden
+    - --assets-link "{\"name\":\"$JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$JAR_FILE_NAME\"}"
