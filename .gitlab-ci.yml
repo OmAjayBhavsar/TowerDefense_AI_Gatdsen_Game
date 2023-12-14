@@ -140,10 +140,8 @@ test-util:
 
 prepare-release:
   stage: build
-  only:
-    - main
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /Release.*/
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^Release.*/i
   script:
     - gradle dist
     - echo RELEASE_JOB_URL=$CI_JOB_URL >> release_job_url.env
@@ -167,13 +165,11 @@ prepare-release:
 create-release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
-  only:
-    - main
   needs:
     - job: prepare-release
       artifacts: true
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /Release.*/
+    - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^Release.*/i
   release:
     name: $CI_PROJECT_TITLE v$JAR_FILE_VERSION
     tag_name: $VERSION
