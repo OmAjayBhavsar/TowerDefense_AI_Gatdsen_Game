@@ -170,11 +170,6 @@ create-release:
       artifacts: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^Release.*/i
-  release:
-    name: $CI_PROJECT_TITLE v$JAR_FILE_VERSION
-    tag_name: $VERSION
-    description: Release $JAR_FILE_VERSION
-    assets:
-      links:
-        - name: $JAR_FILE_NAME
-          url: $RELEASE_JOB_URL/artifacts/file/$JAR_FILE_NAME
+  script:
+    - |
+      release-cli create --name "$CI_PROJECT_TITLE v$JAR_FILE_VERSION" --tag-name $VERSION --description "Release $JAR_FILE_VERSION" --assets-link "{\"name\":\"$JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$JAR_FILE_NAME\"}"
