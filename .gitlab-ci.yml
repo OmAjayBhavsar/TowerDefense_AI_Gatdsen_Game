@@ -163,7 +163,7 @@ prepare-release:
       - '*.jar'
 
 create-release:
-  stage: release
+  stage: deploy
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   needs:
     - job: prepare-release
