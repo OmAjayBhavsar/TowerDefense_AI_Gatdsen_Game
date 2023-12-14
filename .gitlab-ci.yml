@@ -12,132 +12,6 @@ before_script:
   - GRADLE_USER_HOME="$(pwd)/.gradle"
   - export GRADLE_USER_HOME
 
-
-
-debug:
-  stage: .pre
-  only:
-    - beta
-    - main
-    - merge_requests
-  script:
-    - echo $PWD
-
-debug-file-tree:
-  stage: .pre
-  only:
-    - beta
-    - main
-    - merge_requests
-  script:
-    - ls -R
-
-asset-pipeline:
-  stage: build
-  only:
-    - beta
-    - main
-    - merge_requests
-  script:
-    - gradle --build-cache pipeline:build
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: push
-    paths:
-      - pipeline/build
-      - .gradle
-
-build-core:
-  stage: build
-  only:
-    - beta
-    - main
-    - merge_requests
-  script:
-    - echo $PWD
-    - gradle --build-cache core:assemble
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: push
-    paths:
-      - build
-      - .gradle
-
-build-desktop:
-  stage: build
-  only:
-    - beta
-    - main
-    - merge_requests
-  script:
-    - gradle --build-cache desktop:assemble
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: push
-    paths:
-      - build
-      - .gradle
-
-test-core:
-  stage: test
-  only:
-    - beta
-    - main
-    - merge_requests
-  script:
-    - gradle core:check
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    expire_in: 1 week
-    when: always
-    reports:
-      junit: core/build/test-results/test/TEST-*.xml
-
-test-pipeline:
-  stage: test
-  only:
-    - beta
-    - main
-    - merge_requests
-  script:
-    - gradle pipeline:check
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    expire_in: 1 week
-    when: always
-    reports:
-      junit: pipeline/build/test-results/test/TEST-*.xml
-
-test-util:
-  stage: test
-  only:
-    - beta
-    - main
-    - merge_requests
-  script:
-    - gradle util:check
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
-  artifacts:
-    expire_in: 1 week
-    when: always
-    reports:
-      junit: util/build/test-results/test/TEST-*.xml
-
 prepare-release:
   stage: build
   rules:
@@ -148,7 +22,7 @@ prepare-release:
     - echo JAR_FILE_NAME=$(ls *.jar) >> jar_file_name.env
     - echo JAR_FILE_VERSION=$(echo $JAR_FILE_NAME | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+') >> jar_file_version.env
   artifacts:
-    expire_in: 1 week
+    expire_in: 1 hour
     paths:
       - '*.jar'
     reports:
@@ -171,5 +45,8 @@ create-release:
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^Release.*/i
   script:
+    - echo $RELEASE_JOB_URL
+    - echo $JAR_FILE_NAME
+    - echo $JAR_FILE_VERSION
     - |
-      release-cli create --name "$CI_PROJECT_TITLE v$JAR_FILE_VERSION" --tag-name $VERSION --description "Release $JAR_FILE_VERSION" --assets-link "{\"name\":\"$JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$JAR_FILE_NAME\"}"
+      release-cli create --name "$CI_PROJECT_TITLE v$JAR_FILE_VERSION" --tag-name $JAR_FILE_VERSION --description "Release $JAR_FILE_VERSION" --assets-link "{\"name\":\"$JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$JAR_FILE_NAME\"}"
