@@ -180,8 +180,8 @@ create-release:
     # --assets-link: Die JAR-Datei des Spiels, die im "prepare-release" Job erstellt wurde, soll dem
     #                Release als Asset hinzugefügt werden
     - | 
-      release-cli create 
-      --name "$CI_PROJECT_TITLE v$JAR_FILE_VERSION"
-      --tag-name $JAR_FILE_VERSION
-      --description "Release $JAR_FILE_VERSION"
+      release-cli create \
+      --name "$CI_PROJECT_TITLE v$JAR_FILE_VERSION" \
+      --tag-name $JAR_FILE_VERSION \
+      --description "Release $JAR_FILE_VERSION" \
       --assets-link "{\"name\":\"$JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$JAR_FILE_NAME\"}"
