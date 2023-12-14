@@ -141,15 +141,23 @@ test-util:
 prepare-release:
   stage: build
   only:
-    refs:
-      - main
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /^Release/
+    - main
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /Release.*/
   script:
     - gradle dist
+    - echo RELEASE_JOB_URL=$CI_JOB_URL >> release_job_url.env
+    - echo JAR_FILE_NAME=$(ls *.jar) >> jar_file_name.env
+    - echo JAR_FILE_VERSION=$(echo $JAR_FILE_NAME | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+') >> jar_file_version.env
   artifacts:
+    expire_in: 1 week
     paths:
       - '*.jar'
+    reports:
+      dotenv:
+        - release_job_url.env
+        - jar_file_name.env
+        - jar_file_version.env
   cache:
     when: 'on_success'
     policy: push
@@ -157,19 +165,20 @@ prepare-release:
       - '*.jar'
 
 create-release:
-  stage: deploy
+  stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   only:
-    refs:
-      - main
-    variables:
-      - $CI_COMMIT_MESSAGE =~ /^Release/
-  dependencies:
-    - prepare-release
-  script:
-    - |
-      FILE_NAME=$(ls *.jar)  # Lesen Sie den Dateinamen aus dem Artefakt
-      VERSION=$(echo $FILE_NAME | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
-      echo $FILE_NAME
-      echo $VERSION
-      release-cli create --name "$CI_PROJECT_NAME v$VERSION" --tag-name $VERSION --description "Release $VERSION" --assets-link "{\"name\":\"$FILE_NAME\", \"url\":\"$CI_JOB_URL/artifacts/download\"}"
+    - main
+  needs:
+    - job: prepare-release
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /Release.*/
+  release:
+    name: $CI_PROJECT_TITLE v$JAR_FILE_VERSION
+    tag_name: $VERSION
+    description: Release $JAR_FILE_VERSION
+    assets:
+      links:
+        - name: $JAR_FILE_NAME
+          url: $RELEASE_JOB_URL/artifacts/file/$JAR_FILE_NAME
