@@ -228,7 +228,10 @@ public class Animator implements Screen, AnimationLogProcessor {
             EnemyUpdateHealthAction updateHealth = (EnemyUpdateHealthAction) action;
 
             ExecutorAction changeHealth = new ExecutorAction(updateHealth.getDelay(), () -> {
-                enemies[updateHealth.getTeam()][updateHealth.getPos().x][updateHealth.getPos().y].healthbar.changeHealth(updateHealth.getNewHealth());
+                GameEnemy enemy = enemies[updateHealth.getTeam()][updateHealth.getPos().x][updateHealth.getPos().y];
+                if (enemy != null) {
+                    enemy.healthbar.changeHealth(updateHealth.getNewHealth());
+                }
                 return 0;
             });
 
