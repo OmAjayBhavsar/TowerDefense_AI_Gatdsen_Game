@@ -53,10 +53,12 @@ public class Hud implements Disposable{
     private int player0Balance = 100;
     private int player1Balance = 100;
     protected GADS gameInstance;
+    private GameState gameState;
 
     private int health = 300;
     private ProgressBar healthBarPlayer0 = new ProgressBar(0, health, 1, false, skin);
     private ProgressBar healthBarPlayer1 = new ProgressBar(0, health, 1, false, skin);
+    private int roundCounter = 1;
 
     /**
      * Initialisiert das HUD-Objekt
@@ -91,6 +93,10 @@ public class Hud implements Disposable{
         healthBarPlayer0.setAnimateDuration(0.25f);
         healthBarPlayer1.setValue(health);
         healthBarPlayer1.setAnimateDuration(0.25f);
+        if (gameState != null){
+            roundCounter = gameState.getTurn();
+        }
+        else roundCounter = 1;
     }
 
     /**
@@ -163,6 +169,8 @@ public class Hud implements Disposable{
         currentPlayer0.setAlignment(Align.center);
         Label currentPlayer1 = new Label("Spieler 1", skin);
         currentPlayer1.setAlignment(Align.center);
+        Label currentRoundLabel = new Label("Runde: " + roundCounter, skin);
+        currentRoundLabel.setAlignment(Align.center);
 
         Label invisibleLabel = new Label("", skin);
         nextRoundButton = new TextButton("Zug beenden", skin);
@@ -180,7 +188,6 @@ public class Hud implements Disposable{
                 layoutHudElements();
             }
         });
-
         layoutTable.add(currentPlayer0).expandX();
         layoutTable.add(player0BalanceLabel).pad(padding).expandX();
         layoutTable.add(healthBarPlayer0).pad(padding).expandX();
@@ -188,6 +195,11 @@ public class Hud implements Disposable{
         layoutTable.add(healthBarPlayer1).pad(padding).expandX();
         layoutTable.add(player1BalanceLabel).pad(padding).expandX();
         layoutTable.add(currentPlayer1).pad(padding).expandX().row();
+        layoutTable.add(invisibleLabel).row();
+        layoutTable.add(invisibleLabel);
+        layoutTable.add(invisibleLabel);
+        layoutTable.add(invisibleLabel);
+        layoutTable.add(currentRoundLabel).pad(padding).expandX().row();
         layoutTable.add(invisibleLabel).row();
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
@@ -332,6 +344,7 @@ public class Hud implements Disposable{
      * @param seconds Die Dauer des Spielzug-Timers in Sekunden
      */
     public void startTurnTimer(int seconds) {
+        roundCounter++;
         turnTimer.startTimer(seconds);
     }
 
@@ -444,6 +457,8 @@ public class Hud implements Disposable{
      * @param tileMap               Die TileMap des Spiels
      */
     public void newGame(GameState gameState, Vector2[] arrayPositionTileMaps, int tileSize, TileMap tileMap) {
+
+        this.gameState = gameState;
         Group group = new Group();
         stage.addActor(group);
 
