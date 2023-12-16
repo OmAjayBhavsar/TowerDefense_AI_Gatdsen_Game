@@ -36,7 +36,7 @@ public class Hud implements Disposable{
     private final InputHandler inputHandler;
     private final InputMultiplexer inputMultiplexer;
     private final TurnTimer turnTimer;
-    private final Table layoutTable;
+    public final Table layoutTable;
     private final Container<ImagePopup> turnPopupContainer;
     private final InGameScreen inGameScreen;
     private final TextureRegion turnChangeSprite;
@@ -158,7 +158,7 @@ public class Hud implements Disposable{
     /**
      * Konfiguriert die HUD-Elemente und deren Anordnung
      */
-    private void layoutHudElements() {
+    public void layoutHudElements() {
         float padding = 10;
 
         Label player0BalanceLabel = new Label("$" + player0Balance, skin);
