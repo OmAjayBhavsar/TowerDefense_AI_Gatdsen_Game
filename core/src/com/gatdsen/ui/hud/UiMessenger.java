@@ -90,7 +90,7 @@ public class UiMessenger {
      * @param health   Der neue Lebenswert für den Spieler
      */
     public void setPlayerHealth(int playerID, int health) {
-        if (playerHealthCallCount < 2) {
+        if (playerHealthCallCount < 1) {
             hud.initPlayerHealth(playerID, health);
         } else {
             hud.setPlayerHealth(playerID, health);

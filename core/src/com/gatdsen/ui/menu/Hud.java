@@ -54,11 +54,12 @@ public class Hud implements Disposable{
     private int player1Balance = 100;
     protected GADS gameInstance;
     private GameState gameState;
-
     private int health = 300;
     private ProgressBar healthBarPlayer0 = new ProgressBar(0, health, 1, false, skin);
     private ProgressBar healthBarPlayer1 = new ProgressBar(0, health, 1, false, skin);
     private int roundCounter = 1;
+    private int healthPlayer0 = health;
+    private int healthPlayer1 = health;
 
     /**
      * Initialisiert das HUD-Objekt
@@ -171,6 +172,10 @@ public class Hud implements Disposable{
         currentPlayer1.setAlignment(Align.center);
         Label currentRoundLabel = new Label("Runde: " + roundCounter, skin);
         currentRoundLabel.setAlignment(Align.center);
+        Label healthPlayer0Label = new Label("" + healthPlayer0 , skin);
+        healthPlayer0Label.setAlignment(Align.center);
+        Label healthPlayer1Label = new Label("" + healthPlayer1, skin);
+        healthPlayer1Label.setAlignment(Align.center);
 
         Label invisibleLabel = new Label("", skin);
         nextRoundButton = new TextButton("Zug beenden", skin);
@@ -191,16 +196,19 @@ public class Hud implements Disposable{
         layoutTable.add(currentPlayer0).expandX();
         layoutTable.add(player0BalanceLabel).pad(padding).expandX();
         layoutTable.add(healthBarPlayer0).pad(padding).expandX();
-        layoutTable.add(turnTimer);
+        layoutTable.add(currentRoundLabel).align(Align.center).pad(padding).expandX();
         layoutTable.add(healthBarPlayer1).pad(padding).expandX();
         layoutTable.add(player1BalanceLabel).pad(padding).expandX();
         layoutTable.add(currentPlayer1).pad(padding).expandX().row();
-        layoutTable.add(invisibleLabel).row();
+        layoutTable.add(invisibleLabel).pad(padding).expandX();
+        layoutTable.add(invisibleLabel).pad(padding).expandX();
+        layoutTable.add(healthPlayer0Label).pad(padding).expandX();
+        layoutTable.add(invisibleLabel).pad(padding).expandX();
+        layoutTable.add(healthPlayer1Label).pad(padding).expandX().row();
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
-        layoutTable.add(currentRoundLabel).pad(padding).expandX().row();
-        layoutTable.add(invisibleLabel).row();
+        layoutTable.add(turnTimer).row();
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
@@ -547,10 +555,12 @@ public class Hud implements Disposable{
             healthBarPlayer0.setRange(0, maxHealth);
             healthBarPlayer0.setValue(maxHealth);
             healthBarPlayer0.updateVisualValue();
+            healthPlayer0 = maxHealth;
         } else if (playerID == 1) {
             healthBarPlayer1.setRange(0, maxHealth);
             healthBarPlayer1.setValue(maxHealth);
             healthBarPlayer1.updateVisualValue();
+            healthPlayer1 = maxHealth;
         }
         layoutTable.clear();
         layoutHudElements();
@@ -560,9 +570,11 @@ public class Hud implements Disposable{
         if (playerID == 0) {
             healthBarPlayer0.setValue(health);
             healthBarPlayer0.updateVisualValue();
+            healthPlayer0 = health;
         } else if (playerID == 1) {
             healthBarPlayer1.setValue(health);
             healthBarPlayer1.updateVisualValue();
+            healthPlayer1 = health;
         }
         layoutTable.clear();
         layoutHudElements();
