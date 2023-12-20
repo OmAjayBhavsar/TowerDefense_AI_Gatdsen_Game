@@ -57,10 +57,13 @@ project(":desktop") {
 
 
     dependencies {
+        implementation project(":pipeline")
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+        api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
+        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api 'commons-cli:commons-cli:1.5.0'
     }
 }
@@ -70,10 +73,7 @@ project(":core") {
 
 
     dependencies {
-        implementation project(":pipeline")
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api 'commons-cli:commons-cli:1.5.0'
     }
 }
