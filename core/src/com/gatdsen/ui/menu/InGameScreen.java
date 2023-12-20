@@ -40,7 +40,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
     public InGameScreen(GADS instance) {
 
         gameManager = instance;
-        gameViewport = new FitViewport(worldWidth, worldHeight + 500);
+        gameViewport = new FitViewport(worldWidth, worldHeight + 700);
 
         hud = new Hud(this, gameViewport, gameManager);
 
