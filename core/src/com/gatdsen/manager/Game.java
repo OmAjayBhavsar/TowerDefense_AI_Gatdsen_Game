@@ -270,7 +270,6 @@ public class Game extends Executable {
                 ", state=" + state +
                 /*", players=" + Arrays.toString(players) +*/
                 ", simulationThread=" + simulationThread +
-                ", uiMessenger=" + uiMessenger +
                 ", pendingShutdown=" + pendingShutdown +
                 ", config=" + config +
                 '}';

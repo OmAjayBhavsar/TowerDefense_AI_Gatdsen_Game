@@ -1,7 +1,5 @@
 package com.gatdsen.manager;
 
-import com.gatdsen.ui.hud.UiMessenger;
-
 import java.util.ArrayList;
 
 public abstract class Executable {
@@ -29,9 +27,6 @@ public abstract class Executable {
     protected final AnimationLogProcessor animationLogProcessor;
 
     protected final boolean gui;
-
-    private Thread simulationThread;
-    protected final UiMessenger uiMessenger;
     protected boolean pendingShutdown = false;
 
     protected GameConfig config;
@@ -44,7 +39,6 @@ public abstract class Executable {
         saveReplay = config.replay;
         animationLogProcessor = config.animationLogProcessor;
         inputGenerator = config.inputProcessor;
-        uiMessenger = config.uiMessenger;
     }
 
 
@@ -120,8 +114,6 @@ public abstract class Executable {
                 ", inputGenerator=" + inputGenerator +
                 ", animationLogProcessor=" + animationLogProcessor +
                 ", gui=" + gui +
-                ", simulationThread=" + simulationThread +
-                ", uiMessenger=" + uiMessenger +
                 ", pendingShutdown=" + pendingShutdown +
                 ", config=" + config +
                 '}';
