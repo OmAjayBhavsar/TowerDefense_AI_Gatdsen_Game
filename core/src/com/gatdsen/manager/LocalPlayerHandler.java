@@ -6,7 +6,6 @@ import com.gatdsen.manager.concurrent.ThreadExecutor;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.PlayerHandler;
 import com.gatdsen.simulation.GameState;
-import org.lwjgl.Sys;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
