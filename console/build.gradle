@@ -33,7 +33,8 @@ task dist(type: Jar) {
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
-    archiveBaseName = "gaTDsen"
+    archiveVersion.set version.toString()
+    archiveFileName = appName + "-console.jar"
     destinationDirectory = file("$rootDir")
     dependsOn configurations.runtimeClasspath
     from {
