@@ -68,6 +68,16 @@ project(":desktop") {
     }
 }
 
+project(":console") {
+    apply plugin: "java-library"
+
+
+    dependencies {
+        implementation project(":core")
+        api 'commons-cli:commons-cli:1.5.0'
+    }
+}
+
 project(":core") {
     apply plugin: "java-library"
 
