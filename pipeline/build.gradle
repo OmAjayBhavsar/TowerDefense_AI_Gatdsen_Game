@@ -75,6 +75,6 @@ tasks.register('compileConsoleAssets', CompileAssets) {
 
     inputDir = rootProject.file('assets/res/maps/').absoluteFile
     executableJar = file('build/libs/pipeline-1.1.jar').absoluteFile
-    tmpDir = file('build/tmp/assets/').absoluteFile
-    outputDir = rootProject.file('core/resources/').absoluteFile
+    tmpDir = file('build/tmp/assets/maps/').absoluteFile
+    outputDir = rootProject.file('core/resources/maps/').absoluteFile
 }
