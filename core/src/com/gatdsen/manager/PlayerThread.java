@@ -74,22 +74,23 @@ public final class PlayerThread {
         this.playerIndex = playerIndex;
         Controller controller = createController();
         StaticGameState staticState = new StaticGameState(state, playerIndex);
+        Future<?> future;
         switch (player.getType()) {
-            case HUMAN ->{
-                Future<?> future = executor.execute(() -> {
+            case HUMAN:
+                future = executor.execute(() -> {
                     Thread.currentThread().setName("Init_Thread_Player_" + player.getName());
                     player.init(staticState);
                 });
                 awaitHumanPlayerFuture(future, controller, HUMAN_EXECUTE_INIT_TIMEOUT);
-            }
-            case BOT -> {
-                Future<?> future = executor.execute(() -> {
+                break;
+            case BOT:
+                future = executor.execute(() -> {
                     Thread.currentThread().setName("Init_Thread_Player_" + player.getName());
                     ((Bot) player).setRandomSeed(seed);
                     player.init(staticState);
                 });
                 awaitBotFuture(future, controller, BOT_EXECUTE_INIT_TIMEOUT);
-            }
+                break;
         }
         return controller.commands;
     }
@@ -100,16 +101,21 @@ public final class PlayerThread {
             Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
             player.executeTurn(new StaticGameState(state, playerIndex), controller);
         });
-        Thread futureExecutor = switch (player.getType()) {
-            case HUMAN -> new Thread(() -> {
-                Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
-                inputGenerator.activateTurn((HumanPlayer) player, playerIndex);
-                awaitHumanPlayerFuture(future, controller, HUMAN_EXECUTE_TURN_TIMEOUT);
-            });
-            case BOT -> new Thread(() -> {
-                Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
-                awaitBotFuture(future, controller, BOT_EXECUTE_TURN_TIMEOUT);
-            });
+        Thread futureExecutor = null;
+        switch (player.getType()) {
+            case HUMAN:
+                futureExecutor = new Thread(() -> {
+                    Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
+                    inputGenerator.activateTurn((HumanPlayer) player, playerIndex);
+                    awaitHumanPlayerFuture(future, controller, HUMAN_EXECUTE_TURN_TIMEOUT);
+                });
+                break;
+            case BOT:
+                futureExecutor = new Thread(() -> {
+                    Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
+                    awaitBotFuture(future, controller, BOT_EXECUTE_TURN_TIMEOUT);
+                });
+                break;
         };
         futureExecutor.start();
         return controller.commands;

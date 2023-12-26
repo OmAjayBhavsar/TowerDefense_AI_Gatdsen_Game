@@ -104,8 +104,8 @@ public class Tower extends Tile {
      */
     private void setPathList() {
         for (Tile tile : inRange) {
-            if (tile instanceof PathTile pathTile) {
-                pathInRange.add(pathTile);
+            if (tile instanceof PathTile) {
+                pathInRange.add((PathTile) tile);
             }
         }
     }
