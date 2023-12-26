@@ -250,6 +250,8 @@ create-release:
     # Der Job soll nur ausgeführt werden, wenn der Branch "main" ist und der Commit-Message mit "Release" beginnt
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^Release.*/i
   script:
+    - DESKTOP_JAR_ARTIFACT_URL=$$RELEASE_JOB_URL/artifacts/file/$DESKTOP_JAR_FILE_NAME
+    - CONSOLE_JAR_ARTIFACT_URL=$$RELEASE_JOB_URL/artifacts/file/$CONSOLE_JAR_FILE_NAME
     # release-cli:   Erstellen des Releases in GitLab
     # --name:        Der Releasename soll vom Format "[Projekt] v[Version]" sein, bspw. "GaTDsen v1.0.0"
     # --tag-name:    Der Tag des Releases soll die Version als Namen haben, bspw. "1.0.0"
@@ -260,6 +262,6 @@ create-release:
       release-cli create \
       --name "$CI_PROJECT_TITLE v$GAME_VERSION" \
       --tag-name $GAME_VERSION \
-      --description "Release von $CI_PROJECT_TITLE Version $GAME_VERSION!<br />- **$DESKTOP_JAR_FILE_NAME**:<br />  - Dies ist die vollständige Version des Spiels, mit der sowohl der grafische als auch der headless-Modus ausgeführt werden kann.<br />- **$CONSOLE_JAR_FILE_NAME**:<br />  - Mit dieser Version des Spiels kann lediglich der headless-Modus ausgeführt werden. Alle grafischen Komponenten des Spiels sind nicht in der Jar enthalten, wodurch die Dateigröße wesentlich kleiner ist." \
-      --assets-link "{\"name\":\"$DESKTOP_JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$DESKTOP_JAR_FILE_NAME\"}" \
-      --assets-link "{\"name\":\"$CONSOLE_JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$CONSOLE_JAR_FILE_NAME\"}"
+      --description "Release von $CI_PROJECT_TITLE Version $GAME_VERSION!<br /><ul><li>[**$CONSOLE_JAR_FILE_NAME**]($CONSOLE_JAR_ARTIFACT_URL):<ul><li>Mit dieser Version des Spiels kann lediglich der headless-Modus ausgeführt werden. Alle grafischen Komponenten des Spiels sind nicht in der Jar enthalten, wodurch die Dateigröße wesentlich kleiner ist.</li></ul></li><li>[**$DESKTOP_JAR_FILE_NAME**]($DESKTOP_JAR_ARTIFACT_URL):<ul><li>Dies ist die vollständige Version des Spiels, mit der sowohl der grafische als auch der headless-Modus ausgeführt werden kann.</li></ul></li></ul>" \
+      --assets-link "{\"name\":\"$DESKTOP_JAR_FILE_NAME\", \"url\":\"$DESKTOP_JAR_ARTIFACT_URL\"}" \
+      --assets-link "{\"name\":\"$CONSOLE_JAR_FILE_NAME\", \"url\":\"$CONSOLE_JAR_ARTIFACT_URL\"}"
