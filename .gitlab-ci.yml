@@ -38,6 +38,11 @@ debug-file-tree:
     - merge_requests
   script:
     - gradle --build-cache pipeline:build
+  rules:
+    - changes:
+        - assets/*
+        - pipeline/*
+        - util/*
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -71,11 +76,39 @@ build-asset-pipeline-java21:
       - build
       - .gradle
 
+# Template für die Kompilierung des core-Moduls
+.build_core_template: &build_core_template
+  <<: *build_template
+  script:
+    - gradle --build-cache core:assemble
+  rules:
+    - changes:
+        - core/*
+# Kompilierung des core-Moduls mit Java 11
+build-core-java11:
+  image: gradle:7.6-jdk11-alpine
+  <<: *build_core_template
+# Kompilierung des core-Moduls mit Java 17
+build-core-java17:
+  image: gradle:7.6-jdk17-alpine
+  <<: *build_core_template
+# Kompilierung des core-Moduls mit Java 21
+build-core-java21:
+  image: gradle:8.5-jdk21-alpine
+  <<: *build_core_template
+
 # Template für die Kompilierung des desktop-Moduls
 .build_desktop_template: &build_desktop_template
   <<: *build_template
   script:
     - gradle --build-cache desktop:assemble
+  rules:
+    - changes:
+        - desktop/*
+        - core/*
+        - assets/*
+        - pipeline/*
+        - util/*
 # Kompilierung des desktop-Moduls mit Java 11
 build-desktop-java11:
   image: gradle:7.6-jdk11-alpine
@@ -94,6 +127,10 @@ build-desktop-java21:
   <<: *build_template
   script:
     - gradle --build-cache console:assemble
+  rules:
+    - changes:
+        - console/*
+        - core/*
 # Kompilierung des console-Moduls mit Java 11
 build-console-java11:
   image: gradle:7.6-jdk11-alpine
@@ -250,8 +287,10 @@ create-release:
     # Der Job soll nur ausgeführt werden, wenn der Branch "main" ist und der Commit-Message mit "Release" beginnt
     - if: $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE =~ /^Release.*/i
   script:
-    - DESKTOP_JAR_ARTIFACT_URL=$$RELEASE_JOB_URL/artifacts/file/$DESKTOP_JAR_FILE_NAME
-    - CONSOLE_JAR_ARTIFACT_URL=$$RELEASE_JOB_URL/artifacts/file/$CONSOLE_JAR_FILE_NAME
+    - DESKTOP_JAR_ARTIFACT_URL=$($RELEASE_JOB_URL/artifacts/file/$DESKTOP_JAR_FILE_NAME)
+    - CONSOLE_JAR_ARTIFACT_URL=$($RELEASE_JOB_URL/artifacts/file/$CONSOLE_JAR_FILE_NAME)
+    - echo $DESKTOP_JAR_ARTIFACT_URL
+    - echo $CONSOLE_JAR_ARTIFACT_URL
     # release-cli:   Erstellen des Releases in GitLab
     # --name:        Der Releasename soll vom Format "[Projekt] v[Version]" sein, bspw. "GaTDsen v1.0.0"
     # --tag-name:    Der Tag des Releases soll die Version als Namen haben, bspw. "1.0.0"
