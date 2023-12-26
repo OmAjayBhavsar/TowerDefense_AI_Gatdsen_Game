@@ -54,7 +54,7 @@ build-asset-pipeline-java17:
   <<: *build_asset_pipeline_template
 # Kompilierung der asset-pipeline mit Java 21
 build-asset-pipeline-java21:
-  image: gradle:7.6-jdk21-alpine
+  image: gradle:8.5-jdk21-alpine
   <<: *build_asset_pipeline_template
 
 # Template für die Kompilierung von Modulen
@@ -86,7 +86,7 @@ build-core-java17:
   <<: *build_core_template
 # Kompilierung des core-Moduls mit Java 21
 build-core-java21:
-  image: gradle:7.6-jdk21-alpine
+  image: gradle:8.5-jdk21-alpine
   <<: *build_core_template
 
 # Template für die Kompilierung des desktop-Moduls
@@ -104,7 +104,7 @@ build-desktop-java17:
   <<: *build_desktop_template
 # Kompilierung des desktop-Moduls mit Java 21
 build-desktop-java21:
-  image: gradle:7.6-jdk21-alpine
+  image: gradle:8.5-jdk21-alpine
   <<: *build_desktop_template
 
 # Template für die Kompilierung des console-Moduls
@@ -122,7 +122,7 @@ build-console-java17:
   <<: *build_console_template
 # Kompilierung des console-Moduls mit Java 21
 build-console-java21:
-  image: gradle:7.6-jdk21-alpine
+  image: gradle:8.5-jdk21-alpine
   <<: *build_console_template
 
 test-core:
