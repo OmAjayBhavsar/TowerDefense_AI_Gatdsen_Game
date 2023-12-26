@@ -115,7 +115,7 @@ Thumbs.db
 
 ## Project Specific
 ### Ignore resources as they are the asset-pipelines output
-/core/resources/
+/desktop/resources/
 ### Exclude build directories
 /assets/build/
 /pipeline/build

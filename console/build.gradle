@@ -43,8 +43,6 @@ task dist(type: Jar) {
     with jar
 }
 
-processResources.dependsOn ':pipeline:compileConsoleAssets'
-
 dist.dependsOn classes
 
 eclipse.project.name = appName + "-console"
