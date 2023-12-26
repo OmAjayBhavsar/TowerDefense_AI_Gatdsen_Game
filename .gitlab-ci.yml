@@ -71,24 +71,6 @@ build-asset-pipeline-java21:
       - build
       - .gradle
 
-# Template für die Kompilierung des core-Moduls
-.build_core_template: &build_core_template
-  <<: *build_template
-  script:
-    - gradle --build-cache core:assemble
-# Kompilierung des core-Moduls mit Java 11
-build-core-java11:
-  image: gradle:7.6-jdk11-alpine
-  <<: *build_core_template
-# Kompilierung des core-Moduls mit Java 17
-build-core-java17:
-  image: gradle:7.6-jdk17-alpine
-  <<: *build_core_template
-# Kompilierung des core-Moduls mit Java 21
-build-core-java21:
-  image: gradle:8.5-jdk21-alpine
-  <<: *build_core_template
-
 # Template für die Kompilierung des desktop-Moduls
 .build_desktop_template: &build_desktop_template
   <<: *build_template
