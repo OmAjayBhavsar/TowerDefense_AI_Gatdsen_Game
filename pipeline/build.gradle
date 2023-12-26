@@ -69,5 +69,12 @@ tasks.register('compileAssets', CompileAssets) {
     outputDir = rootProject.file('core/resources/').absoluteFile
 }
 
+tasks.register('compileConsoleAssets', CompileAssets) {
 
+    dependsOn ':pipeline:dist'
 
+    inputDir = rootProject.file('assets/res/maps/').absoluteFile
+    executableJar = file('build/libs/pipeline-1.1.jar').absoluteFile
+    tmpDir = file('build/tmp/assets/').absoluteFile
+    outputDir = rootProject.file('core/resources/').absoluteFile
+}
