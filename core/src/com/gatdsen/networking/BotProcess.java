@@ -62,16 +62,18 @@ public class BotProcess {
             BlockingQueue<Command> commands;
             if (information instanceof CreatePlayerInformation) {
                 commands = playerThread.create(playerClass, null);
-            } else if (information instanceof GameInformation gameInformation) {
+            } else if (information instanceof GameInformation) {
+                GameInformation gameInformation = (GameInformation) information;
                 if (!playerThread.isCreated()) {
                     throw new RuntimeException("Received GameInformation before CreatePlayerInformation.");
                 }
-                commands = playerThread.init(gameInformation.state(), gameInformation.isDebug(), gameInformation.seed(), gameInformation.playerIndex());
-            } else if (information instanceof TurnInformation turnInformation) {
+                commands = playerThread.init(gameInformation.state, gameInformation.isDebug, gameInformation.seed, gameInformation.playerIndex);
+            } else if (information instanceof TurnInformation) {
+                TurnInformation turnInformation = (TurnInformation) information;
                 if (!playerThread.isInitialized()) {
                     throw new RuntimeException("Received TurnInformation before GameInformation.");
                 }
-                commands = playerThread.executeTurn(turnInformation.state());
+                commands = playerThread.executeTurn(turnInformation.state);
             } else {
                 throw new RuntimeException("Received unknown information type.");
             }

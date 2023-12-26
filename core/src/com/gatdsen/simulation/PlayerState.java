@@ -57,10 +57,18 @@ public class PlayerState implements Serializable {
                 if (gameState.getMap()[i][j].ordinal() >= GameState.MapTileType.PATH_RIGHT.ordinal()) {
                     IntVector2 destination = new IntVector2(i, j);
                     switch (gameState.getMap()[i][j]) {
-                        case PATH_RIGHT -> destination.add(1, 0);
-                        case PATH_DOWN -> destination.add(0, -1);
-                        case PATH_LEFT -> destination.add(-1, 0);
-                        case PATH_UP -> destination.add(0, 1);
+                        case PATH_RIGHT:
+                            destination.add(1, 0);
+                            break;
+                        case PATH_DOWN:
+                            destination.add(0, -1);
+                            break;
+                        case PATH_LEFT:
+                            destination.add(-1, 0);
+                            break;
+                        case PATH_UP:
+                            destination.add(0, 1);
+                            break;
                     }
                     PathTile current = (PathTile) board[i][j];
                     PathTile next = null;
@@ -107,7 +115,8 @@ public class PlayerState implements Serializable {
 
         for (int i = 0; i < boardX; i++) {
             for (int j = 0; j < boardY; j++) {
-                if (board[i][j] instanceof PathTile actual) {
+                if (board[i][j] instanceof PathTile) {
+                    PathTile actual = (PathTile) board[i][j];
                     PathTile originalPT = (PathTile) original.board[i][j];
                     PathTile next = null;
                     if (originalPT.getNext() != null) {
@@ -253,10 +262,16 @@ public class PlayerState implements Serializable {
             // ToDo: append error action
             return head;
         }
-        if (board[x][y] instanceof Tower tower && tower.getLevel() < Tower.getMaxLevel() && money > tower.getUpgradePrice()) {
-            money -= tower.getUpgradePrice();
-            tower.upgrade();
-            head.addChild(new TowerPlaceAction(0, tower.getPosition(), tower.getType().ordinal(), index));
+        if (board[x][y] instanceof Tower) {
+            Tower tower = (Tower) board[x][y];
+            if (tower.getLevel() < Tower.getMaxLevel() && money > tower.getUpgradePrice()) {
+                money -= tower.getUpgradePrice();
+                tower.upgrade();
+                head.addChild(new TowerPlaceAction(0, tower.getPosition(), tower.getType().ordinal(), index));
+            } else {
+                // ToDo: append error action
+                return head;
+            }
         } else {
             // ToDo: append error action
             return head;
@@ -371,8 +386,8 @@ public class PlayerState implements Serializable {
     Action tickTowers(Action head) {
         for (Tile[] tiles : board) {
             for (Tile tile : tiles) {
-                if (tile instanceof Tower tower) {
-                    head = tower.tick(head);
+                if (tile instanceof Tower) {
+                    head = ((Tower) tile).tick(head);
                 }
             }
         }

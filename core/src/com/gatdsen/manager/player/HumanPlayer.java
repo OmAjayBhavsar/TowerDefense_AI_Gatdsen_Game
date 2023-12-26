@@ -23,16 +23,31 @@ public class HumanPlayer extends Player {
         KEY_CHARACTER_END_TURN;
 
         private static Key fromKeycode(int keycode) {
-            return switch (keycode) {
-                case HumanPlayer.KEY_CHARACTER_TILE_UP -> Key.KEY_CHARACTER_TILE_UP;
-                case HumanPlayer.KEY_CHARACTER_TILE_DOWN -> Key.KEY_CHARACTER_TILE_DOWN;
-                case HumanPlayer.KEY_CHARACTER_TILE_LEFT -> Key.KEY_CHARACTER_TILE_LEFT;
-                case HumanPlayer.KEY_CHARACTER_TILE_RIGHT -> Key.KEY_CHARACTER_TILE_RIGHT;
-                case HumanPlayer.KEY_CHARACTER_TOWER_PLACE -> Key.KEY_CHARACTER_TOWER_PLACE;
-                case HumanPlayer.KEY_CHARACTER_TOWER_UPGRADE -> Key.KEY_CHARACTER_TOWER_UPGRADE;
-                case HumanPlayer.KEY_CHARACTER_END_TURN -> Key.KEY_CHARACTER_END_TURN;
-                default -> null;
-            };
+            Key key = null;
+            switch (keycode) {
+                case HumanPlayer.KEY_CHARACTER_TILE_UP:
+                    key = Key.KEY_CHARACTER_TILE_UP;
+                    break;
+                case HumanPlayer.KEY_CHARACTER_TILE_DOWN:
+                    key = Key.KEY_CHARACTER_TILE_DOWN;
+                    break;
+                case HumanPlayer.KEY_CHARACTER_TILE_LEFT:
+                    key = Key.KEY_CHARACTER_TILE_LEFT;
+                    break;
+                case HumanPlayer.KEY_CHARACTER_TILE_RIGHT:
+                    key = Key.KEY_CHARACTER_TILE_RIGHT;
+                    break;
+                case HumanPlayer.KEY_CHARACTER_TOWER_PLACE:
+                    key = Key.KEY_CHARACTER_TOWER_PLACE;
+                    break;
+                case HumanPlayer.KEY_CHARACTER_TOWER_UPGRADE:
+                    key = Key.KEY_CHARACTER_TOWER_UPGRADE;
+                    break;
+                case HumanPlayer.KEY_CHARACTER_END_TURN:
+                    key = Key.KEY_CHARACTER_END_TURN;
+                    break;
+            }
+            return key;
         }
     }
 
