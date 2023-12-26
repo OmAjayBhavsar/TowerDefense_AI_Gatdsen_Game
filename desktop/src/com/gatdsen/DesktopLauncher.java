@@ -4,102 +4,22 @@ import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.gatdsen.manager.*;
-import com.gatdsen.manager.player.Bot;
-import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.run.config.RunConfiguration;
-import com.gatdsen.simulation.GameState;
 import com.gatdsen.ui.GADS;
-import org.apache.commons.cli.*;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
+import org.apache.commons.cli.CommandLine;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
-public class DesktopLauncher {
-
-    private static final Options cliOptions = new Options();
-
-    static {
-
-        cliOptions.addOption(Option
-                .builder("?")
-                .longOpt("help")
-                .desc("Prints this list").build());
-
-        cliOptions.addOption(Option
-                .builder("m")
-                .longOpt("map")
-                .hasArg()
-                .desc("(Required for -n) String name of the map without extension").build());
-
-        cliOptions.addOption(Option
-                .builder("p")
-                .longOpt("players")
-                .hasArg()
-                .desc("(Required for -n) Names of the bots class files without extension in format \"Bot1 Bot2 Bot3\" \n Attention: Case-sensitive!").build());
-
-        cliOptions.addOption(Option
-                .builder("g")
-                .longOpt("gamemode")
-                .hasArg()
-                .type(Number.class)
-                .desc("GameMode to be played (Default: 0)\n" +
-                        "  0 - Normal\n" +
-                        "  1 - Campaign\n" +
-                        "  2 - Exam Admission\n" +
-                        "  3 - Tournament: Phase 1\n" +
-                        "  4 - Tournament: Phase 2").build());
-
-        cliOptions.addOption(Option.builder("n")
-                .longOpt("nogui")
-                .desc("Runs the simulation without animation").build());
-
-        cliOptions.addOption(Option
-                .builder("k")
-                .longOpt("key")
-                .hasArg()
-                .desc("When printing results, they will be encased by the given key, ensuring authenticity").build());
-
-        cliOptions.addOption(Option
-                .builder("r")
-                .longOpt("replay")
-                .desc("Saves replay and results of the matches (WIP)").build());
-
-    }
+public final class DesktopLauncher extends Launcher {
 
     public static void main(String[] args) {
-        CommandLineParser parser = new DefaultParser();
-        CommandLine params;
-        try {
-            for (String arg : args
-            ) {
-                if (arg.equals("-?") || arg.equals("--help")) {
-                    printHelp();
-                    return;
-                }
-            }
-
-            params = parser.parse(cliOptions, args);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-            printHelp();
+        CommandLine params = getParamsFromArgs(args);
+        if (params == null) {
             return;
         }
-        RunConfiguration runConfig = new RunConfiguration();
-        runConfig.gui = !params.hasOption("n");
-        runConfig.mapName = params.getOptionValue("m", null);
-        if (params.hasOption("p"))
-            runConfig.players = Manager.getPlayers(params.getOptionValue("p").trim().split("\\s+"), !runConfig.gui);
-        if (params.hasOption("r"))
-            runConfig.replay = true;
-        int gameMode = Integer.parseInt(params.getOptionValue("g", "0"));
-        if (gameMode < 0 || gameMode >= GameState.GameMode.values().length) {
-            System.err.println("Valid GameModes range from 0 to 4");
-            printHelp();
+        RunConfiguration runConfig = parseRunConfiguration(params);
+        if (runConfig == null) {
             return;
         }
-        runConfig.gameMode = GameState.GameMode.values()[gameMode];
         if (runConfig.gui) {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setForegroundFPS(60);
@@ -130,70 +50,5 @@ public class DesktopLauncher {
 
             printResults(run, params.getOptionValue("k", ""));
         }
-    }
-
-    private static void printResults(Run run, String key) {
-        StringBuilder builder = new StringBuilder();
-        if (key != null && key.length() > 0) builder.append("<").append(key).append(">");
-        switch (run.getGameMode()) {
-            case Normal:
-            case Tournament_Phase_1:
-                builder.append("\nScores:\n");
-                int i = 0;
-                for (Class<? extends Player> cur : run.getPlayers()) {
-                    String name = "";
-                    int matrikel = 0;
-                    if (Bot.class.isAssignableFrom(cur))
-                        try {
-                            Bot player = (Bot) cur.getDeclaredConstructors()[0].newInstance();
-                            name = player.getStudentName();
-                            matrikel = player.getMatrikel();
-                        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                            System.err.println("Unable to fetch Player instance");
-                        }
-                    builder.append(String.format("%-10s (%s, %d) :  %-6f%n", cur.getName(), name, matrikel, run.getScores()[i++]));
-                }
-                builder.append("\n");
-                break;
-            case Campaign:
-                if (run.getScores()[0] > 0) builder.append("passed");
-                else builder.append("failed");
-                break;
-            case Exam_Admission:
-                StringBuilder scoreBuilder = new StringBuilder();
-                scoreBuilder.append("\nScores:\n");
-                int j = 0;
-                for (Class<? extends Player> cur : run.getPlayers()) {
-                    String name = "";
-                    int matrikel = 0;
-                    if (Bot.class.isAssignableFrom(cur))
-                    try {
-                        Bot player = (Bot) cur.getDeclaredConstructors()[0].newInstance();
-                        name = player.getStudentName();
-                        matrikel = player.getMatrikel();
-                    } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                        System.err.println("Unable to fetch Player instance");
-                    }
-                    scoreBuilder.append(String.format("%-10s (%-10s, %-6d) :  %-6f%n", cur.getName(), name, matrikel, run.getScores()[j++]));
-                }
-                System.out.println(scoreBuilder);
-                if (run.getScores()[0] >= 420) builder.append("passed");
-                else builder.append("failed");
-                break;
-            default:
-                builder.append(Arrays.toString(run.getPlayers().toArray()));
-                builder.append("\n");
-                builder.append(Arrays.toString(run.getScores()));
-        }
-        if (key != null && key.length() > 0) builder.append("<").append(key).append(">");
-        System.out.println(builder.toString());
-    }
-
-    private static void printHelp() {
-        String header = "\n\n";
-        String footer = "\nPlease report issues at wettbewerb@acagamics.de";
-
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("java -jar example-1.0.0.jar", header, cliOptions, footer, true);
     }
 }

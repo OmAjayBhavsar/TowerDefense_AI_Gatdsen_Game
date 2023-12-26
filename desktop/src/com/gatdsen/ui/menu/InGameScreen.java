@@ -58,7 +58,6 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         super.setRunConfiguration(runConfiguration);
         this.runConfiguration.gui = true;
         this.runConfiguration.animationLogProcessor = this;
-        this.runConfiguration.uiMessenger = hud.getUiMessenger();
         this.runConfiguration.inputProcessor = hud.getInputHandler();
 
         run = manager.startRun(this.runConfiguration);

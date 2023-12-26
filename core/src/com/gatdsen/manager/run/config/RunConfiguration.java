@@ -6,7 +6,6 @@ import com.gatdsen.manager.InputProcessor;
 import com.gatdsen.manager.player.IdleBot;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.simulation.GameState.GameMode;
-import com.gatdsen.ui.hud.UiMessenger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,6 @@ public final class RunConfiguration {
         gameMode = original.gameMode;
         gui = original.gui;
         animationLogProcessor = original.animationLogProcessor;
-        uiMessenger = original.uiMessenger;
         inputProcessor = original.inputProcessor;
         mapName = original.mapName;
         replay = original.replay;
@@ -34,7 +32,6 @@ public final class RunConfiguration {
     public GameMode gameMode = GameMode.Normal;
     public boolean gui = true;
     public AnimationLogProcessor animationLogProcessor = null;
-    public UiMessenger uiMessenger = null;
     public InputProcessor inputProcessor = null;
     public String mapName = null;
     public boolean replay = false;
@@ -98,7 +95,6 @@ public final class RunConfiguration {
                 "gameMode=" + gameMode +
                 ", gui=" + gui +
                 ", animationLogProcessor=" + animationLogProcessor +
-                ", uiMessenger=" + uiMessenger +
                 ", inputProcessor=" + inputProcessor +
                 ", mapName=\"" + mapName + "\"" +
                 ", replay=" + replay +

@@ -66,8 +66,5 @@ tasks.register('compileAssets', CompileAssets) {
     inputDir = rootProject.file('assets/res/').absoluteFile
     executableJar = file('build/libs/pipeline-1.1.jar').absoluteFile
     tmpDir = file('build/tmp/assets/').absoluteFile
-    outputDir = rootProject.file('core/resources/').absoluteFile
+    outputDir = rootProject.file('desktop/resources/').absoluteFile
 }
-
-
-

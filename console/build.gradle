@@ -4,7 +4,7 @@ dependencies {
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-project.ext.mainClassName = "com.gatdsen.DesktopLauncher"
+project.ext.mainClassName = "com.gatdsen.ConsoleLauncher"
 
 import org.gradle.internal.os.OperatingSystem
 
@@ -34,7 +34,7 @@ task dist(type: Jar) {
         attributes 'Main-Class': project.mainClassName
     }
     archiveVersion.set version.toString()
-    archiveBaseName = appName
+    archiveFileName = appName + "-console.jar"
     destinationDirectory = file("$rootDir")
     dependsOn configurations.runtimeClasspath
     from {
@@ -43,8 +43,6 @@ task dist(type: Jar) {
     with jar
 }
 
-processResources.dependsOn ':pipeline:compileAssets'
-
 dist.dependsOn classes
 
-eclipse.project.name = appName + "-desktop"
+eclipse.project.name = appName + "-console"

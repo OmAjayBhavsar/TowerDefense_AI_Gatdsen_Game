@@ -8,6 +8,4 @@ dependencies {
 sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["resources/"]
 
-processResources.dependsOn ':pipeline:compileAssets'
-
 eclipse.project.name = appName + "-core"
