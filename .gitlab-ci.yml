@@ -226,6 +226,7 @@ test-util:
       junit: util/build/test-results/test/TEST-*.xml
 
 prepare-release:
+  image: gradle:7.6-jdk11-alpine
   stage: build
   rules:
     # Der Job soll nur ausgeführt werden, wenn der Branch "main" ist und der Commit-Message mit "Release" beginnt
