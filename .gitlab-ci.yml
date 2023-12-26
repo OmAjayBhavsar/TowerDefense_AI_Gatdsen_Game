@@ -260,6 +260,6 @@ create-release:
       release-cli create \
       --name "$CI_PROJECT_TITLE v$GAME_VERSION" \
       --tag-name $GAME_VERSION \
-      --description "Release von $CI_PROJECT_TITLE Version $GAME_VERSION!\r\n\r\n- **$DESKTOP_JAR_FILE_NAME**:\r\n\r\n  - Dies ist die vollständige Version des Spiels, mit der sowohl der grafische als auch der headless-Modus ausgeführt werden kann.\r\n\r\n- **$CONSOLE_JAR_FILE_NAME**:\r\n\r\n  - Mit dieser Version des Spiels kann lediglich der headless-Modus ausgeführt werden. Alle grafischen Komponenten des Spiels sind nicht in der Jar enthalten, wodurch die Dateigröße wesentlich kleiner ist." \
+      --description "Release von $CI_PROJECT_TITLE Version $GAME_VERSION!<br />- **$DESKTOP_JAR_FILE_NAME**:<br />  - Dies ist die vollständige Version des Spiels, mit der sowohl der grafische als auch der headless-Modus ausgeführt werden kann.<br />- **$CONSOLE_JAR_FILE_NAME**:<br />  - Mit dieser Version des Spiels kann lediglich der headless-Modus ausgeführt werden. Alle grafischen Komponenten des Spiels sind nicht in der Jar enthalten, wodurch die Dateigröße wesentlich kleiner ist." \
       --assets-link "{\"name\":\"$DESKTOP_JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$DESKTOP_JAR_FILE_NAME\"}" \
       --assets-link "{\"name\":\"$CONSOLE_JAR_FILE_NAME\", \"url\":\"$RELEASE_JOB_URL/artifacts/file/$CONSOLE_JAR_FILE_NAME\"}"
