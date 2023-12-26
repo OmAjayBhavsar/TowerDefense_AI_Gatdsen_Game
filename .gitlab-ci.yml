@@ -29,7 +29,8 @@ debug-file-tree:
   script:
     - ls -R
 
-asset-pipeline:
+# Template für die Kompilierung der asset-pipeline
+.build_asset_pipeline_template: &build_asset_pipeline_template
   stage: build
   only:
     - beta
@@ -43,16 +44,26 @@ asset-pipeline:
     paths:
       - pipeline/build
       - .gradle
+# Kompilierung der asset-pipeline mit Java 11
+build-asset-pipeline-java11:
+  image: gradle:7.6-jdk11-alpine
+  <<: *build_asset_pipeline_template
+# Kompilierung der asset-pipeline mit Java 17
+build-asset-pipeline-java17:
+  image: gradle:7.6-jdk17-alpine
+  <<: *build_asset_pipeline_template
+# Kompilierung der asset-pipeline mit Java 21
+build-asset-pipeline-java21:
+  image: gradle:7.6-jdk21-alpine
+  <<: *build_asset_pipeline_template
 
-build-core:
+# Template für die Kompilierung von Modulen
+.build_template: &build_template
   stage: build
   only:
     - beta
     - main
     - merge_requests
-  script:
-    - echo $PWD
-    - gradle --build-cache core:assemble
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -60,35 +71,59 @@ build-core:
       - build
       - .gradle
 
-build-desktop:
-  stage: build
-  only:
-    - beta
-    - main
-    - merge_requests
+# Template für die Kompilierung des core-Moduls
+.build_core_template: &build_core_template
+  <<: *build_template
+  script:
+    - gradle --build-cache core:assemble
+# Kompilierung des core-Moduls mit Java 11
+build-core-java11:
+  image: gradle:7.6-jdk11-alpine
+  <<: *build_core_template
+# Kompilierung des core-Moduls mit Java 17
+build-core-java17:
+  image: gradle:7.6-jdk17-alpine
+  <<: *build_core_template
+# Kompilierung des core-Moduls mit Java 21
+build-core-java21:
+  image: gradle:7.6-jdk21-alpine
+  <<: *build_core_template
+
+# Template für die Kompilierung des desktop-Moduls
+.build_desktop_template: &build_desktop_template
+  <<: *build_template
   script:
     - gradle --build-cache desktop:assemble
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: push
-    paths:
-      - build
-      - .gradle
+# Kompilierung des desktop-Moduls mit Java 11
+build-desktop-java11:
+  image: gradle:7.6-jdk11-alpine
+  <<: *build_desktop_template
+# Kompilierung des desktop-Moduls mit Java 17
+build-desktop-java17:
+  image: gradle:7.6-jdk17-alpine
+  <<: *build_desktop_template
+# Kompilierung des desktop-Moduls mit Java 21
+build-desktop-java21:
+  image: gradle:7.6-jdk21-alpine
+  <<: *build_desktop_template
 
-build-console:
-  stage: build
-  only:
-    - beta
-    - main
-    - merge_requests
+# Template für die Kompilierung des console-Moduls
+.build_console_template: &build_console_template
+  <<: *build_template
   script:
     - gradle --build-cache console:assemble
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: push
-    paths:
-      - build
-      - .gradle
+# Kompilierung des console-Moduls mit Java 11
+build-console-java11:
+  image: gradle:7.6-jdk11-alpine
+  <<: *build_console_template
+# Kompilierung des console-Moduls mit Java 17
+build-console-java17:
+  image: gradle:7.6-jdk17-alpine
+  <<: *build_console_template
+# Kompilierung des console-Moduls mit Java 21
+build-console-java21:
+  image: gradle:7.6-jdk21-alpine
+  <<: *build_console_template
 
 test-core:
   stage: test
