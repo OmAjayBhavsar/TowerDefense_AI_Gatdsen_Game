@@ -1,3 +1,19 @@
+# Dies ist die Konfigurationsdatei für die GitLab CI/CD Pipeline.
+
+# Für die Module "core", "desktop", "console", "pipeline" baut diese Pipeline die JAR-Dateien in den Java-Versionen 11,
+# 17 und 21. Bezieht man sich auf den main-Branch, so ist das für jeden Push der Fall. Bezieht man sich allerdings auf
+# den beta-Branch oder einen Merge-Request, werden diese Module nur dann gebaut, wenn es Änderungen in den Ordnern, auf
+# die sie sich beziehen oder eine Abhängigkeit haben, gibt.
+
+# Die Tests für die Module "core", "desktop", "console", "pipeline" und "util" werden hingegen immer auf dem main- und
+# beta-Branch sowie bei Merge-Requests ausgeführt, um sicherzustellen, dass die Änderungen keine Fehler verursachen.
+# Es wird mit Java 17 getestet.
+
+# Die Pipeline erstellt außerdem automatisch ein Release, wenn der Branch "main" ist und die Commit-Message mit
+# "Release" beginnt. Dabei werden die JAR-Dateien der Module "desktop" und "console" als Assets dem Release hinzugefügt.
+# Diese JAR-Dateien werden im "prepare-release" Job mit Java 11 kompiliert, da dies die niedrigste Java-Version ist,
+# die von der aktuell verwendeten Version von libGDX (Version 1.12.1) unterstützt wird.
+
 image: gradle:7.6-jdk17-alpine
 
 # Disable the Gradle daemon for Continuous Integration servers as correctness
@@ -307,6 +323,6 @@ create-release:
       release-cli create \
       --name "$CI_PROJECT_TITLE v$GAME_VERSION" \
       --tag-name $GAME_VERSION \
-      --description "Release von $CI_PROJECT_TITLE Version $GAME_VERSION!<br /><ul><li>[**$CONSOLE_JAR_FILE_NAME**]($CONSOLE_JAR_ARTIFACT_URL):<ul><li>Mit dieser Version des Spiels kann lediglich der headless-Modus ausgeführt werden. Alle grafischen Komponenten des Spiels sind nicht in der Jar enthalten, wodurch die Dateigröße wesentlich kleiner ist.</li></ul></li><li>[**$DESKTOP_JAR_FILE_NAME**]($DESKTOP_JAR_ARTIFACT_URL):<ul><li>Dies ist die vollständige Version des Spiels, mit der sowohl der grafische als auch der headless-Modus ausgeführt werden kann.</li></ul></li></ul>" \
+      --description "Release von $CI_PROJECT_TITLE Version $GAME_VERSION! Die Changelogs sind [hier](https://wettbewerb.acagamics.de/changelogs/) zu finden.<br /><ul><li>[**$CONSOLE_JAR_FILE_NAME**]($CONSOLE_JAR_ARTIFACT_URL):<ul><li>Mit dieser Version des Spiels kann lediglich der headless-Modus ausgeführt werden. Alle grafischen Komponenten des Spiels sind nicht in der Jar enthalten, wodurch die Dateigröße wesentlich kleiner ist.</li></ul></li><li>[**$DESKTOP_JAR_FILE_NAME**]($DESKTOP_JAR_ARTIFACT_URL):<ul><li>Dies ist die vollständige Version des Spiels, mit der sowohl der grafische als auch der headless-Modus ausgeführt werden kann.</li></ul></li></ul>" \
       --assets-link "{\"name\":\"$DESKTOP_JAR_FILE_NAME\", \"url\":\"$DESKTOP_JAR_ARTIFACT_URL\"}" \
       --assets-link "{\"name\":\"$CONSOLE_JAR_FILE_NAME\", \"url\":\"$CONSOLE_JAR_ARTIFACT_URL\"}"
