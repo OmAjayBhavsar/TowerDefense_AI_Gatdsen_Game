@@ -16,6 +16,7 @@ public class PlayerAttribute extends Attribute {
 
     int playerIndex;
     SelectBox<Manager.NamedPlayerClass> playerSelectBox;
+    Manager.NamedPlayerClass[] availablePlayers;
 
     /**
      * Konstruktor für die PlayerAttribute-Klasse.
@@ -24,6 +25,7 @@ public class PlayerAttribute extends Attribute {
      */
     public PlayerAttribute(int playerIndex) {
         this.playerIndex = playerIndex;
+        availablePlayers = Manager.getPossiblePlayers();
     }
 
     /**
@@ -34,11 +36,10 @@ public class PlayerAttribute extends Attribute {
      */
     @Override
     public Actor getContent(Skin skin) {
-        Manager.NamedPlayerClass[] availableBots = Manager.getPossiblePlayers();
         Label textLabelPlayer = new Label("Spieler " + (playerIndex + 1) + ":", skin);
         textLabelPlayer.setAlignment(Align.center);
         playerSelectBox = new SelectBox<>(skin);
-        playerSelectBox.setItems(availableBots);
+        playerSelectBox.setItems(availablePlayers);
         Table playerChooseTable = new Table();
 
         playerChooseTable.columnDefaults(0).width(100);
@@ -74,16 +75,15 @@ public class PlayerAttribute extends Attribute {
      */
     @Override
     public void setConfig(RunConfiguration runConfiguration) {
-        Manager.NamedPlayerClass[] availableBots = Manager.getPossiblePlayers();
         if (runConfiguration.players == null || runConfiguration.players.size() <= playerIndex) {
             playerSelectBox.setSelected(null);
             return;
         }
         Class<? extends Player> targetClass = runConfiguration.players.get(playerIndex);
         Manager.NamedPlayerClass result = null;
-        for (Manager.NamedPlayerClass availableBot : availableBots) {
-            if (availableBot.getClassRef() == targetClass) {
-                result = availableBot;
+        for (Manager.NamedPlayerClass availablePlayer : availablePlayers) {
+            if (availablePlayer.getClassRef() == targetClass) {
+                result = availablePlayer;
                 break;
             }
         }

@@ -217,9 +217,7 @@ public class Manager {
         players.add(new NamedPlayerClass(HumanPlayer.class, "HumanPlayer"));
         players.add(new NamedPlayerClass(IdleBot.class, "IdleBot"));
         File botDir = new File("bots");
-        System.out.println(new File("").getAbsolutePath());
         if (botDir.exists()) {
-            System.out.println("Attempting to load Bots from " + botDir.getAbsolutePath());
             try {
                 URL url = new File(".").toURI().toURL();
                 URL[] urls = new URL[]{url};
@@ -245,7 +243,7 @@ public class Manager {
                 throw new RuntimeException(e);
             }
         } else {
-            System.err.println("Warning: No Bot-Dir found at " + botDir.getAbsolutePath());
+            System.err.println("Warning: No bot directory found at " + botDir.getAbsolutePath());
         }
         NamedPlayerClass[] array = new NamedPlayerClass[players.size()];
         players.toArray(array);
