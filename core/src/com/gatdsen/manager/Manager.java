@@ -226,15 +226,20 @@ public class Manager {
                 ClassLoader loader = new URLClassLoader(urls);
 
                 for (File botFile : Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))) {
+                    Class<?> nextClass;
                     try {
-                        Class<?> nextClass = loader.loadClass("bots." + botFile.getName().replace(".class", ""));
-                        if (!Bot.class.isAssignableFrom(nextClass)) {
-                            continue;
-                        }
-                        players.add(new NamedPlayerClass((Class<? extends Player>) nextClass, botFile.getName().replace(".class", "")));
+                        nextClass = loader.loadClass("bots." + botFile.getName().replace(".class", ""));
                     } catch (ClassNotFoundException e) {
                         System.err.println("Could not find class for " + botFile.getName());
+                        continue;
+                    } catch (UnsupportedClassVersionError e) {
+                        System.err.println("Class " + botFile.getName() + " is compiled for a newer Java version than the current one.");
+                        continue;
                     }
+                    if (!Bot.class.isAssignableFrom(nextClass)) {
+                        continue;
+                    }
+                    players.add(new NamedPlayerClass((Class<? extends Player>) nextClass, botFile.getName().replace(".class", "")));
                 }
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
