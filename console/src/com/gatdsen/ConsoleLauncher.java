@@ -8,6 +8,7 @@ import org.apache.commons.cli.CommandLine;
 public final class ConsoleLauncher extends Launcher {
 
     public static void main(String[] args) {
+        System.out.println("Running GaTDsen Version: " + ConsoleLauncher.class.getPackage().getImplementationVersion());
         CommandLine params = getParamsFromArgs(args);
         if (params == null) {
             return;

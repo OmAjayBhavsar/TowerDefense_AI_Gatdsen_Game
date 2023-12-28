@@ -12,6 +12,7 @@ import org.apache.commons.cli.CommandLine;
 public final class DesktopLauncher extends Launcher {
 
     public static void main(String[] args) {
+        System.out.println("Running GaTDsen Version: " + DesktopLauncher.class.getPackage().getImplementationVersion());
         CommandLine params = getParamsFromArgs(args);
         if (params == null) {
             return;

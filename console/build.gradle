@@ -31,7 +31,8 @@ task debug(dependsOn: classes, type: JavaExec) {
 task dist(type: Jar) {
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
     manifest {
-        attributes 'Main-Class': project.mainClassName
+        attributes('Main-Class': project.mainClassName,
+                   'Implementation-Version': version)
     }
     archiveVersion.set version.toString()
     archiveFileName = appName + "-console.jar"
