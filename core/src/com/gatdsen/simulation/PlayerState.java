@@ -10,7 +10,6 @@ import java.util.List;
  * Speichert den Zustand eines Spielers.
  */
 public class PlayerState implements Serializable {
-    private final GameState gameState;
     private final Tile[][] board;
     private int health;
     private int money;
@@ -31,7 +30,6 @@ public class PlayerState implements Serializable {
      * @param money     das Geld des Spielers
      */
     PlayerState(GameState gameState, int index, int health, int money) {
-        this.gameState = gameState;
         this.index = index;
         int width = gameState.getBoardSizeX();
         int height = gameState.getBoardSizeY();
@@ -91,7 +89,6 @@ public class PlayerState implements Serializable {
      * @param gameState der neue GameState
      */
     private PlayerState(PlayerState original, GameState gameState) {
-        this.gameState = gameState;
         this.index = original.index;
         int boardX = gameState.getBoardSizeX();
         int boardY = gameState.getBoardSizeY();
