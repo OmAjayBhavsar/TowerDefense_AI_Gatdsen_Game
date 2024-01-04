@@ -255,8 +255,7 @@ public class PlayerState implements Serializable {
             // ToDo: append error action
             return head;
         }
-        if (board[x][y] instanceof Tower) {
-            Tower tower = (Tower) board[x][y];
+        if (board[x][y] instanceof Tower tower) {
             if (tower.getLevel() < Tower.getMaxLevel() && money > tower.getUpgradePrice()) {
                 money -= tower.getUpgradePrice();
                 tower.upgrade();
