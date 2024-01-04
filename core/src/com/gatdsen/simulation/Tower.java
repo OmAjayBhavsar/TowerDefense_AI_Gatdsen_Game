@@ -100,6 +100,14 @@ public class Tower extends Tile {
     }
 
     /**
+     * @return False, da auf einem Turm nicht gebaut werden kann
+     */
+    @Override
+    public boolean isBuildable() {
+        return false;
+    }
+
+    /**
      * Setzt die Liste der Tiles, die in Reichweite des Towers sind.
      */
     private void setPathList() {

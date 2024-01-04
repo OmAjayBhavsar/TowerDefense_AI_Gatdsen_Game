@@ -28,6 +28,11 @@ public abstract class Tile implements Serializable {
     }
 
     /**
+     * @return True, wenn das Tile bebaubar ist
+     */
+    public abstract boolean isBuildable();
+
+    /**
      * @return die Position des Tiles als IntVector2
      */
     public IntVector2 getPosition() {
