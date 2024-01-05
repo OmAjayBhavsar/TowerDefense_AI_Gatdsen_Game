@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Die Klasse Enemy repräsentiert einen Gegner im Spiel.
  */
-public class Enemy implements Serializable {
+public abstract class Enemy implements Serializable {
     private final PlayerState playerState;
     private int health;
     private int level;
@@ -16,16 +16,10 @@ public class Enemy implements Serializable {
 
     /**
      * Erstellt einen neuen Gegner.
-     *
-     * @param health  Die Lebenspunkte des Gegners.
      * @param level   Die Stufe des Gegners.
      * @param posTile Die Position des Gegners.
      */
-    public Enemy(PlayerState playerState, int health, int level, PathTile posTile) {
-        this.health = health;
-        this.level = level;
-        this.posTile = posTile;
-        this.damage = 10 * level;
+    public Enemy(PlayerState playerState, int level, PathTile posTile) {
         this.playerState = playerState;
     }
 
@@ -35,9 +29,7 @@ public class Enemy implements Serializable {
      * @param posTile Die Position des Gegners.
      * @return Die Kopie des Gegners.
      */
-    Enemy copy(PathTile posTile) {
-        return new Enemy(this.playerState, this.health, this.level, posTile);
-    }
+    abstract Enemy copy(PathTile posTile);
 
     /**
      * Fügt dem Gegner Schaden zu.

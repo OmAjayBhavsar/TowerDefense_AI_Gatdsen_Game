@@ -277,7 +277,7 @@ public class PlayerState implements Serializable {
     void initEnemiesToBeSpawned() {
         for (int i = 0; i < enemiesToBeSpawned.length; i++) {
             for (int j = 0; j < enemyTypeCount; j++) {
-                enemiesToBeSpawned[i][j] = new Enemy(this, 100 * ((i / 20) + 1), (i / 20) + 1, spawnTile);
+                //enemiesToBeSpawned[i][j] = new Enemy(this, 100 * ((i / 20) + 1), (i / 20) + 1, spawnTile);
             }
         }
     }
