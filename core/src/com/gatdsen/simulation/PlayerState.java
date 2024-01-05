@@ -221,21 +221,23 @@ public class PlayerState implements Serializable {
             return head;
         }
 
-        if (money < Tower.getPrice(type)) {
+        TowerTile towerTile = new TowerTile(this, x, y, type);
+
+        if (money < towerTile.getTower().getPrice()) {
             // ToDo: append error action
             return head;
         }
 
-        if (!board[x][y].isBuildable()) {
+        if (board[x][y] != null && !board[x][y].isBuildable()) {
             // ToDo: append error action
             return head;
         }
 
-        money -= Tower.getPrice(type);
+        money -= towerTile.getTower().getPrice();
         Action updateAction = new UpdateCurrencyAction(0, money, index);
         head.addChild(updateAction);
 
-        board[x][y] = new Tower(this, type, x, y, board);
+        board[x][y] = towerTile;
         IntVector2 pos = new IntVector2(x, y);
         Action action = new TowerPlaceAction(0, pos, type.ordinal(), index);
         head.addChild(action);
@@ -255,11 +257,12 @@ public class PlayerState implements Serializable {
             // ToDo: append error action
             return head;
         }
-        if (board[x][y] instanceof Tower tower) {
+        if (board[x][y] instanceof TowerTile towerTile) {
+            Tower tower = towerTile.getTower();
             if (tower.getLevel() < Tower.getMaxLevel() && money > tower.getUpgradePrice()) {
                 money -= tower.getUpgradePrice();
                 tower.upgrade();
-                head.addChild(new TowerPlaceAction(0, tower.getPosition(), tower.getType().ordinal(), index));
+                head.addChild(new TowerPlaceAction(0, towerTile.getPosition(), tower.getType().ordinal(), index));
             } else {
                 // ToDo: append error action
                 return head;
@@ -378,8 +381,8 @@ public class PlayerState implements Serializable {
     Action tickTowers(Action head) {
         for (Tile[] tiles : board) {
             for (Tile tile : tiles) {
-                if (tile instanceof Tower) {
-                    head = ((Tower) tile).tick(head);
+                if (tile instanceof TowerTile towerTile) {
+                    head = towerTile.getTower().tick(head);
                 }
             }
         }
