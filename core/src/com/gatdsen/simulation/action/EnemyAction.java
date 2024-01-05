@@ -9,6 +9,8 @@ public class EnemyAction extends TeamAction {
     private final IntVector2 pos;
     private final int level;
 
+    private final int id;
+
     /**
      * Erstellt eine neue EnemyAction.
      *
@@ -17,10 +19,11 @@ public class EnemyAction extends TeamAction {
      * @param level Die Stufe des Gegners, der die Action ausführt.
      * @param team  Das Team, dem der Gegner angehört.
      */
-    public EnemyAction(float delay, IntVector2 pos, int level, int team) {
+    public EnemyAction(float delay, IntVector2 pos, int level, int team, int id) {
         super(delay, team);
         this.pos = pos;
         this.level = level;
+        this.id = id;
     }
 
     /**
@@ -41,11 +44,18 @@ public class EnemyAction extends TeamAction {
         return level;
     }
 
+    public int getId() {
+        return id;
+    }
+
+
     @Override
     public String toString() {
         return "EnemyAction{" +
                 "pos=" + pos +
                 ", level=" + level +
-                '}' + super.toString();
+                ", id=" + id +
+                ", team=" + team +
+                '}';
     }
 }

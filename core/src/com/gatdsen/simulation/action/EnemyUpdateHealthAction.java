@@ -18,8 +18,8 @@ public class EnemyUpdateHealthAction extends EnemyAction {
      * @param level     Level des Gegners
      * @param team      Team des Gegners
      */
-    public EnemyUpdateHealthAction(float delay, IntVector2 pos, int newHealth, int level, int team) {
-        super(delay, pos, level, team);
+    public EnemyUpdateHealthAction(float delay, IntVector2 pos, int newHealth, int level, int team, int id) {
+        super(delay, pos, level, team, id);
         this.newHealth = newHealth;
     }
 
