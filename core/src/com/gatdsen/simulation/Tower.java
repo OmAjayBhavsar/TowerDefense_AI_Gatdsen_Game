@@ -28,7 +28,6 @@ public abstract class Tower {
     static final int MAX_LEVEL = 3;
 
     private final PlayerState playerState;
-    private final Tile[][] board;
     private final TowerType type;
     private final IntVector2 pos;
     private final List<PathTile> pathInRange = new ArrayList<>();
@@ -51,7 +50,6 @@ public abstract class Tower {
         this.type = type;
         this.level = 1;
         this.cooldown = getRechargeTime();
-        this.board = board;
         this.inRange = getNeighbours(getRange(), board);
         setPathList();
         pathInRange.sort(Comparator.comparingInt(PathTile::getIndex));
