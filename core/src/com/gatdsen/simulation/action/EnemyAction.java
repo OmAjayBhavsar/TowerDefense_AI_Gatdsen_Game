@@ -18,6 +18,7 @@ public class EnemyAction extends TeamAction {
      * @param pos   Die Position, an der die Action ausgeführt werden soll.
      * @param level Die Stufe des Gegners, der die Action ausführt.
      * @param team  Das Team, dem der Gegner angehört.
+     * @param id    Die ID des Gegners, der die Action ausführt.
      */
     public EnemyAction(float delay, IntVector2 pos, int level, int team, int id) {
         super(delay, team);

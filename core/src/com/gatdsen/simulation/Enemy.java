@@ -8,14 +8,15 @@ import java.io.Serializable;
  * Die Klasse Enemy repräsentiert einen Gegner im Spiel.
  */
 public abstract class Enemy implements Serializable {
-    private final PlayerState playerState;
+    protected final PlayerState playerState;
 
     private static int idCounter = 0;
-    private final int id = idCounter++;
-    private int health;
-    private int level;
-    private int damage;
-    private PathTile posTile;
+
+    protected final int id = idCounter++;
+    protected int health;
+    protected int level;
+    protected int damage;
+    protected PathTile posTile;
 
     /**
      * Erstellt einen neuen Gegner.
@@ -36,7 +37,7 @@ public abstract class Enemy implements Serializable {
      * @param posTile Die Position des Gegners.
      * @return Die Kopie des Gegners.
      */
-    abstract Enemy copy(PathTile posTile);
+    protected abstract Enemy copy(PathTile posTile);
 
     /**
      * Fügt dem Gegner Schaden zu.
@@ -45,7 +46,7 @@ public abstract class Enemy implements Serializable {
      * @param head   Die vorrausgehende Action.
      * @return Die letzte Action.
      */
-    Action updateHealth(int damage, Action head) {
+    protected Action updateHealth(int damage, Action head) {
         if (health - damage <= 0) {
             health = 0;
             posTile.getEnemies().remove(this);
@@ -72,7 +73,7 @@ public abstract class Enemy implements Serializable {
      * @param head Die vorrausgehende Action
      * @return Die letzte Action
      */
-    Action move(Action head) {
+    protected Action move(Action head) {
         if (posTile.getNext() != null) {
             posTile.getEnemies().remove(this);
             posTile = posTile.getNext();
