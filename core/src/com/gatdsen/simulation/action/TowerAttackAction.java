@@ -17,8 +17,8 @@ public class TowerAttackAction extends TowerAction {
      * @param type  Typ des Turms
      * @param team  index des Teams
      */
-    public TowerAttackAction(float delay, IntVector2 pos, IntVector2 dir, int type, int team) {
-        super(delay, pos, type, team);
+    public TowerAttackAction(float delay, IntVector2 pos, IntVector2 dir, int type, int team, int id) {
+        super(delay, pos, type, team, id);
         this.dir = dir;
     }
 

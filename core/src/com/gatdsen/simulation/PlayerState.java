@@ -235,6 +235,7 @@ public class PlayerState implements Serializable {
 
         if (money < towerTile.getTower().getPrice()) {
             // ToDo: append error action
+            Tower.idCounter--;
             return head;
         }
 
@@ -249,7 +250,7 @@ public class PlayerState implements Serializable {
 
         board[x][y] = towerTile;
         IntVector2 pos = new IntVector2(x, y);
-        Action action = new TowerPlaceAction(0, pos, type.ordinal(), index);
+        Action action = new TowerPlaceAction(0, pos, type.ordinal(), index, towerTile.getTower().getId());
         head.addChild(action);
         return head;
     }
@@ -273,7 +274,7 @@ public class PlayerState implements Serializable {
             if (tower.getLevel() < Tower.getMaxLevel() && money > tower.getUpgradePrice()) {
                 money -= tower.getUpgradePrice();
                 tower.upgrade();
-                head.addChild(new TowerPlaceAction(0, towerTile.getPosition(), tower.getType().ordinal(), index));
+                head.addChild(new TowerPlaceAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));
             } else {
                 // ToDo: append error action
                 return head;

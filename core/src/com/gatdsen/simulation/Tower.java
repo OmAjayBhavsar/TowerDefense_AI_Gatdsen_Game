@@ -30,6 +30,9 @@ public abstract class Tower {
     private final PlayerState playerState;
     private final TowerType type;
     private final IntVector2 pos;
+
+    protected static int idCounter = 0;
+    protected final int id;
     private final List<PathTile> pathInRange = new ArrayList<>();
     private List<Tile> inRange;
     protected int level;
@@ -46,6 +49,8 @@ public abstract class Tower {
      */
     protected Tower(PlayerState playerState, TowerType type, int x, int y, Tile[][] board) {
         pos = new IntVector2(x, y);
+        id = idCounter++;
+        System.out.println("Tower id: " + id);
         this.playerState = playerState;
         this.type = type;
         this.level = 1;
@@ -135,6 +140,11 @@ public abstract class Tower {
         return type;
     }
 
+    public int getId() {
+        return id;
+    }
+
+
     /**
      * Gibt den Preis für ein Upgrade des Towers zurück
      *
@@ -215,7 +225,7 @@ public abstract class Tower {
             }
         }
         if (target != null) {
-            head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex()));
+            head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex(), id));
             Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 1);
             path.setDuration(0);
             head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));

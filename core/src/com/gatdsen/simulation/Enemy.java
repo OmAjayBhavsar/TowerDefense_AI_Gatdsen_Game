@@ -12,7 +12,7 @@ public abstract class Enemy implements Serializable {
 
     private static int idCounter = 0;
 
-    protected final int id = idCounter++;
+    protected final int id;
     protected int health;
     protected int level;
     protected int damage;
@@ -24,6 +24,7 @@ public abstract class Enemy implements Serializable {
      * @param posTile Die Position des Gegners.
      */
     public Enemy(PlayerState playerState, int level, PathTile posTile) {
+        id = idCounter++;
         this.playerState = playerState;
         this.posTile = posTile;
         this.level = level;

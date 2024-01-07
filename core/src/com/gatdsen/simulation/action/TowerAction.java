@@ -17,7 +17,7 @@ public class TowerAction extends TeamAction{
      * @param type  Typ des Turms
      * @param team  index des Teams
      */
-    public TowerAction(float delay, IntVector2 pos, int type, int team) {
+    public TowerAction(float delay, IntVector2 pos, int type, int team, int id) {
         super(delay, team);
         this.type = type;
         this.pos = pos;
