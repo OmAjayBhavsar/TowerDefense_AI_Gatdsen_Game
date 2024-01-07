@@ -25,6 +25,8 @@ public abstract class Enemy implements Serializable {
      */
     public Enemy(PlayerState playerState, int level, PathTile posTile) {
         this.playerState = playerState;
+        this.posTile = posTile;
+        this.level = level;
         // IdCounter wird zurückgesetzt, wenn Integer.MAX_VALUE erreicht wird.
         if (idCounter == Integer.MAX_VALUE) {
             idCounter = 0;
