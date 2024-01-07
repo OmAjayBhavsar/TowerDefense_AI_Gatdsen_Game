@@ -38,11 +38,16 @@ public class TowerTile extends Tile {
      */
     TowerTile(PlayerState playerState, int x, int y, Tower.TowerType type) {
         super(x, y);
-        this.tower = switch (type) {
-            case BASIC_TOWER -> new BasicTower(playerState, x, y, playerState.getBoard());
-            case AOE_TOWER -> new AOETower(playerState, x, y, playerState.getBoard());
-            case SNIPER_TOWER -> new SniperTower(playerState, x, y, playerState.getBoard());
-        };
+        Tower tower1 = null;
+        switch (type) {
+            case BASIC_TOWER: tower1 = new BasicTower(playerState, x, y, playerState.getBoard());
+            break;
+            case AOE_TOWER: tower1 = new AOETower(playerState, x, y, playerState.getBoard());
+            break;
+            case SNIPER_TOWER: tower1 = new SniperTower(playerState, x, y, playerState.getBoard());
+            
+        }
+        this.tower = tower1;
     }
 
     /**

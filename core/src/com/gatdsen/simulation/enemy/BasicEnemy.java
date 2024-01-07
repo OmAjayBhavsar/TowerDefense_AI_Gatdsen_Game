@@ -16,12 +16,19 @@ public class BasicEnemy extends Enemy {
     public BasicEnemy(PlayerState playerState, int level, PathTile posTile) {
         super(playerState, level, posTile);
         System.out.println(posTile.toString());
-        health = switch (level) {
-            case 1 -> 100;
-            case 2 -> 150;
-            case 3 -> 200;
-            default -> 0;
-        };
+        switch (level) {
+            case 1:
+                health = 100;
+                break;
+            case 2:
+                health = 150;
+                break;
+            case 3:
+                health = 200;
+                break;
+            default:
+                health = 0;
+        }
 
     }
 

@@ -44,12 +44,12 @@ public class BasicTower extends Tower {
      */
     @Override
     public int getDamage() {
-        return switch (level) {
-            case 1 -> 35;
-            case 2 -> 60;
-            case 3 -> 90;
-            default -> 0;
-        };
+        switch (level) {
+            case 1: return 35;
+            case 2: return 60;
+            case 3: return 90;
+            default: return 0;
+        }
     }
 
     /**
@@ -73,11 +73,11 @@ public class BasicTower extends Tower {
      */
     @Override
     public int getPrice() {
-        return switch (level) {
-            case 1 -> 80;
-            case 2 -> 90;
-            case 3 -> 100;
-            default -> 0;
-        };
+        switch (level) {
+            case 1: return 80;
+            case 2: return 90;
+            case 3: return 100;
+            default: return 0;
+        }
     }
 }

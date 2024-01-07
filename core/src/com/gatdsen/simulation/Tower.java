@@ -101,7 +101,8 @@ public abstract class Tower {
      */
     private void setPathList() {
         for (Tile tile : inRange) {
-            if (tile instanceof PathTile pathTile) {
+            if (tile instanceof PathTile) {
+                PathTile pathTile = (PathTile) tile;
                 pathInRange.add(pathTile);
             }
         }

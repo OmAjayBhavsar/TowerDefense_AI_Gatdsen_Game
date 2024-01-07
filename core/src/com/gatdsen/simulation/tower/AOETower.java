@@ -44,12 +44,12 @@ public class AOETower extends Tower {
      */
     @Override
     public int getDamage() {
-        return switch (level) {
-            case 1 -> 0;
-            case 2 -> 0;
-            case 3 -> 0;
-            default -> 0;
-        };
+        switch (level) {
+            case 1: return 0;
+            case 2: return 0;
+            case 3: return 0;
+            default: return 0;
+        }
     }
 
     /**
@@ -73,11 +73,11 @@ public class AOETower extends Tower {
      */
     @Override
     public int getPrice() {
-        return switch (level) {
-            case 1 -> 0;
-            case 2 -> 0;
-            case 3 -> 0;
-            default -> 0;
-        };
+        switch (level) {
+            case 1: return 0;
+            case 2: return 0;
+            case 3: return 0;
+            default: return 0;
+        }
     }
 }
