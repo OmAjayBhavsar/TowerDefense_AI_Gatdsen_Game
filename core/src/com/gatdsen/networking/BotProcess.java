@@ -2,11 +2,9 @@ package com.gatdsen.networking;
 
 import com.gatdsen.manager.PlayerThread;
 import com.gatdsen.manager.command.Command;
+import com.gatdsen.manager.command.EndTurnCommand;
 import com.gatdsen.manager.player.Player;
-import com.gatdsen.networking.data.CommunicatedInformation;
-import com.gatdsen.networking.data.CreatePlayerInformation;
-import com.gatdsen.networking.data.GameInformation;
-import com.gatdsen.networking.data.TurnInformation;
+import com.gatdsen.networking.data.*;
 import com.gatdsen.networking.rmi.ProcessCommunicator;
 
 import java.rmi.NotBoundException;
@@ -27,8 +25,6 @@ public class BotProcess {
     private final int port;
     private final String remoteReferenceName;
 
-    private ProcessCommunicator communicator;
-
     public BotProcess(Class<? extends Player> playerClass, String host, int port, String remoteReferenceName) {
         this.playerClass = playerClass;
         this.host = host;
@@ -44,6 +40,7 @@ public class BotProcess {
         } catch (RemoteException e) {
             throw new RuntimeException("There was no Remote Object Registry to get at the given host \"" + (host == null ? "localhost" : host) + "\" and port \"" + port + "\".", e);
         }
+        ProcessCommunicator communicator;
         try {
             communicator = (ProcessCommunicator) registry.lookup(remoteReferenceName);
         } catch (NotBoundException e) {
@@ -74,6 +71,13 @@ public class BotProcess {
                     throw new RuntimeException("Received TurnInformation before GameInformation.");
                 }
                 commands = playerThread.executeTurn(turnInformation.state);
+            } else if (information instanceof EndGameInformation) {
+                try {
+                    communicator.queueCommand(new EndTurnCommand());
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+                break;
             } else {
                 throw new RuntimeException("Received unknown information type.");
             }

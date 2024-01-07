@@ -50,6 +50,7 @@ public final class DesktopLauncher extends Launcher {
             }
 
             printResults(run, params.getOptionValue("k", ""));
+            manager.dispose();
         }
     }
 }

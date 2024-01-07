@@ -42,5 +42,6 @@ public final class ConsoleLauncher extends Launcher {
         }
 
         printResults(run, params.getOptionValue("k", ""));
+        manager.dispose();
     }
 }
