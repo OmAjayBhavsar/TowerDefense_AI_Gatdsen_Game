@@ -29,7 +29,7 @@ public class GADSAssetManager {
     public static final String atlas = resourceDirectory + "texture_atlas/TextureAtlas.atlas";
 
     public final String skin = resourceDirectory + "uiUtility/skin.json";
-    public final String font = resourceDirectory + "uiUtility/lsans-15.fnt";
+    public final String font = resourceDirectory + "uiUtility/arial.fnt"; //lsans-15
 
     public static final String particleGroup = "particle/";
     public static final String explosionParticle = "idle/mage_Cat_idle_down";
