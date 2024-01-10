@@ -215,11 +215,13 @@ public class Game extends Executable {
         state = null;
         simulationThread = null;
         gameResults = null;
-        if (playerHandlers != null) {
-            for (PlayerHandler playerHandler : playerHandlers) {
-                playerHandler.dispose();
+        synchronized (schedulingLock) {
+            if (playerHandlers != null) {
+                for (PlayerHandler playerHandler : playerHandlers) {
+                    playerHandler.dispose();
+                }
+                playerHandlers = null;
             }
-            playerHandlers = null;
         }
     }
 

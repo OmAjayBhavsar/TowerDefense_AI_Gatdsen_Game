@@ -6,6 +6,7 @@ import com.gatdsen.manager.concurrent.ThreadExecutor;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.PlayerHandler;
 import com.gatdsen.networking.data.CreatePlayerInformation;
+import com.gatdsen.networking.data.EndGameInformation;
 import com.gatdsen.networking.data.GameInformation;
 import com.gatdsen.networking.data.TurnInformation;
 import com.gatdsen.networking.rmi.ProcessCommunicator;
@@ -15,6 +16,7 @@ import com.gatdsen.simulation.GameState;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -32,7 +34,8 @@ public final class ProcessPlayerHandler extends PlayerHandler {
     private final String remoteReferenceName;
 
     private Registry registry;
-    private ProcessCommunicator communicator;
+    private ProcessCommunicator communicatorRemoteObject;
+    private ProcessCommunicator communicatorStub;
     private Process process;
 
     public ProcessPlayerHandler(Class<? extends Player> playerClass, int gameId, int playerIndex) {
@@ -56,11 +59,11 @@ public final class ProcessPlayerHandler extends PlayerHandler {
         }
 
         // Lokale Instanz des ProcessCommunicator-Objekts
-        ProcessCommunicator localCommunicator = new ProcessCommunicatorImpl();
+        communicatorRemoteObject = new ProcessCommunicatorImpl();
         try {
             // Exportieren des Objekts, damit es von anderen Prozessen verwendet werden kann
-            communicator = (ProcessCommunicator) UnicastRemoteObject.exportObject(localCommunicator, 0);
-            registry.rebind(remoteReferenceName, communicator);
+            communicatorStub = (ProcessCommunicator) UnicastRemoteObject.exportObject(communicatorRemoteObject, 0);
+            registry.rebind(remoteReferenceName, communicatorStub);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -95,7 +98,7 @@ public final class ProcessPlayerHandler extends PlayerHandler {
     @Override
     public Future<?> create(CommandHandler commandHandler) {
         try {
-            communicator.queueInformation(new CreatePlayerInformation());
+            communicatorStub.queueInformation(new CreatePlayerInformation());
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -103,7 +106,7 @@ public final class ProcessPlayerHandler extends PlayerHandler {
             Command command;
             do {
                 try {
-                    command = communicator.dequeueCommand();
+                    command = communicatorStub.dequeueCommand();
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
@@ -115,7 +118,7 @@ public final class ProcessPlayerHandler extends PlayerHandler {
     @Override
     public Future<?> init(GameState gameState, boolean isDebug, long seed, CommandHandler commandHandler) {
         try {
-            communicator.queueInformation(new GameInformation(gameState, isDebug, seed, playerIndex));
+            communicatorStub.queueInformation(new GameInformation(gameState, isDebug, seed, playerIndex));
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -123,7 +126,7 @@ public final class ProcessPlayerHandler extends PlayerHandler {
             Command command;
             do {
                 try {
-                    command = communicator.dequeueCommand();
+                    command = communicatorStub.dequeueCommand();
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
@@ -135,7 +138,7 @@ public final class ProcessPlayerHandler extends PlayerHandler {
     @Override
     protected Future<?> onExecuteTurn(GameState gameState, CommandHandler commandHandler) {
         try {
-            communicator.queueInformation(new TurnInformation(gameState));
+            communicatorStub.queueInformation(new TurnInformation(gameState));
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -143,7 +146,7 @@ public final class ProcessPlayerHandler extends PlayerHandler {
             Command command;
             do {
                 try {
-                    command = communicator.dequeueCommand();
+                    command = communicatorStub.dequeueCommand();
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
                 }
@@ -154,7 +157,25 @@ public final class ProcessPlayerHandler extends PlayerHandler {
 
     @Override
     public void dispose() {
+        try {
+            communicatorStub.queueInformation(new EndGameInformation());
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+        Command command;
+        do {
+            try {
+                command = communicatorStub.dequeueCommand();
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        } while (!command.endsTurn());
         executor.interrupt();
+        try {
+            UnicastRemoteObject.unexportObject(communicatorRemoteObject, true);
+        } catch (NoSuchObjectException e) {
+            throw new RuntimeException(e);
+        }
         try {
             registry.unbind(remoteReferenceName);
         } catch (RemoteException | NotBoundException e) {
