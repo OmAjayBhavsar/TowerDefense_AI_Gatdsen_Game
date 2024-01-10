@@ -241,6 +241,7 @@ public class PlayerState implements Serializable {
 
         if (board[x][y] != null && !board[x][y].isBuildable()) {
             // ToDo: append error action
+            Tower.idCounter--;
             return head;
         }
 

@@ -50,7 +50,6 @@ public abstract class Tower {
     protected Tower(PlayerState playerState, TowerType type, int x, int y, Tile[][] board) {
         pos = new IntVector2(x, y);
         id = idCounter++;
-        System.out.println("Tower id: " + id);
         this.playerState = playerState;
         this.type = type;
         this.level = 1;
