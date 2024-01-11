@@ -271,21 +271,20 @@ public class Manager {
     }
 
     private Manager() {
-        Runtime.getRuntime().addShutdownHook(new Thread(this::dispose));
+        //Runtime.getRuntime().addShutdownHook(new Thread(this::dispose));
         executionManager = new Thread(this::executionManager);
         executionManager.start();
     }
 
-    private void dispose() {
+    public void dispose() {
         //Shutdown all running threads
         pendingShutdown = true;
-        executionManager.interrupt();
         synchronized (games) {
-            for (Executable cur :
-                    games) {
-                cur.dispose();
+            for (Executable game : games) {
+                game.dispose();
             }
         }
+        executionManager.interrupt();
     }
 
     public static int getSystemReservedProcessorCount() {
