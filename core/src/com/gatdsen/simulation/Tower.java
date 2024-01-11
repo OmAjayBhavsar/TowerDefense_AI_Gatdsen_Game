@@ -81,6 +81,7 @@ public abstract class Tower {
         this.level = original.level;
         this.cooldown = original.cooldown;
         this.inRange = original.inRange;
+        this.targetOption = original.targetOption;
     }
 
     /**
