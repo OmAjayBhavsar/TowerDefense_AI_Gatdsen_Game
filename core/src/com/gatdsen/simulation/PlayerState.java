@@ -38,7 +38,6 @@ public class PlayerState implements Serializable {
         this.health = health;
         this.money = money;
 
-
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 if (gameState.getMap()[i][j].ordinal() >= GameState.MapTileType.PATH_RIGHT.ordinal()) {
@@ -288,6 +287,27 @@ public class PlayerState implements Serializable {
     }
 
     /**
+     * Setzt das Target eines Towers
+     *
+     * @param x            x-Koordinate des Towers
+     * @param y            y-Koordinate des Towers
+     * @param targetOption TargetOption des Towers
+     * @param head         Kopf der Action-Liste
+     * @return neuer Kopf der Action-Liste
+     */
+    Action setTarget(int x, int y, Tower.TargetOption targetOption, Action head) {
+        if (board[x][y] instanceof TowerTile) {
+            TowerTile towerTile = (TowerTile) board[x][y];
+            towerTile.getTower().setTargetOption(targetOption);
+        } else {
+            // ToDo: append error action
+            return head;
+        }
+
+        return head;
+    }
+
+    /**
      * Initialisiert die Gegner, die gespawnt werden sollen
      */
     void initEnemiesToBeSpawned() {
@@ -350,8 +370,6 @@ public class PlayerState implements Serializable {
         }
         return head;
     }
-
-
 
     /**
      * Setzt die Lebenspunkte des Spielers

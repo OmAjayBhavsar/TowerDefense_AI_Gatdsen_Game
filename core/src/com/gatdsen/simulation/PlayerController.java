@@ -92,6 +92,10 @@ public class PlayerController {
         return endCommand();
     }
 
+    public ActionLog setTarget(int x, int y, Tower.TargetOption targetOption) {
+        return endCommand();
+    }
+
     /**
      * Beleidigt den Gegner
      *
