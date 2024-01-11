@@ -93,7 +93,7 @@ public abstract class BaseMenuScreen extends ConfigScreen {
         Table navigationTable = new Table(skin);
 
         if (getPrev() != null) {
-            TextButton backButton = new TextButton("Zurück", skin);
+            TextButton backButton = new TextButton("Zurueck", skin);
             backButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
