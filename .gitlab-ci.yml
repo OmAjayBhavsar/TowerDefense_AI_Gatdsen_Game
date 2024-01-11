@@ -53,11 +53,19 @@ debug-file-tree:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
-    - if: '$CI_COMMIT_BRANCH == "beta" || $CI_MERGE_REQUEST_ID'
+    - if: '$CI_COMMIT_BRANCH == "beta"'
       changes:
-        - assets/*
-        - pipeline/*
-        - util/*
+        compare_to: 'refs/heads/main'
+        paths:
+          - assets/**/*
+          - pipeline/**/*
+          - util/**/*
+      when: on_success
+    - if: '$CI_MERGE_REQUEST_ID'
+      changes:
+        - assets/**/*
+        - pipeline/**/*
+        - util/**/*
       when: on_success
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -96,9 +104,15 @@ build-asset-pipeline-java21:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
-    - if: '$CI_COMMIT_BRANCH == "beta" || $CI_MERGE_REQUEST_ID'
+    - if: '$CI_COMMIT_BRANCH == "beta"'
       changes:
-        - core/*
+        compare_to: 'refs/heads/main'
+        paths:
+          - core/**/*
+      when: on_success
+    - if: '$CI_MERGE_REQUEST_ID'
+      changes:
+        - core/**/*
       when: on_success
 # Kompilierung des core-Moduls mit Java 11
 build-core-java11:
@@ -121,13 +135,23 @@ build-core-java21:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
-    - if: '$CI_COMMIT_BRANCH == "beta" || $CI_MERGE_REQUEST_ID'
+    - if: '$CI_COMMIT_BRANCH == "beta"'
       changes:
-        - desktop/*
-        - core/*
-        - assets/*
-        - pipeline/*
-        - util/*
+        compare_to: 'refs/heads/main'
+        paths:
+          - desktop/**/*
+          - core/**/*
+          - assets/**/*
+          - pipeline/**/*
+          - util/**/*
+      when: on_success
+    - if: '$CI_MERGE_REQUEST_ID'
+      changes:
+        - desktop/**/*
+        - core/**/*
+        - assets/**/*
+        - pipeline/**/*
+        - util/**/*
       when: on_success
 # Kompilierung des desktop-Moduls mit Java 11
 build-desktop-java11:
@@ -150,10 +174,17 @@ build-desktop-java21:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
-    - if: '$CI_COMMIT_BRANCH == "beta" || $CI_MERGE_REQUEST_ID'
+    - if: '$CI_COMMIT_BRANCH == "beta"'
       changes:
-        - console/*
-        - core/*
+        compare_to: 'refs/heads/main'
+        paths:
+          - console/**/*
+          - core/**/*
+      when: on_success
+    - if: '$CI_MERGE_REQUEST_ID'
+      changes:
+        - console/**/*
+        - core/**/*
       when: on_success
 # Kompilierung des console-Moduls mit Java 11
 build-console-java11:
