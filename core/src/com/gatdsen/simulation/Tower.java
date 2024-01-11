@@ -212,6 +212,9 @@ public abstract class Tower {
         ++level;
     }
 
+    /**
+     * @return den ersten Gegner in Reichweite
+     */
     private Enemy getFirstEnemy() {
         for (int i = pathInRange.size() - 1; i >= 0; i--) {
             if (!pathInRange.get(i).getEnemies().isEmpty()) {
@@ -221,6 +224,9 @@ public abstract class Tower {
         return null;
     }
 
+    /**
+     * @return den letzten Gegner in Reichweite
+     */
     private Enemy getLastEnemy() {
         for (PathTile pathTile : pathInRange) {
             if (!pathTile.getEnemies().isEmpty()) {
@@ -231,6 +237,9 @@ public abstract class Tower {
         return null;
     }
 
+    /**
+     * @return den stärksten Gegner in Reichweite
+     */
     private Enemy getStrongestEnemy() {
         Enemy strongest = getFirstEnemy();
         if (strongest == null) {
@@ -247,6 +256,9 @@ public abstract class Tower {
         return strongest;
     }
 
+    /**
+     * @return den schwächsten Gegner in Reichweite
+     */
     private Enemy getWeakestEnemy() {
         Enemy weakest = getFirstEnemy();
         if (weakest == null) {
@@ -263,10 +275,10 @@ public abstract class Tower {
         return weakest;
     }
 
+    /**
+     * @return den Gegner, der vom Tower angegriffen werden soll
+     */
     private Enemy getTarget() {
-        if (pathInRange.isEmpty()) {
-            return null;
-        }
         Enemy target = null;
         switch (targetOption) {
             case FIRST:
@@ -300,8 +312,6 @@ public abstract class Tower {
             --cooldown;
             return head;
         }
-
-        int lastIndex = pathInRange.size() - 1;
 
         Enemy target = getTarget();
 

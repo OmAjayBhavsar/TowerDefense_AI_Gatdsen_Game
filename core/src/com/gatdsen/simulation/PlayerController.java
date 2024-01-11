@@ -17,7 +17,7 @@ public class PlayerController {
      * Disqualifiziert den Spieler
      */
     public void disqualify() {
-       playerState.disqualify();
+        playerState.disqualify();
     }
 
     /**
@@ -92,7 +92,16 @@ public class PlayerController {
         return endCommand();
     }
 
+    /**
+     * Setzt das Ziel eines Turms
+     *
+     * @param x            x-Koordinate
+     * @param y            y-Koordinate
+     * @param targetOption Zieloption als Enum
+     * @return Der ActionLog der durch das Ausführen des Befehls entstanden ist
+     */
     public ActionLog setTarget(int x, int y, Tower.TargetOption targetOption) {
+        playerState.setTarget(x, y, targetOption, getRoot());
         return endCommand();
     }
 
