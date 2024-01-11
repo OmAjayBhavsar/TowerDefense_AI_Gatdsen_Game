@@ -16,11 +16,12 @@ public class EnemyMoveAction extends EnemyAction {
      * @param pos   Position des Gegners
      * @param des   Zielposition des Gegners
      * @param level Level des Gegners
+     * @param team  Team des Gegners
+     * @param id    ID des Gegners
      */
-    public EnemyMoveAction(float delay, IntVector2 pos, IntVector2 des, int level, int team) {
-        super(delay, pos, level, team);
+    public EnemyMoveAction(float delay, IntVector2 pos, IntVector2 des, int level, int team, int id) {
+        super(delay, pos, level, team, id);
         this.des = des;
-        //Handling which team?
     }
 
     /**

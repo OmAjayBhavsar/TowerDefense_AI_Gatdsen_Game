@@ -7,26 +7,31 @@ import java.io.Serializable;
 /**
  * Die Klasse Enemy repräsentiert einen Gegner im Spiel.
  */
-public class Enemy implements Serializable {
-    private final PlayerState playerState;
-    private int health;
-    private int level;
-    private int damage;
-    private PathTile posTile;
+public abstract class Enemy implements Serializable {
+    protected final PlayerState playerState;
+
+    private static int idCounter = 0;
+
+    protected final int id;
+    protected int health;
+    protected int level;
+    protected int damage;
+    protected PathTile posTile;
 
     /**
      * Erstellt einen neuen Gegner.
-     *
-     * @param health  Die Lebenspunkte des Gegners.
      * @param level   Die Stufe des Gegners.
      * @param posTile Die Position des Gegners.
      */
-    public Enemy(PlayerState playerState, int health, int level, PathTile posTile) {
-        this.health = health;
-        this.level = level;
-        this.posTile = posTile;
-        this.damage = 10 * level;
+    public Enemy(PlayerState playerState, int level, PathTile posTile) {
+        id = idCounter++;
         this.playerState = playerState;
+        this.posTile = posTile;
+        this.level = level;
+        // IdCounter wird zurückgesetzt, wenn Integer.MAX_VALUE erreicht wird.
+        if (idCounter == Integer.MAX_VALUE) {
+            idCounter = 0;
+        }
     }
 
     /**
@@ -35,9 +40,7 @@ public class Enemy implements Serializable {
      * @param posTile Die Position des Gegners.
      * @return Die Kopie des Gegners.
      */
-    Enemy copy(PathTile posTile) {
-        return new Enemy(this.playerState, this.health, this.level, posTile);
-    }
+    protected abstract Enemy copy(PathTile posTile);
 
     /**
      * Fügt dem Gegner Schaden zu.
@@ -46,7 +49,7 @@ public class Enemy implements Serializable {
      * @param head   Die vorrausgehende Action.
      * @return Die letzte Action.
      */
-    Action updateHealth(int damage, Action head) {
+    protected Action updateHealth(int damage, Action head) {
         if (health - damage <= 0) {
             health = 0;
             posTile.getEnemies().remove(this);
@@ -55,13 +58,13 @@ public class Enemy implements Serializable {
             chaining:
             | -> head -> update health -> enemy defeat -> |
              */
-            Action updateHealthAction = new EnemyUpdateHealthAction(0, posTile.getPosition(), 0, level, playerState.getIndex());
+            Action updateHealthAction = new EnemyUpdateHealthAction(0, posTile.getPosition(), 0, level, playerState.getIndex(), id);
             head.addChild(updateHealthAction);
-            updateHealthAction.addChild(new EnemyDefeatAction(0, posTile.getPosition(), level, playerState.getIndex()));
+            updateHealthAction.addChild(new EnemyDefeatAction(0, posTile.getPosition(), level, playerState.getIndex(), id));
             head = playerState.updateMoney(30 * level, updateHealthAction);
         } else {
             health -= damage;
-            head.addChild(new EnemyUpdateHealthAction(0, posTile.getPosition(), health, level, playerState.getIndex()));
+            head.addChild(new EnemyUpdateHealthAction(0, posTile.getPosition(), health, level, playerState.getIndex(), id));
         }
         return head;
     }
@@ -73,16 +76,16 @@ public class Enemy implements Serializable {
      * @param head Die vorrausgehende Action
      * @return Die letzte Action
      */
-    Action move(Action head) {
+    protected Action move(Action head) {
         if (posTile.getNext() != null) {
             posTile.getEnemies().remove(this);
             posTile = posTile.getNext();
             posTile.getEnemies().add(this);
-            head.addChild(new EnemyMoveAction(0, posTile.getPrev().getPosition(), posTile.getPosition(), level, playerState.getIndex()));
+            head.addChild(new EnemyMoveAction(0, posTile.getPrev().getPosition(), posTile.getPosition(), level, playerState.getIndex(), id));
         } else {
             posTile.getEnemies().remove(this);
             head = playerState.setHealth(damage, head);
-            head.addChild(new EnemyDefeatAction(0, posTile.getPosition(), level, playerState.getIndex()));
+            head.addChild(new EnemyDefeatAction(0, posTile.getPosition(), level, playerState.getIndex(), id));
         }
         return head;
     }
@@ -106,5 +109,9 @@ public class Enemy implements Serializable {
      */
     public IntVector2 getPosition() {
         return new IntVector2(posTile.getPosition());
+    }
+
+    public int getId() {
+        return id;
     }
 }

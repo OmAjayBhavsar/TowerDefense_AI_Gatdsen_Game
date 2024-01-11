@@ -15,8 +15,8 @@ public class TowerPlaceAction extends TowerAction {
      * @param type  Typ des Turms
      * @param team  index des Teams
      */
-    public TowerPlaceAction(float delay, IntVector2 pos, int type, int team) {
-        super(delay, pos, type, team);
+    public TowerPlaceAction(float delay, IntVector2 pos, int type, int team, int id) {
+        super(delay, pos, type, team, id);
     }
 
     @Override

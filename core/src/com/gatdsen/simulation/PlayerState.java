@@ -1,6 +1,7 @@
 package com.gatdsen.simulation;
 
 import com.gatdsen.simulation.action.*;
+import com.gatdsen.simulation.enemy.BasicEnemy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,7 +11,6 @@ import java.util.List;
  * Speichert den Zustand eines Spielers.
  */
 public class PlayerState implements Serializable {
-    private final GameState gameState;
     private final Tile[][] board;
     private int health;
     private int money;
@@ -31,7 +31,6 @@ public class PlayerState implements Serializable {
      * @param money     das Geld des Spielers
      */
     PlayerState(GameState gameState, int index, int health, int money) {
-        this.gameState = gameState;
         this.index = index;
         int width = gameState.getBoardSizeX();
         int height = gameState.getBoardSizeY();
@@ -99,7 +98,6 @@ public class PlayerState implements Serializable {
      * @param gameState der neue GameState
      */
     private PlayerState(PlayerState original, GameState gameState) {
-        this.gameState = gameState;
         this.index = original.index;
         int boardX = gameState.getBoardSizeX();
         int boardY = gameState.getBoardSizeY();
@@ -233,18 +231,27 @@ public class PlayerState implements Serializable {
             return head;
         }
 
-        if (money < Tower.getPrice(type)) {
+        TowerTile towerTile = new TowerTile(this, x, y, type);
+
+        if (money < towerTile.getTower().getPrice()) {
             // ToDo: append error action
+            Tower.idCounter--;
             return head;
         }
 
-        money -= Tower.getPrice(type);
+        if (board[x][y] != null && !board[x][y].isBuildable()) {
+            // ToDo: append error action
+            Tower.idCounter--;
+            return head;
+        }
+
+        money -= towerTile.getTower().getPrice();
         Action updateAction = new UpdateCurrencyAction(0, money, index);
         head.addChild(updateAction);
 
-        board[x][y] = new Tower(this, type, x, y, board);
+        board[x][y] = towerTile;
         IntVector2 pos = new IntVector2(x, y);
-        Action action = new TowerPlaceAction(0, pos, type.ordinal(), index);
+        Action action = new TowerPlaceAction(0, pos, type.ordinal(), index, towerTile.getTower().getId());
         head.addChild(action);
         return head;
     }
@@ -262,12 +269,13 @@ public class PlayerState implements Serializable {
             // ToDo: append error action
             return head;
         }
-        if (board[x][y] instanceof Tower) {
-            Tower tower = (Tower) board[x][y];
+        if (board[x][y] instanceof TowerTile) {
+            TowerTile towerTile = (TowerTile) board[x][y];
+            Tower tower = towerTile.getTower();
             if (tower.getLevel() < Tower.getMaxLevel() && money > tower.getUpgradePrice()) {
                 money -= tower.getUpgradePrice();
                 tower.upgrade();
-                head.addChild(new TowerPlaceAction(0, tower.getPosition(), tower.getType().ordinal(), index));
+                head.addChild(new TowerPlaceAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));
             } else {
                 // ToDo: append error action
                 return head;
@@ -285,7 +293,7 @@ public class PlayerState implements Serializable {
     void initEnemiesToBeSpawned() {
         for (int i = 0; i < enemiesToBeSpawned.length; i++) {
             for (int j = 0; j < enemyTypeCount; j++) {
-                enemiesToBeSpawned[i][j] = new Enemy(this, 100 * ((i / 20) + 1), (i / 20) + 1, spawnTile);
+                enemiesToBeSpawned[i][j] = new BasicEnemy(this, 1, spawnTile);
             }
         }
     }
@@ -302,7 +310,7 @@ public class PlayerState implements Serializable {
             if (wave > 99) wave = 80;
             Enemy actual = enemiesToBeSpawned[wave][i];
             spawnTile.getEnemies().add(actual);
-            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), actual.getLevel(), actual.getHealth(), index));
+            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), actual.getLevel(), actual.getHealth(), index, actual.getId()));
         }
         return head;
     }
@@ -386,8 +394,9 @@ public class PlayerState implements Serializable {
     Action tickTowers(Action head) {
         for (Tile[] tiles : board) {
             for (Tile tile : tiles) {
-                if (tile instanceof Tower) {
-                    head = ((Tower) tile).tick(head);
+                if (tile instanceof TowerTile) {
+                    TowerTile towerTile = (TowerTile) tile;
+                    head = towerTile.getTower().tick(head);
                 }
             }
         }

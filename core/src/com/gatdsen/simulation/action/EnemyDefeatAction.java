@@ -15,9 +15,10 @@ public class EnemyDefeatAction extends EnemyAction {
      * @param pos   Position des Gegners
      * @param level Level des Gegners
      * @param team  Team des Gegners
+     * @param id    ID des Gegners
      */
-    public EnemyDefeatAction(float delay, IntVector2 pos, int level, int team) {
-        super(delay, pos, level, team);
+    public EnemyDefeatAction(float delay, IntVector2 pos, int level, int team, int id) {
+        super(delay, pos, level, team, id);
     }
 
     @Override

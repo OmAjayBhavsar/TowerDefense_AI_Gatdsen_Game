@@ -10,13 +10,28 @@ public class ObstacleTile extends Tile{
         super(x, y);
     }
 
+    /**
+     * Erstellt eine Kopie eines Hindernisses (Obstacle).
+     * @param original das zu kopierende Hindernis
+     */
     ObstacleTile(ObstacleTile original) {
         super(original.getPosition().x, original.getPosition().y);
     }
 
- 
+    /**
+     * Erstellt eine Kopie des Hindernisses (Obstacle).
+     * @return eine Kopie des Hindernisses (Obstacle)
+     */
     @Override
     protected Tile copy() {
         return new ObstacleTile(this);
+    }
+
+    /**
+     * @return False, da Hindernisse nicht bebaubar sind
+     */
+    @Override
+    public boolean isBuildable() {
+        return false;
     }
 }

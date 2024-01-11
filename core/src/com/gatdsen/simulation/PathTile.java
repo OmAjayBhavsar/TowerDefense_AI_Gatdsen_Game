@@ -46,6 +46,14 @@ public class PathTile extends Tile {
     }
 
     /**
+     * @return False, da Pfade nicht bebaubar sind
+     */
+    @Override
+    public boolean isBuildable() {
+        return false;
+    }
+
+    /**
      * Setzt das next-Attribut des PathTiles.
      *
      * @param next das nächste PathTile

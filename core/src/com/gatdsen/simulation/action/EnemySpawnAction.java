@@ -16,9 +16,10 @@ public class EnemySpawnAction extends EnemyAction {
      * @param pos   Position des Gegners
      * @param level Level des Gegners
      * @param team  Team des Gegners
+     * @param id    ID des Gegners
      */
-    public EnemySpawnAction(float delay, IntVector2 pos, int level, int maxHealth, int team) {
-        super(delay, pos, level, team);
+    public EnemySpawnAction(float delay, IntVector2 pos, int level, int maxHealth, int team, int id) {
+        super(delay, pos, level, team, id);
         this.maxHealth = maxHealth;
     }
 
