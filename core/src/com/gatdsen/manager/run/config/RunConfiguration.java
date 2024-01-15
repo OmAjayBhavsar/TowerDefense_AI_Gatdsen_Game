@@ -12,6 +12,15 @@ import java.util.List;
 
 public final class RunConfiguration {
 
+
+    public GameMode gameMode = GameMode.Normal;
+    public boolean gui = true;
+    public AnimationLogProcessor animationLogProcessor = null;
+    public InputProcessor inputProcessor = null;
+    public String mapName = null;
+    public boolean replay = false;
+    public List<Class<? extends Player>> players = new ArrayList<>();
+
     public RunConfiguration() {
     }
 
@@ -28,14 +37,6 @@ public final class RunConfiguration {
         replay = original.replay;
         players = new ArrayList<>(original.players);
     }
-
-    public GameMode gameMode = GameMode.Normal;
-    public boolean gui = true;
-    public AnimationLogProcessor animationLogProcessor = null;
-    public InputProcessor inputProcessor = null;
-    public String mapName = null;
-    public boolean replay = false;
-    public List<Class<? extends Player>> players = new ArrayList<>();
 
     public boolean validate() {
         boolean isValid = true;

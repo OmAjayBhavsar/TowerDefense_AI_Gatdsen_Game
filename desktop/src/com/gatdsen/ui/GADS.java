@@ -101,6 +101,7 @@ public class GADS extends Game {
             initScreens();
         }
         setScreen(screens[screenState.ordinal()], runConfiguration);
+        //ToDo Screens auf Stack ablegen, davor durchsuchen nach dopplungen
     }
 
     /**
@@ -109,7 +110,7 @@ public class GADS extends Game {
      * @param screen may be {@code null}
      */
     public void setScreen(ConfigScreen screen, RunConfiguration runConfiguration) {
-        if (runConfiguration != null){
+        if (runConfiguration != null) {
             screen.setRunConfiguration(runConfiguration);
         }
         currentScreen = screen;

@@ -30,7 +30,7 @@ import com.gatdsen.ui.hud.*;
  * Input Handling during the game.
  * Displaying health, inventory
  */
-public class Hud implements Disposable{
+public class Hud implements Disposable {
 
     private static Stage stage;
     private final InputHandler inputHandler;
@@ -48,6 +48,8 @@ public class Hud implements Disposable{
     private String[] names;
     private final ScoreView scoreView;
     private TextButton nextRoundButton;
+    private TextButton restartGameButton;
+    private TextButton backToMainMenuButton;
     private final Skin skin = AssetContainer.MainMenuAssets.skin;
     Viewport hudViewport;
     private int player0Balance = 100;
@@ -73,7 +75,6 @@ public class Hud implements Disposable{
         this.inGameScreen = ingameScreen;
         hudViewport = new FitViewport(gameViewport.getWorldWidth() / 10, gameViewport.getWorldHeight() / 10);
         this.uiMessenger = new UiMessenger(this);
-        float animationSpeedupValue = 8;
         turnChangeDuration = 2;
         turnChangeSprite = AssetContainer.IngameAssets.turnChange;
         stage = new Stage(hudViewport);
@@ -94,10 +95,9 @@ public class Hud implements Disposable{
         healthBarPlayer0.setAnimateDuration(0.25f);
         healthBarPlayer1.setValue(health);
         healthBarPlayer1.setAnimateDuration(0.25f);
-        if (gameState != null){
+        if (gameState != null) {
             roundCounter = gameState.getTurn();
-        }
-        else roundCounter = 1;
+        } else roundCounter = 1;
     }
 
     /**
@@ -162,6 +162,8 @@ public class Hud implements Disposable{
     public void layoutHudElements() {
         float padding = 10;
 
+        // Erstellen der Elemente
+
         Label player0BalanceLabel = new Label("$" + player0Balance, skin);
         player0BalanceLabel.setAlignment(Align.center);
         Label player1BalanceLabel = new Label("$" + player1Balance, skin);
@@ -172,13 +174,14 @@ public class Hud implements Disposable{
         currentPlayer1.setAlignment(Align.center);
         Label currentRoundLabel = new Label("Runde: " + roundCounter, skin);
         currentRoundLabel.setAlignment(Align.center);
-        Label healthPlayer0Label = new Label("" + healthPlayer0 , skin);
+        Label healthPlayer0Label = new Label("" + healthPlayer0, skin);
         healthPlayer0Label.setAlignment(Align.center);
         Label healthPlayer1Label = new Label("" + healthPlayer1, skin);
         healthPlayer1Label.setAlignment(Align.center);
-
         Label invisibleLabel = new Label("", skin);
         nextRoundButton = new TextButton("Zug beenden", skin);
+        backToMainMenuButton = new TextButton("Hauptmenue", skin);
+        restartGameButton = new TextButton("Neustart", skin);
         nextRoundButton.addListener(new ChangeListener() {
             /**
              * Wird aufgerufen, wenn der Button geklickt wird
@@ -193,6 +196,19 @@ public class Hud implements Disposable{
                 layoutHudElements();
             }
         });
+        backToMainMenuButton.addListener(new ChangeListener() {
+            /**
+             * Wird aufgerufen, wenn der Button geklickt wird
+             *
+             * @param event Das ChangeEvent
+             * @param actor Das Actor-Objekt, das das Änderungsereignis ausgelöst hat
+             */
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                inGameScreen.dispose();
+            }
+        });
+
         layoutTable.add(currentPlayer0).expandX();
         layoutTable.add(player0BalanceLabel).pad(padding).expandX();
         layoutTable.add(healthBarPlayer0).pad(padding).expandX();
@@ -213,26 +229,14 @@ public class Hud implements Disposable{
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
         layoutTable.add(nextRoundButton).pad(padding).expandX().row();
+        layoutTable.add(invisibleLabel).expandY().top().row();
         layoutTable.add(invisibleLabel);
+        layoutTable.add(invisibleLabel);
+        layoutTable.add(invisibleLabel);
+        layoutTable.add(backToMainMenuButton).expandX().row();
+        layoutTable.add(invisibleLabel).row();
+        layoutTable.add(invisibleLabel).row();
     }
-
-    /*
-    /**
-     * Erstellt einen FastForwardButton und gibt ihn zurück
-     *
-     * @param uiMessenger Der UiMessenger für die Kommunikation
-     * @param speedUp     Die Geschwindigkeitssteigerung für die Schnellvorlauf-Funktion
-     * @return Ein neues FastForwardButton-Objekt
-
-    private FastForwardButton setupFastForwardButton(UiMessenger uiMessenger, float speedUp) {
-
-        FastForwardButton button = new FastForwardButton(new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButton),
-                new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButtonPressed),
-                new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButtonChecked),
-                uiMessenger, speedUp);
-        return button;
-    }
-    */
 
     /**
      * Gibt den InputHandler zurück
@@ -390,20 +394,6 @@ public class Hud implements Disposable{
     }
 
     /**
-     * Passt die Punktzahlen im HUD basierend auf dem gegebenen Array an
-     *
-     * @param scores Ein Array mit den neuen Punktzahlen
-
-    public void adjustScores(float[] scores) {
-    this.scores = scores;
-
-    if (scoreView != null) {
-    scoreView.adjustScores(scores);
-    }
-    }
-     */
-
-    /**
      * Passt die Punktzahl für das angegebene Team im HUD an
      *
      * @param team  Das Team, dessen Punktzahl angepasst wird
@@ -426,7 +416,6 @@ public class Hud implements Disposable{
      */
     public void gameEnded(boolean won, int team, boolean isDraw) {
 
-        // ToDo: Remove color
         //create a pixel with a set color that will be used as Background
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         //set the color to black
@@ -435,8 +424,6 @@ public class Hud implements Disposable{
         layoutTable.clear();
         layoutTable.setBackground(new TextureRegionDrawable(new Texture(pixmap)));
         pixmap.dispose();
-
-        ImagePopup display;
 
         //determine sprite
         if (isDraw) {
@@ -550,6 +537,11 @@ public class Hud implements Disposable{
         layoutHudElements();
     }
 
+    /**
+     * Initialisiert die Gesundheit eines Spielers mit einem maximalen Gesundheitswert.
+     * @param playerID Die ID des Spielers.
+     * @param maxHealth Der maximale Gesundheitswert für den Spieler.
+     */
     public void initPlayerHealth(int playerID, int maxHealth) {
         if (playerID == 0) {
             healthBarPlayer0.setRange(0, maxHealth);
@@ -566,6 +558,11 @@ public class Hud implements Disposable{
         layoutHudElements();
     }
 
+    /**
+     * Aktualisiert den Gesundheitswert eines Spielers.
+     * @param playerID Die ID des Spielers.
+     * @param health Der neue Gesundheitswert.
+     */
     public void setPlayerHealth(int playerID, int health) {
         if (playerID == 0) {
             healthBarPlayer0.setValue(health);
