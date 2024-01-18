@@ -1,11 +1,11 @@
 package com.gatdsen.simulation;
-
 import com.gatdsen.simulation.action.*;
 import com.gatdsen.simulation.enemy.BasicEnemy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Speichert den Zustand eines Spielers.
@@ -14,11 +14,15 @@ public class PlayerState implements Serializable {
     private final Tile[][] board;
     private int health;
     private int money;
+
+    private int spawnCoins;
     private final int index;
     private PathTile spawnTile;
     private PathTile endTile;
+
+    private final Stack<Enemy> spawnEnemies = new Stack<Enemy>();
+
     private final int enemyTypeCount = 1;
-    private final Enemy[][] enemiesToBeSpawned = new Enemy[100][enemyTypeCount];
     private boolean disqualified;
     private boolean deactivated;
 
@@ -87,7 +91,6 @@ public class PlayerState implements Serializable {
         }
         spawnTile = endTile.getFirstPathTile();
         spawnTile.indexPathTiles();
-        initEnemiesToBeSpawned();
     }
 
     /**
@@ -245,7 +248,7 @@ public class PlayerState implements Serializable {
         }
 
         money -= towerTile.getTower().getPrice();
-        Action updateAction = new UpdateCurrencyAction(0, money, index);
+        Action updateAction = new UpdateCurrencyAction(0, money, spawnCoins, index);
         head.addChild(updateAction);
 
         board[x][y] = towerTile;
@@ -310,13 +313,13 @@ public class PlayerState implements Serializable {
     /**
      * Initialisiert die Gegner, die gespawnt werden sollen
      */
-    void initEnemiesToBeSpawned() {
-        for (int i = 0; i < enemiesToBeSpawned.length; i++) {
-            for (int j = 0; j < enemyTypeCount; j++) {
-                enemiesToBeSpawned[i][j] = new BasicEnemy(this, 1, spawnTile);
-            }
-        }
+
+    void SpawnEnemy(int wave){
+        if (wave%10 == 0) spawnEnemies.push(new BasicEnemy(this, wave, spawnTile));
+        else if (wave%5 == 0) spawnEnemies.push(new BasicEnemy(this, wave/2, spawnTile));
+        else spawnEnemies.push(new BasicEnemy(this, 1 + wave/10, spawnTile));
     }
+
 
     /**
      * Spawnt die Gegner
@@ -326,11 +329,11 @@ public class PlayerState implements Serializable {
      * @return der Action Head
      */
     Action spawnEnemies(Action head, int wave) {
-        for (int i = 0; i < enemyTypeCount; i++) {
-            if (wave > 99) wave = 80;
-            Enemy actual = enemiesToBeSpawned[wave][i];
-            spawnTile.getEnemies().add(actual);
-            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), actual.getLevel(), actual.getHealth(), index, actual.getId()));
+        SpawnEnemy(wave + 1);
+        while (!spawnEnemies.isEmpty()) {
+            Enemy enemy = spawnEnemies.pop();
+            spawnTile.getEnemies().add(enemy);
+            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemy.getLevel(), enemy.getHealth(), index, enemy.getId()));
         }
         return head;
     }
@@ -395,13 +398,16 @@ public class PlayerState implements Serializable {
      * @param head  Kopf der Action-Liste
      * @return neuer Kopf der Action-Liste
      */
-    Action updateMoney(int money, Action head) {
+    Action updateCurrency(int money, int spawnCoins, Action head) {
         this.money += money;
-        Action updateMoneyAction = new UpdateCurrencyAction(0, this.money, index);
+        this.spawnCoins += spawnCoins;
+        Action updateMoneyAction = new UpdateCurrencyAction(0, this.money, this.spawnCoins, index);
         head.addChild(updateMoneyAction);
         head = updateMoneyAction;
         return head;
     }
+
+
 
     /**
      * Führt alle Tower-Aktionen aus
