@@ -2,9 +2,15 @@ package com.gatdsen.ui.hud;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.gatdsen.manager.player.HumanPlayer;
 import com.gatdsen.simulation.Tower;
+import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.menu.Hud;
 import com.gatdsen.ui.menu.InGameScreen;
 
@@ -50,6 +56,8 @@ public class InputHandler implements InputProcessor, com.gatdsen.manager.InputPr
 
     private Hud hud;
 
+    private Tower.TowerType towerType;
+
 
     public InputHandler(InGameScreen ingameScreen, Hud h) {
         this.ingameScreen = ingameScreen;
@@ -61,7 +69,7 @@ public class InputHandler implements InputProcessor, com.gatdsen.manager.InputPr
         boolean wasEmpty;
         // activateTurn() wird bei min. zwei HumanPlayern in einem Spiel von mehreren Threads aufgerufen, sodass der
         // Zugriff auf currentPlayers synchronisiert werden muss
-        synchronized(currentPlayers) {
+        synchronized (currentPlayers) {
             wasEmpty = currentPlayers.isEmpty();
             currentPlayers.put(playerIndex, player);
         }
@@ -117,12 +125,12 @@ public class InputHandler implements InputProcessor, com.gatdsen.manager.InputPr
      * @param x        Die x-Koordinate des Spielfelds
      * @param y        Die y-Koordinate des Spielfelds
      */
-    public void playerFieldLeftClicked(int playerId, int x, int y) {
+    public void playerFieldLeftClicked(int playerId, int x, int y, Tower.TowerType towerType) {
         HumanPlayer currentPlayer = currentPlayers.get(playerId);
         if (currentPlayer == null) {
             return;
         }
-        currentPlayer.placeTower(x, y, Tower.TowerType.BASIC_TOWER);
+        currentPlayer.placeTower(x, y, towerType);
     }
 
     /**
