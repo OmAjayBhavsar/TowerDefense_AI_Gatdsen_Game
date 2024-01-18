@@ -15,20 +15,8 @@ public class BasicEnemy extends Enemy {
      */
     public BasicEnemy(PlayerState playerState, int level, PathTile posTile) {
         super(playerState, level, posTile);
-        switch (level) {
-            case 1:
-                health = 100;
-                break;
-            case 2:
-                health = 150;
-                break;
-            case 3:
-                health = 200;
-                break;
-            default:
-                health = 0;
-        }
-
+        health = 100 * level;
+        damage = 10 * level;
     }
 
 
