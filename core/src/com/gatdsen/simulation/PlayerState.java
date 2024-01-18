@@ -315,9 +315,9 @@ public class PlayerState implements Serializable {
      */
 
     void SpawnEnemy(int wave){
-        if (wave%10 == 0) spawnEnemies.push(new BasicEnemy(this, wave, spawnTile));
-        else if (wave%5 == 0) spawnEnemies.push(new BasicEnemy(this, wave/2, spawnTile));
-        else spawnEnemies.push(new BasicEnemy(this, 1 + wave/10, spawnTile));
+        if (wave%10 == 0) spawnEnemies.push(new BasicEnemy(this, wave/2, spawnTile));
+        else if (wave%5 == 0) spawnEnemies.push(new BasicEnemy(this, wave/5 + 1, spawnTile));
+        else spawnEnemies.push(new BasicEnemy(this, 1 + wave/20, spawnTile));
     }
 
 
