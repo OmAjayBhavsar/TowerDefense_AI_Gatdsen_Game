@@ -274,7 +274,7 @@ public class PlayerState implements Serializable {
         if (board[x][y] instanceof TowerTile) {
             TowerTile towerTile = (TowerTile) board[x][y];
             Tower tower = towerTile.getTower();
-            if (tower.getLevel() < Tower.getMaxLevel() && money > tower.getUpgradePrice()) {
+            if (tower.getLevel() < Tower.getMaxLevel() && money >= tower.getUpgradePrice()) {
                 money -= tower.getUpgradePrice();
                 tower.upgrade();
                 head.addChild(new TowerUpgradeAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));

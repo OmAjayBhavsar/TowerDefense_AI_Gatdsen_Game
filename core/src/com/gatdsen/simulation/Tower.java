@@ -65,7 +65,7 @@ public abstract class Tower {
         this.playerState = playerState;
         this.type = type;
         this.level = 1;
-        this.cooldown = getRechargeTime();
+        this.cooldown = 0;
         this.inRange = getNeighbours(getRange(), board);
         setPathList();
         pathInRange.sort(Comparator.comparingInt(PathTile::getIndex));
@@ -209,7 +209,6 @@ public abstract class Tower {
      * Upgraded den Tower
      */
     void upgrade() {
-        // ToDo: implement upgrade after christmas task
         ++level;
     }
 
