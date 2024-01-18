@@ -3,6 +3,7 @@ package com.gatdsen.simulation.tower;
 import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Tile;
 import com.gatdsen.simulation.Tower;
+import com.gatdsen.simulation.action.Action;
 
 /**
  * Speichert einen SniperTower.
@@ -45,16 +46,11 @@ public class SniperTower extends Tower {
     @Override
     public int getDamage() {
         switch (level) {
-            case 1:
-                return 0;
-            case 2:
-                return 0;
-            case 3:
-                return 0;
-            default:
-                return 0;
+            case 1: return 100; // One shot one kill
+            case 2: return 200;
+            case 3: return 300;
+            default: return 0;
         }
-
     }
 
     /**
@@ -62,7 +58,7 @@ public class SniperTower extends Tower {
      */
     @Override
     public int getRange() {
-        return 0;
+        return 4;
     }
 
     /**
@@ -70,7 +66,7 @@ public class SniperTower extends Tower {
      */
     @Override
     public int getRechargeTime() {
-        return 0;
+        return 3;
     }
 
     /**
@@ -79,9 +75,9 @@ public class SniperTower extends Tower {
     @Override
     public int getPrice() {
         switch (level) {
-            case 1: return 0;
-            case 2: return 0;
-            case 3: return 0;
+            case 1: return 100;
+            case 2: return 150;
+            case 3: return 250;
             default: return 0;
         }
     }

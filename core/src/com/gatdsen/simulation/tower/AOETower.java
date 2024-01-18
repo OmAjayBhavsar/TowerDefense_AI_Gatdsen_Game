@@ -1,8 +1,12 @@
 package com.gatdsen.simulation.tower;
 
-import com.gatdsen.simulation.PlayerState;
-import com.gatdsen.simulation.Tile;
-import com.gatdsen.simulation.Tower;
+import com.gatdsen.simulation.*;
+import com.gatdsen.simulation.action.Action;
+import com.gatdsen.simulation.action.ProjectileAction;
+import com.gatdsen.simulation.action.TowerAttackAction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Speichert einen AOETower.
@@ -45,9 +49,9 @@ public class AOETower extends Tower {
     @Override
     public int getDamage() {
         switch (level) {
-            case 1: return 0;
-            case 2: return 0;
-            case 3: return 0;
+            case 1: return 10;
+            case 2: return 15;
+            case 3: return 25;
             default: return 0;
         }
     }
@@ -57,7 +61,7 @@ public class AOETower extends Tower {
      */
     @Override
     public int getRange() {
-        return 0;
+        return 1;
     }
 
     /**
@@ -74,10 +78,53 @@ public class AOETower extends Tower {
     @Override
     public int getPrice() {
         switch (level) {
-            case 1: return 0;
-            case 2: return 0;
-            case 3: return 0;
+            case 1: return 100;
+            case 2: return 130;
+            case 3: return 160;
             default: return 0;
         }
+    }
+
+    /**
+     * @return Liste von Gegnern, die vom Tower aus erreichbar sind
+     */
+    private List<Enemy> getTargets() {
+        List<Enemy> targets = new ArrayList<>();
+        for (PathTile tile : pathInRange)
+            targets.addAll(tile.getEnemies());
+        return targets;
+    }
+
+    /**
+     * Führt einen Angriff aus, wenn möglich.
+     *
+     * @param head Kopf der Action-Liste
+     * @return neuer Kopf der Action-Liste
+     */
+    @Override
+    public Action attack(Action head) {
+        if (pathInRange.isEmpty()) {
+            return head;
+        }
+
+        if (getRechargeTime() > 0) {
+            --cooldown;
+            return head;
+        }
+
+        List<Enemy> targets = getTargets();
+
+        if (!targets.isEmpty()) {
+            for (Enemy target : targets) {
+                head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex(), id));
+                Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 1);
+                path.setDuration(0);
+                head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));
+                head = updateEnemyHealth(target, head);
+            }
+
+            cooldown = getRechargeTime();
+        }
+        return head;
     }
 }

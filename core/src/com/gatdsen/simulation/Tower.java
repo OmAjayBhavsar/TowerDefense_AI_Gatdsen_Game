@@ -37,16 +37,16 @@ public abstract class Tower {
 
     static final int MAX_LEVEL = 3;
 
-    private final PlayerState playerState;
-    private final TowerType type;
-    private final IntVector2 pos;
+    protected final PlayerState playerState;
+    protected final TowerType type;
+    protected final IntVector2 pos;
 
-    private TargetOption targetOption = TargetOption.FIRST;
+    protected TargetOption targetOption = TargetOption.FIRST;
 
     protected static int idCounter = 0;
     protected final int id;
-    private final List<PathTile> pathInRange = new ArrayList<>();
-    private List<Tile> inRange;
+    protected final List<PathTile> pathInRange = new ArrayList<>();
+    protected List<Tile> inRange;
     protected int level;
     protected int cooldown;
 
@@ -279,7 +279,7 @@ public abstract class Tower {
     /**
      * @return den Gegner, der vom Tower angegriffen werden soll
      */
-    private Enemy getTarget() {
+    protected Enemy getTarget() {
         Enemy target = null;
         switch (targetOption) {
             case FIRST:
@@ -298,18 +298,23 @@ public abstract class Tower {
         return target;
     }
 
+    protected Action updateEnemyHealth(Enemy enemy, Action head) {
+        return enemy.updateHealth(getDamage(), head);
+    }
+
     /**
      * Führt einen Angriff aus, wenn möglich.
      *
      * @param head Kopf der Action-Liste
      * @return neuer Kopf der Action-Liste
      */
-    public Action attack(Action head) {
+    protected Action attack(Action head) {
+        System.out.println("attack");
         if (pathInRange.isEmpty()) {
             return head;
         }
 
-        if (getRechargeTime() > 0) {
+        if (cooldown > 0) {
             --cooldown;
             return head;
         }
@@ -322,7 +327,7 @@ public abstract class Tower {
             path.setDuration(0);
             head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));
 
-            head = target.updateHealth(getDamage(), head);
+            head = updateEnemyHealth(target, head);
             cooldown = getRechargeTime();
         }
         return head;
