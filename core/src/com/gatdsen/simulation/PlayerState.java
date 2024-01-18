@@ -290,6 +290,33 @@ public class PlayerState implements Serializable {
     }
 
     /**
+     * Verkauft einen Tower auf dem Spielfeld
+     *
+     * @param x    x-Koordinate des Towers
+     * @param y    y-Koordinate des Towers
+     * @param head Kopf der Action-Liste
+     * @return neuer Kopf der Action-Liste
+     */
+    Action sellTower(int x, int y, Action head) {
+        if (board[x][y] == null) {
+            // ToDo: append error action
+            return head;
+        }
+        if (board[x][y] instanceof TowerTile) {
+            TowerTile towerTile = (TowerTile) board[x][y];
+            Tower tower = towerTile.getTower();
+            money += tower.getPrice() / 2;
+            head.addChild(new UpdateCurrencyAction(0, money, spawnCoins, index));
+            head.addChild(new TowerDestroyAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));
+            board[x][y] = null;
+        } else {
+            // ToDo: append error action
+            return head;
+        }
+        return head;
+    }
+
+    /**
      * Setzt das Target eines Towers
      *
      * @param x            x-Koordinate des Towers

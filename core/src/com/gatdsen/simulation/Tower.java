@@ -308,7 +308,6 @@ public abstract class Tower {
      * @return neuer Kopf der Action-Liste
      */
     protected Action attack(Action head) {
-        System.out.println("attack");
         if (pathInRange.isEmpty()) {
             return head;
         }

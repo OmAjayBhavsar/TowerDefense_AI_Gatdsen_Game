@@ -88,7 +88,7 @@ public class PlayerController {
      * @return Der ActionLog der durch das Ausführen des Befehls entstanden ist
      */
     public ActionLog sellTower(int x, int y) {
-        // ToDo: implement sellTower after christmas task
+        playerState.sellTower(x, y, getRoot());
         return endCommand();
     }
 
