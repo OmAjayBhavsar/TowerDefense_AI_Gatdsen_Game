@@ -133,7 +133,7 @@ public class InputHandler implements InputProcessor, com.gatdsen.manager.InputPr
         if (towerType!=null && targetOption==null){
             currentPlayer.placeTower(x, y, towerType);
         } else if (towerType == null && targetOption != null) {
-            //ToDo implement TargetOption Action
+            //ToDo implement TargetOption action
 
         }
     }
@@ -145,12 +145,16 @@ public class InputHandler implements InputProcessor, com.gatdsen.manager.InputPr
      * @param x        Die x-Koordinate des Spielfelds
      * @param y        Die y-Koordinate des Spielfelds
      */
-    public void playerFieldRightClicked(int playerId, int x, int y) {
+    public void playerFieldRightClicked(int playerId, int x, int y, boolean upgradeTower, boolean sellTower) {
         HumanPlayer currentPlayer = currentPlayers.get(playerId);
         if (currentPlayer == null) {
             return;
         }
-        currentPlayer.upgradeTower(x, y);
+        if (upgradeTower){
+            currentPlayer.upgradeTower(x, y);
+        } else if (sellTower) {
+            //ToDo implement SellTower action
+        }
     }
 
     /**

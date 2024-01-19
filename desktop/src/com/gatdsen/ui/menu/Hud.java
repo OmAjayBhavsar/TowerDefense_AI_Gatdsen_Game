@@ -518,7 +518,10 @@ public class Hud implements Disposable {
                 int posX = (int) ((x / tileMap.getTileSize()) * 10);
                 int posY = (int) ((y / tileMap.getTileSize()) * 10);
                 if (button == Input.Buttons.RIGHT && tileMap.getTile(posX, posY) == 0) {
-                    inputHandler.playerFieldRightClicked(team, posX, posY);
+                    inputHandler.playerFieldRightClicked(team, posX, posY, true, false);
+                    return true;
+                } else if (button == Input.Buttons.RIGHT && tileMap.getTile(posX, posY) == 1) { //ToDo tile ID adjust, is still wrong, waiting for code from animation
+                    inputHandler.playerFieldRightClicked(team, posX, posY, false, true);
                     return true;
                 } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 0) {
                     Skin skin = AssetContainer.MainMenuAssets.skin;
@@ -540,7 +543,7 @@ public class Hud implements Disposable {
                         }
                     });
                     return true;
-                } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 1) {
+                } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 1) { //ToDo tile ID adjust, is still wrong, waiting for code from animation
                     Skin skin = AssetContainer.MainMenuAssets.skin;
                     fireModeSelectBox = new SelectBox<>(skin);
                     fireModeSelectBox = new SelectBox<>(skin);
