@@ -31,7 +31,7 @@ import com.gatdsen.ui.hud.*;
  * Input Handling during the game.
  * Displaying health, inventory
  */
-public class Hud implements Disposable{
+public class Hud implements Disposable {
 
     private static Stage stage;
     private final InputHandler inputHandler;
@@ -64,7 +64,8 @@ public class Hud implements Disposable{
     public Group hudGroup = new Group();
     public TileMap tileMap;
     private SelectBox<Tower.TowerType> towerSelectBox;
-    private Tower.TowerType towerType;
+    private SelectBox fireModeSelectBox;
+
 
     /**
      * Initialisiert das HUD-Objekt
@@ -99,10 +100,9 @@ public class Hud implements Disposable{
         healthBarPlayer0.setAnimateDuration(0.25f);
         healthBarPlayer1.setValue(health);
         healthBarPlayer1.setAnimateDuration(0.25f);
-        if (gameState != null){
+        if (gameState != null) {
             roundCounter = gameState.getTurn();
-        }
-        else roundCounter = 1;
+        } else roundCounter = 1;
     }
 
     /**
@@ -177,7 +177,7 @@ public class Hud implements Disposable{
         currentPlayer1.setAlignment(Align.center);
         Label currentRoundLabel = new Label("Runde: " + roundCounter, skin);
         currentRoundLabel.setAlignment(Align.center);
-        Label healthPlayer0Label = new Label("" + healthPlayer0 , skin);
+        Label healthPlayer0Label = new Label("" + healthPlayer0, skin);
         healthPlayer0Label.setAlignment(Align.center);
         Label healthPlayer1Label = new Label("" + healthPlayer1, skin);
         healthPlayer1Label.setAlignment(Align.center);
@@ -522,29 +522,41 @@ public class Hud implements Disposable{
                     return true;
                 } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 0) {
                     Skin skin = AssetContainer.MainMenuAssets.skin;
-
-                    if (towerSelectBox != null) {
-                        towerSelectBox.remove();
-                    }
                     towerSelectBox = new SelectBox<>(skin);
-
-
                     Tower.TowerType[] towerTypes = Tower.TowerType.values();
                     towerSelectBox.setItems(towerTypes);
-
                     towerSelectBox.setSize(140, 20);
-
-                    towerSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() +y);
-
+                    towerSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
                     hudGroup.addActor(towerSelectBox);
-
                     towerSelectBox.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
+                            Tower.TowerType towerType;
                             towerType = towerSelectBox.getSelected();
-                            inputHandler.playerFieldLeftClicked(team, posX, posY, towerType);
+                            inputHandler.playerFieldLeftClicked(team, posX, posY, towerType, null);
                             if (towerSelectBox != null) {
                                 towerSelectBox.remove();
+                            }
+                        }
+                    });
+                    return true;
+                } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 1) {
+                    Skin skin = AssetContainer.MainMenuAssets.skin;
+                    fireModeSelectBox = new SelectBox<>(skin);
+                    fireModeSelectBox = new SelectBox<>(skin);
+                    Tower.TargetOption[] targetOption = Tower.TargetOption.values();
+                    fireModeSelectBox.setItems(targetOption);
+                    fireModeSelectBox.setSize(140, 20);
+                    fireModeSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
+                    hudGroup.addActor(fireModeSelectBox);
+                    fireModeSelectBox.addListener(new ChangeListener() {
+                        @Override
+                        public void changed(ChangeEvent event, Actor actor) {
+                            Tower.TargetOption targetOption;
+                            targetOption = (Tower.TargetOption) fireModeSelectBox.getSelected();
+                            inputHandler.playerFieldLeftClicked(team, posX, posY, null, targetOption);
+                            if (fireModeSelectBox != null) {
+                                fireModeSelectBox.remove();
                             }
                         }
                     });
