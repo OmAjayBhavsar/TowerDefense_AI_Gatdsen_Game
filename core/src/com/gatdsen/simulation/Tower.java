@@ -25,16 +25,28 @@ public abstract class Tower {
         SNIPER_TOWER
     }
 
+    /**
+     * Speichert die verschiedenen Optionen, wie ein Tower sein Ziel auswählen kann
+     */
+    public enum TargetOption {
+        FIRST,
+        LAST,
+        STRONGEST,
+        WEAKEST
+    }
+
     static final int MAX_LEVEL = 3;
 
-    private final PlayerState playerState;
-    private final TowerType type;
-    private final IntVector2 pos;
+    protected final PlayerState playerState;
+    protected final TowerType type;
+    protected final IntVector2 pos;
+
+    protected TargetOption targetOption = TargetOption.FIRST;
 
     protected static int idCounter = 0;
     protected final int id;
-    private final List<PathTile> pathInRange = new ArrayList<>();
-    private List<Tile> inRange;
+    protected final List<PathTile> pathInRange = new ArrayList<>();
+    protected List<Tile> inRange;
     protected int level;
     protected int cooldown;
 
@@ -53,7 +65,7 @@ public abstract class Tower {
         this.playerState = playerState;
         this.type = type;
         this.level = 1;
-        this.cooldown = getRechargeTime();
+        this.cooldown = 0;
         this.inRange = getNeighbours(getRange(), board);
         setPathList();
         pathInRange.sort(Comparator.comparingInt(PathTile::getIndex));
@@ -69,6 +81,7 @@ public abstract class Tower {
         this.level = original.level;
         this.cooldown = original.cooldown;
         this.inRange = original.inRange;
+        this.targetOption = original.targetOption;
     }
 
     /**
@@ -88,10 +101,10 @@ public abstract class Tower {
     private List<Tile> getNeighbours(int range, Tile[][] board) {
         int diameter = (range * 2) + 1;
         List<Tile> neighbours = new ArrayList<>(diameter * diameter - 1);
-        IntRectangle rec = new IntRectangle(0,0, board.length-1, board[0].length-1);
+        IntRectangle rec = new IntRectangle(0, 0, board.length - 1, board[0].length - 1);
         for (int i = 0; i < diameter; i++) {
             for (int j = 0; j < diameter; j++) {
-                if (rec.contains(pos.x - range + i, pos.y -range + j)) {
+                if (rec.contains(pos.x - range + i, pos.y - range + j)) {
                     neighbours.add(board[pos.x - range + i][pos.y - range + j]);
                 }
 
@@ -139,10 +152,12 @@ public abstract class Tower {
         return type;
     }
 
+    /**
+     * @return die ID des Towers
+     */
     public int getId() {
         return id;
     }
-
 
     /**
      * Gibt den Preis für ein Upgrade des Towers zurück
@@ -175,6 +190,7 @@ public abstract class Tower {
      * @return Range-Wert des Towers
      */
     public abstract int getRange();
+
     /**
      * Gibt den RechargeTime-Wert des Towers zurück
      *
@@ -193,8 +209,96 @@ public abstract class Tower {
      * Upgraded den Tower
      */
     void upgrade() {
-        // ToDo: implement upgrade after christmas task
         ++level;
+    }
+
+    /**
+     * @return den ersten Gegner in Reichweite
+     */
+    private Enemy getFirstEnemy() {
+        for (int i = pathInRange.size() - 1; i >= 0; i--) {
+            if (!pathInRange.get(i).getEnemies().isEmpty()) {
+                return pathInRange.get(i).getEnemies().get(0);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return den letzten Gegner in Reichweite
+     */
+    private Enemy getLastEnemy() {
+        for (PathTile pathTile : pathInRange) {
+            if (!pathTile.getEnemies().isEmpty()) {
+                List<Enemy> enemies = pathTile.getEnemies();
+                return enemies.get(enemies.size() - 1);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return den stärksten Gegner in Reichweite
+     */
+    private Enemy getStrongestEnemy() {
+        Enemy strongest = getFirstEnemy();
+        if (strongest == null) {
+            return null;
+        }
+        for (PathTile pathTile : pathInRange) {
+            if (!pathTile.getEnemies().isEmpty()) {
+                List<Enemy> enemies = pathTile.getEnemies();
+                for (Enemy enemy : enemies) {
+                    strongest = strongest.getHealth() < enemy.getHealth() ? enemy : strongest;
+                }
+            }
+        }
+        return strongest;
+    }
+
+    /**
+     * @return den schwächsten Gegner in Reichweite
+     */
+    private Enemy getWeakestEnemy() {
+        Enemy weakest = getFirstEnemy();
+        if (weakest == null) {
+            return null;
+        }
+        for (int i = pathInRange.size() - 1; i >= 0; i--) {
+            if (!pathInRange.get(i).getEnemies().isEmpty()) {
+                List<Enemy> enemies = pathInRange.get(i).getEnemies();
+                for (Enemy enemy : enemies) {
+                    weakest = weakest.getHealth() > enemy.getHealth() ? enemy : weakest;
+                }
+            }
+        }
+        return weakest;
+    }
+
+    /**
+     * @return den Gegner, der vom Tower angegriffen werden soll
+     */
+    protected Enemy getTarget() {
+        Enemy target = null;
+        switch (targetOption) {
+            case FIRST:
+                target = getFirstEnemy();
+                break;
+            case LAST:
+                target = getLastEnemy();
+                break;
+            case STRONGEST:
+                target = getStrongestEnemy();
+                break;
+            case WEAKEST:
+                target = getWeakestEnemy();
+                break;
+        }
+        return target;
+    }
+
+    protected Action updateEnemyHealth(Enemy enemy, Action head) {
+        return enemy.updateHealth(getDamage(), head);
     }
 
     /**
@@ -203,36 +307,32 @@ public abstract class Tower {
      * @param head Kopf der Action-Liste
      * @return neuer Kopf der Action-Liste
      */
-    public Action attack(Action head) {
+    protected Action attack(Action head) {
         if (pathInRange.isEmpty()) {
             return head;
         }
 
-        if (getRechargeTime() > 0) {
+        if (cooldown > 0) {
             --cooldown;
             return head;
         }
 
-        int lastIndex = pathInRange.size() - 1;
+        Enemy target = getTarget();
 
-        Enemy target = null;
-
-        for (int i = lastIndex; i >= 0; i--) {
-            if (!pathInRange.get(i).getEnemies().isEmpty()) {
-                target = pathInRange.get(i).getEnemies().get(0);
-                break;
-            }
-        }
         if (target != null) {
             head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex(), id));
             Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 1);
             path.setDuration(0);
             head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));
 
-            head = target.updateHealth(getDamage(), head);
+            head = updateEnemyHealth(target, head);
             cooldown = getRechargeTime();
         }
         return head;
+    }
+
+    public void setTargetOption(TargetOption targetOption) {
+        this.targetOption = targetOption;
     }
 
     /**

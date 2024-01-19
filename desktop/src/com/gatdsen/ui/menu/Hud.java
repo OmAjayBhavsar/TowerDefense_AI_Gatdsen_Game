@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gatdsen.animation.entity.TileMap;
 import com.gatdsen.manager.run.config.RunConfiguration;
 import com.gatdsen.simulation.GameState;
+import com.gatdsen.simulation.Tower;
 import com.gatdsen.ui.GADS;
 import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.hud.*;
@@ -62,6 +63,10 @@ public class Hud implements Disposable {
     private int roundCounter = 1;
     private int healthPlayer0 = health;
     private int healthPlayer1 = health;
+    public Group hudGroup = new Group();
+    public TileMap tileMap;
+    private SelectBox<Tower.TowerType> towerSelectBox;
+    private Tower.TowerType towerType;
 
     /**
      * Initialisiert das HUD-Objekt
@@ -454,8 +459,7 @@ public class Hud implements Disposable {
     public void newGame(GameState gameState, Vector2[] arrayPositionTileMaps, int tileSize, TileMap tileMap) {
 
         this.gameState = gameState;
-        Group group = new Group();
-        stage.addActor(group);
+        stage.addActor(hudGroup);
 
         int numberOfTeams = gameState.getPlayerCount();
         TextButton[] teamButtons;
@@ -464,7 +468,7 @@ public class Hud implements Disposable {
         for (int i = 0; i < numberOfTeams; i++) {
             teamButtons[i] = tileMapButton(i, tileMap);
             teamButtons[i].setSize((gameState.getBoardSizeX() * tileSize) / 10.0f, (gameState.getBoardSizeY() * tileSize) / 10.0f);
-            group.addActor(teamButtons[i]);
+            hudGroup.addActor(teamButtons[i]);
             teamButtons[i].setPosition((arrayPositionTileMaps[i].x) / 10.0f, (arrayPositionTileMaps[i].y) / 10.0f);
             teamButtons[i].setColor(Color.CLEAR);
         }
@@ -504,12 +508,39 @@ public class Hud implements Disposable {
                     inputHandler.playerFieldRightClicked(team, posX, posY);
                     return true;
                 } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 0) {
-                    inputHandler.playerFieldLeftClicked(team, posX, posY);
+                    Skin skin = AssetContainer.MainMenuAssets.skin;
+
+                    if (towerSelectBox != null) {
+                        towerSelectBox.remove();
+                    }
+                    towerSelectBox = new SelectBox<>(skin);
+
+
+                    Tower.TowerType[] towerTypes = Tower.TowerType.values();
+                    towerSelectBox.setItems(towerTypes);
+
+                    towerSelectBox.setSize(140, 20);
+
+                    towerSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() +y);
+
+                    hudGroup.addActor(towerSelectBox);
+
+                    towerSelectBox.addListener(new ChangeListener() {
+                        @Override
+                        public void changed(ChangeEvent event, Actor actor) {
+                            towerType = towerSelectBox.getSelected();
+                            inputHandler.playerFieldLeftClicked(team, posX, posY, towerType);
+                            if (towerSelectBox != null) {
+                                towerSelectBox.remove();
+                            }
+                        }
+                    });
                     return true;
                 }
                 return false;
             }
         });
+        this.tileMap = tileMap;
         return tileMapButton;
     }
 

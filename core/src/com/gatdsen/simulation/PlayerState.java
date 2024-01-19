@@ -1,11 +1,11 @@
 package com.gatdsen.simulation;
-
 import com.gatdsen.simulation.action.*;
 import com.gatdsen.simulation.enemy.BasicEnemy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Speichert den Zustand eines Spielers.
@@ -14,11 +14,15 @@ public class PlayerState implements Serializable {
     private final Tile[][] board;
     private int health;
     private int money;
+
+    private int spawnCoins;
     private final int index;
     private PathTile spawnTile;
     private PathTile endTile;
+
+    private final Stack<Enemy> spawnEnemies = new Stack<Enemy>();
+
     private final int enemyTypeCount = 1;
-    private final Enemy[][] enemiesToBeSpawned = new Enemy[100][enemyTypeCount];
     private boolean disqualified;
     private boolean deactivated;
 
@@ -37,7 +41,6 @@ public class PlayerState implements Serializable {
         board = new Tile[width][height];
         this.health = health;
         this.money = money;
-
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -88,7 +91,6 @@ public class PlayerState implements Serializable {
         }
         spawnTile = endTile.getFirstPathTile();
         spawnTile.indexPathTiles();
-        initEnemiesToBeSpawned();
     }
 
     /**
@@ -246,7 +248,7 @@ public class PlayerState implements Serializable {
         }
 
         money -= towerTile.getTower().getPrice();
-        Action updateAction = new UpdateCurrencyAction(0, money, index);
+        Action updateAction = new UpdateCurrencyAction(0, money, spawnCoins, index);
         head.addChild(updateAction);
 
         board[x][y] = towerTile;
@@ -272,10 +274,10 @@ public class PlayerState implements Serializable {
         if (board[x][y] instanceof TowerTile) {
             TowerTile towerTile = (TowerTile) board[x][y];
             Tower tower = towerTile.getTower();
-            if (tower.getLevel() < Tower.getMaxLevel() && money > tower.getUpgradePrice()) {
+            if (tower.getLevel() < Tower.getMaxLevel() && money >= tower.getUpgradePrice()) {
                 money -= tower.getUpgradePrice();
                 tower.upgrade();
-                head.addChild(new TowerPlaceAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));
+                head.addChild(new TowerUpgradeAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));
             } else {
                 // ToDo: append error action
                 return head;
@@ -288,15 +290,63 @@ public class PlayerState implements Serializable {
     }
 
     /**
+     * Verkauft einen Tower auf dem Spielfeld
+     *
+     * @param x    x-Koordinate des Towers
+     * @param y    y-Koordinate des Towers
+     * @param head Kopf der Action-Liste
+     * @return neuer Kopf der Action-Liste
+     */
+    Action sellTower(int x, int y, Action head) {
+        if (board[x][y] == null) {
+            // ToDo: append error action
+            return head;
+        }
+        if (board[x][y] instanceof TowerTile) {
+            TowerTile towerTile = (TowerTile) board[x][y];
+            Tower tower = towerTile.getTower();
+            money += tower.getPrice() / 2;
+            head.addChild(new UpdateCurrencyAction(0, money, spawnCoins, index));
+            head.addChild(new TowerDestroyAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));
+            board[x][y] = null;
+        } else {
+            // ToDo: append error action
+            return head;
+        }
+        return head;
+    }
+
+    /**
+     * Setzt das Target eines Towers
+     *
+     * @param x            x-Koordinate des Towers
+     * @param y            y-Koordinate des Towers
+     * @param targetOption TargetOption des Towers
+     * @param head         Kopf der Action-Liste
+     * @return neuer Kopf der Action-Liste
+     */
+    Action setTarget(int x, int y, Tower.TargetOption targetOption, Action head) {
+        if (board[x][y] instanceof TowerTile) {
+            TowerTile towerTile = (TowerTile) board[x][y];
+            towerTile.getTower().setTargetOption(targetOption);
+        } else {
+            // ToDo: append error action
+            return head;
+        }
+
+        return head;
+    }
+
+    /**
      * Initialisiert die Gegner, die gespawnt werden sollen
      */
-    void initEnemiesToBeSpawned() {
-        for (int i = 0; i < enemiesToBeSpawned.length; i++) {
-            for (int j = 0; j < enemyTypeCount; j++) {
-                enemiesToBeSpawned[i][j] = new BasicEnemy(this, 1, spawnTile);
-            }
-        }
+
+    void SpawnEnemy(int wave){
+        if (wave%10 == 0) spawnEnemies.push(new BasicEnemy(this, wave/2, spawnTile));
+        else if (wave%5 == 0) spawnEnemies.push(new BasicEnemy(this, wave/5 + 1, spawnTile));
+        else spawnEnemies.push(new BasicEnemy(this, 1 + wave/20, spawnTile));
     }
+
 
     /**
      * Spawnt die Gegner
@@ -306,11 +356,11 @@ public class PlayerState implements Serializable {
      * @return der Action Head
      */
     Action spawnEnemies(Action head, int wave) {
-        for (int i = 0; i < enemyTypeCount; i++) {
-            if (wave > 99) wave = 80;
-            Enemy actual = enemiesToBeSpawned[wave][i];
-            spawnTile.getEnemies().add(actual);
-            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), actual.getLevel(), actual.getHealth(), index, actual.getId()));
+        SpawnEnemy(wave + 1);
+        while (!spawnEnemies.isEmpty()) {
+            Enemy enemy = spawnEnemies.pop();
+            spawnTile.getEnemies().add(enemy);
+            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemy.getLevel(), enemy.getHealth(), index, enemy.getId()));
         }
         return head;
     }
@@ -351,8 +401,6 @@ public class PlayerState implements Serializable {
         return head;
     }
 
-
-
     /**
      * Setzt die Lebenspunkte des Spielers
      *
@@ -377,13 +425,16 @@ public class PlayerState implements Serializable {
      * @param head  Kopf der Action-Liste
      * @return neuer Kopf der Action-Liste
      */
-    Action updateMoney(int money, Action head) {
+    Action updateCurrency(int money, int spawnCoins, Action head) {
         this.money += money;
-        Action updateMoneyAction = new UpdateCurrencyAction(0, this.money, index);
+        this.spawnCoins += spawnCoins;
+        Action updateMoneyAction = new UpdateCurrencyAction(0, this.money, this.spawnCoins, index);
         head.addChild(updateMoneyAction);
         head = updateMoneyAction;
         return head;
     }
+
+
 
     /**
      * Führt alle Tower-Aktionen aus
