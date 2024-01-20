@@ -208,5 +208,3 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         hud.skipTurnStart();
     }
 }
-
-//ToDo Vorgänger speichern, wenn
