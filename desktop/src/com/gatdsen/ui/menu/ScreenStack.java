@@ -13,7 +13,6 @@ public class ScreenStack {
 
     public void pushScreen(Screen screen) {
         if (!screenStack.isEmpty()) {
-            // Pause the current top screen if it exists
             screenStack.peek().pause();
         }
         screenStack.push(screen);
@@ -22,12 +21,10 @@ public class ScreenStack {
 
     public void popScreen() {
         if (!screenStack.isEmpty()) {
-            // Dispose the current top screen before popping it
             screenStack.pop().dispose();
         }
 
         if (!screenStack.isEmpty()) {
-            // Resume the new top screen if it exists
             screenStack.peek().resume();
         }
     }
