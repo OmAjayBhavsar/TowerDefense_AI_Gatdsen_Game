@@ -53,10 +53,20 @@ public final class Controller {
      * @param x x-Koordinate, an der sich der Turm befindet
      * @param y y-Koordinate, an der sich der Turm befindet
      */
-    /* TODO:
     public void sellTower(int x, int y) {
         queue(new SellTowerCommand(x, y));
-    }*/
+    }
+
+    /**
+     * Ändert die Zieloption, nach welcher Priorität auf Gegner gezielt werden soll (bspw. erster, stärkster, ...),
+     * eines Turms, der sich auf dem Spielfeld befindet.
+     * @param x x-Koordinate, an der sich der Turm befindet
+     * @param y y-Koordinate, an der sich der Turm befindet
+     * @param targetOption Zieloption, nach der der Turm zielen soll
+     */
+    public void setTowerTarget(int x, int y, Tower.TargetOption targetOption) {
+        queue(new SetTowerTargetCommand(x, y, targetOption));
+    }
 
     /**
      * Internal utility method.
