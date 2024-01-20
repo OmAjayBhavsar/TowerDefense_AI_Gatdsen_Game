@@ -1,4 +1,4 @@
-package com.gatdsen.networking.data;
+package com.gatdsen.networking.rmi.data;
 
 import com.gatdsen.simulation.GameState;
 

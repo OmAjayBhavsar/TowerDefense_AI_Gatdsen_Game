@@ -1,7 +1,7 @@
 package com.gatdsen.networking.rmi;
 
 import com.gatdsen.manager.command.Command;
-import com.gatdsen.networking.data.CommunicatedInformation;
+import com.gatdsen.networking.rmi.data.CommunicatedInformation;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

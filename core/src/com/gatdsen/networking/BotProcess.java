@@ -6,6 +6,7 @@ import com.gatdsen.manager.command.EndTurnCommand;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.networking.data.*;
 import com.gatdsen.networking.rmi.ProcessCommunicator;
+import com.gatdsen.networking.rmi.data.*;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
