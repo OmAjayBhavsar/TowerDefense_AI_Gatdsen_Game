@@ -75,8 +75,8 @@ public class BasicTower extends Tower {
     public int getPrice() {
         switch (level) {
             case 1: return 80;
-            case 2: return 90;
-            case 3: return 100;
+            case 2: return 100;
+            case 3: return 120;
             default: return 0;
         }
     }

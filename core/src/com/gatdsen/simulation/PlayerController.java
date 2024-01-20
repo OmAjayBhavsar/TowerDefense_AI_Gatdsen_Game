@@ -17,7 +17,7 @@ public class PlayerController {
      * Disqualifiziert den Spieler
      */
     public void disqualify() {
-       playerState.disqualify();
+        playerState.disqualify();
     }
 
     /**
@@ -88,7 +88,20 @@ public class PlayerController {
      * @return Der ActionLog der durch das Ausführen des Befehls entstanden ist
      */
     public ActionLog sellTower(int x, int y) {
-        // ToDo: implement sellTower after christmas task
+        playerState.sellTower(x, y, getRoot());
+        return endCommand();
+    }
+
+    /**
+     * Setzt das Ziel eines Turms
+     *
+     * @param x            x-Koordinate
+     * @param y            y-Koordinate
+     * @param targetOption Zieloption als Enum
+     * @return Der ActionLog der durch das Ausführen des Befehls entstanden ist
+     */
+    public ActionLog setTarget(int x, int y, Tower.TargetOption targetOption) {
+        playerState.setTarget(x, y, targetOption, getRoot());
         return endCommand();
     }
 

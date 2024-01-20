@@ -5,6 +5,7 @@ package com.gatdsen.simulation.action;
  */
 public class UpdateCurrencyAction extends TeamAction {
     private final int newCurrency;
+    private final int newSpawnCurrency;
 
     /**
      * Speichert das Ereignis, dass das Geld eines Teams aktualisiert wurde
@@ -13,9 +14,10 @@ public class UpdateCurrencyAction extends TeamAction {
      * @param newCurrency neuer Geldstand
      * @param team        index des Teams
      */
-    public UpdateCurrencyAction(float delay, int newCurrency, int team) {
+    public UpdateCurrencyAction(float delay, int newCurrency, int newSpawnCurrency, int team) {
         super(delay, team);
         this.newCurrency = newCurrency;
+        this.newSpawnCurrency = newSpawnCurrency;
     }
 
     /**
@@ -25,10 +27,15 @@ public class UpdateCurrencyAction extends TeamAction {
         return newCurrency;
     }
 
+    public int getNewSpawnCurrency() {
+        return newSpawnCurrency;
+    }
+
     @Override
     public String toString() {
         return "UpdateCurrencyAction{" +
                 "newCurrency=" + newCurrency +
-                "} " + super.toString();
+                ", newSpawnCurrency=" + newSpawnCurrency +
+                '}';
     }
 }
