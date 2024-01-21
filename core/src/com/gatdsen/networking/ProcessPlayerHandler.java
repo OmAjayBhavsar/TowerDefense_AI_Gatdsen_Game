@@ -5,10 +5,10 @@ import com.gatdsen.manager.command.CommandHandler;
 import com.gatdsen.manager.concurrent.ThreadExecutor;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.PlayerHandler;
-import com.gatdsen.networking.rmi.data.CreatePlayerInformation;
-import com.gatdsen.networking.rmi.data.EndGameInformation;
-import com.gatdsen.networking.rmi.data.GameInformation;
-import com.gatdsen.networking.rmi.data.TurnInformation;
+import com.gatdsen.networking.rmi.message.CreatePlayerMessage;
+import com.gatdsen.networking.rmi.message.EndGameMessage;
+import com.gatdsen.networking.rmi.message.StartGameMessage;
+import com.gatdsen.networking.rmi.message.ExecuteTurnMessage;
 import com.gatdsen.networking.rmi.ProcessCommunicator;
 import com.gatdsen.networking.rmi.ProcessCommunicatorImpl;
 import com.gatdsen.simulation.GameState;
@@ -98,7 +98,7 @@ public final class ProcessPlayerHandler extends PlayerHandler {
     @Override
     public Future<?> create(CommandHandler commandHandler) {
         try {
-            communicatorStub.queueInformation(new CreatePlayerInformation());
+            communicatorStub.queueInformation(new CreatePlayerMessage());
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -118,7 +118,7 @@ public final class ProcessPlayerHandler extends PlayerHandler {
     @Override
     public Future<?> init(GameState gameState, boolean isDebug, long seed, CommandHandler commandHandler) {
         try {
-            communicatorStub.queueInformation(new GameInformation(gameState, isDebug, seed, playerIndex));
+            communicatorStub.queueInformation(new StartGameMessage(gameState, isDebug, seed, playerIndex));
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -138,7 +138,7 @@ public final class ProcessPlayerHandler extends PlayerHandler {
     @Override
     protected Future<?> onExecuteTurn(GameState gameState, CommandHandler commandHandler) {
         try {
-            communicatorStub.queueInformation(new TurnInformation(gameState));
+            communicatorStub.queueInformation(new ExecuteTurnMessage(gameState));
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -158,7 +158,7 @@ public final class ProcessPlayerHandler extends PlayerHandler {
     @Override
     public void dispose() {
         try {
-            communicatorStub.queueInformation(new EndGameInformation());
+            communicatorStub.queueInformation(new EndGameMessage());
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }

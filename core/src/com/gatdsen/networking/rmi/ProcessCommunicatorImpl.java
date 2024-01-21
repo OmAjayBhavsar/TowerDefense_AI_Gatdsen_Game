@@ -1,7 +1,7 @@
 package com.gatdsen.networking.rmi;
 
 import com.gatdsen.manager.command.Command;
-import com.gatdsen.networking.rmi.data.CommunicatedInformation;
+import com.gatdsen.networking.rmi.message.Message;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -11,16 +11,16 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class ProcessCommunicatorImpl implements ProcessCommunicator {
 
-    private final BlockingQueue<CommunicatedInformation> informationQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<Message> informationQueue = new LinkedBlockingQueue<>();
     private final BlockingQueue<Command> commandQueue = new LinkedBlockingQueue<>();
 
     @Override
-    public void queueInformation(CommunicatedInformation information) {
+    public void queueInformation(Message information) {
         informationQueue.add(information);
     }
 
     @Override
-    public CommunicatedInformation dequeueInformation() {
+    public Message dequeueInformation() {
         try {
             return informationQueue.take();
         } catch (InterruptedException e) {

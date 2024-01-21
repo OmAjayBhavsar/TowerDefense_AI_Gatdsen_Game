@@ -4,9 +4,8 @@ import com.gatdsen.manager.PlayerThread;
 import com.gatdsen.manager.command.Command;
 import com.gatdsen.manager.command.EndTurnCommand;
 import com.gatdsen.manager.player.Player;
-import com.gatdsen.networking.data.*;
 import com.gatdsen.networking.rmi.ProcessCommunicator;
-import com.gatdsen.networking.rmi.data.*;
+import com.gatdsen.networking.rmi.message.*;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -51,28 +50,28 @@ public class BotProcess {
         }
 
         while (true) {
-            CommunicatedInformation information;
+            Message information;
             try {
                 information = communicator.dequeueInformation();
             } catch (RemoteException e) {
                 throw new RuntimeException("Could not dequeue information from the parent process.");
             }
             BlockingQueue<Command> commands;
-            if (information instanceof CreatePlayerInformation) {
+            if (information instanceof CreatePlayerMessage) {
                 commands = playerThread.create(playerClass, null);
-            } else if (information instanceof GameInformation) {
-                GameInformation gameInformation = (GameInformation) information;
+            } else if (information instanceof StartGameMessage) {
+                StartGameMessage startGameMessage = (StartGameMessage) information;
                 if (!playerThread.isCreated()) {
                     throw new RuntimeException("Received GameInformation before CreatePlayerInformation.");
                 }
-                commands = playerThread.init(gameInformation.state, gameInformation.isDebug, gameInformation.seed, gameInformation.playerIndex);
-            } else if (information instanceof TurnInformation) {
-                TurnInformation turnInformation = (TurnInformation) information;
+                commands = playerThread.init(startGameMessage.state, startGameMessage.isDebug, startGameMessage.seed, startGameMessage.playerIndex);
+            } else if (information instanceof ExecuteTurnMessage) {
+                ExecuteTurnMessage executeTurnMessage = (ExecuteTurnMessage) information;
                 if (!playerThread.isInitialized()) {
                     throw new RuntimeException("Received TurnInformation before GameInformation.");
                 }
-                commands = playerThread.executeTurn(turnInformation.state);
-            } else if (information instanceof EndGameInformation) {
+                commands = playerThread.executeTurn(executeTurnMessage.state);
+            } else if (information instanceof EndGameMessage) {
                 try {
                     communicator.queueCommand(new EndTurnCommand());
                 } catch (RemoteException e) {

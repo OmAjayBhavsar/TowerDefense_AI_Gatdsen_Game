@@ -1,7 +1,7 @@
 package com.gatdsen.networking.rmi;
 
 import com.gatdsen.manager.command.Command;
-import com.gatdsen.networking.rmi.data.CommunicatedInformation;
+import com.gatdsen.networking.rmi.message.Message;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -14,19 +14,19 @@ import java.rmi.RemoteException;
 public interface ProcessCommunicator extends Remote {
 
     /**
-     * Fügt eine {@link CommunicatedInformation} in die Warteschlange ein.
+     * Fügt eine {@link Message} in die Warteschlange ein.
      * @param information Die einzufügende Information
      * @throws RemoteException Wird geworfen, wenn ein Fehler bei der Kommunikation auftritt
      */
-    void queueInformation(CommunicatedInformation information) throws RemoteException;
+    void queueInformation(Message information) throws RemoteException;
 
     /**
-     * Entfernt eine {@link CommunicatedInformation} aus der Warteschlange.
+     * Entfernt eine {@link Message} aus der Warteschlange.
      * Diese Methode blockiert, bis eine Information verfügbar ist.
      * @return Die entfernte Information
      * @throws RemoteException Wird geworfen, wenn ein Fehler bei der Kommunikation auftritt
      */
-    CommunicatedInformation dequeueInformation() throws RemoteException;
+    Message dequeueInformation() throws RemoteException;
 
     /**
      * Fügt einen {@link Command} in die Warteschlange ein.
