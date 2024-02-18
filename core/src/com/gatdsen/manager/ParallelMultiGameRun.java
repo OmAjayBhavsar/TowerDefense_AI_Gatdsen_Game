@@ -3,6 +3,8 @@ package com.gatdsen.manager;
 
 import com.gatdsen.manager.player.IdleBot;
 import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.config.RunConfiguration;
 import com.gatdsen.simulation.GameState;
 
@@ -24,24 +26,24 @@ public class ParallelMultiGameRun extends Run {
 
             //ToDo this is the configuration for the exam admission
 
-            if (runConfig.players.size() != 1) {
+            if (runConfig.playerFactories.size() != 1) {
                 System.err.println("Exam Admission only accepts exactly 1 player");
                 scores = new float[1];
                 complete();
                 return;
             }
 
-            runConfig.players.add(IdleBot.class);
-            getPlayers().clear();
-            getPlayers().addAll(runConfig.players);
+            runConfig.playerFactories.add(LocalPlayerHandlerFactory.IDLE_BOT);
+            getPlayerFactories().clear();
+            getPlayerFactories().addAll(runConfig.playerFactories);
             runConfig.mapName = "MangoMap";
         }
         ArrayList<Integer> indices = new ArrayList<>();
-        for (int i = 0; i < runConfig.players.size(); i++) {
+        for (int i = 0; i < runConfig.playerFactories.size(); i++) {
             indices.add(i);
         }
-        scores = new float[runConfig.players.size()];
-        List<List<Integer>> listOfMatchUps = subsetK(indices, runConfig.players.size());
+        scores = new float[runConfig.playerFactories.size()];
+        List<List<Integer>> listOfMatchUps = subsetK(indices, runConfig.playerFactories.size());
         List<List<Integer>> permListOfMatchUps = new ArrayList<>();
         for (List<Integer> matchUp : listOfMatchUps) {
             permListOfMatchUps.addAll(permutations(matchUp));
@@ -53,11 +55,11 @@ public class ParallelMultiGameRun extends Run {
         for (List<Integer> matchUp : permListOfMatchUps
         ) {
             RunConfiguration curConfig = runConfig.copy();
-            List<Class<? extends Player>> players = new ArrayList<>();
+            List<PlayerHandlerFactory> playerFactories = new ArrayList<>();
             for (Integer index : matchUp) {
-                players.add(runConfig.players.get(index));
+                playerFactories.add(runConfig.playerFactories.get(index));
             }
-            curConfig.players = players;
+            curConfig.playerFactories = playerFactories;
             Game curGame = new Game(curConfig.asGameConfig());
             curGame.addCompletionListener(this::onGameCompletion);
             if (runConfig.gui) {

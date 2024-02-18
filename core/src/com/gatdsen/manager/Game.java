@@ -6,12 +6,10 @@ import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.PlayerHandler;
 import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.networking.ProcessPlayerHandler;
-import com.gatdsen.simulation.PlayerController;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Simulation;
 import com.gatdsen.simulation.action.ActionLog;
-import com.gatdsen.simulation.campaign.CampaignResources;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -57,17 +55,7 @@ public class Game extends Executable {
         playerHandlers = new PlayerHandler[config.playerCount];
         Future<?>[] futures = new Future[playerHandlers.length];
         for (int playerIndex = 0; playerIndex < config.playerCount; playerIndex++) {
-            PlayerHandler playerHandler;
-            Class<? extends Player> playerClass = config.players[playerIndex];
-            if (Bot.class.isAssignableFrom(playerClass)) {
-                playerHandler = new ProcessPlayerHandler(playerClass, gameNumber.get(), playerIndex);
-            } else {
-                if (!gui) {
-                    throw new RuntimeException("HumanPlayers can't be used without GUI to capture inputs");
-                }
-                playerHandler = new LocalPlayerHandler(playerClass, playerIndex, inputGenerator);
-            }
-
+            PlayerHandler playerHandler = config.playerFactories[playerIndex].createPlayerHandler(inputGenerator, gameNumber.get(), playerIndex);
             playerHandlers[playerIndex] = playerHandler;
             playerHandler.setPlayerController(simulation.getController(playerIndex));
             futures[playerIndex] = playerHandler.create(command -> command.run(playerHandler));

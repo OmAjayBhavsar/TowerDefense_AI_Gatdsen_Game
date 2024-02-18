@@ -1,10 +1,12 @@
 package com.gatdsen.manager;
 
 import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.config.RunConfiguration;
 import com.gatdsen.simulation.GameState;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Run {
 
@@ -12,18 +14,18 @@ public abstract class Run {
     private boolean completed = false;
 
     private final Object schedulingLock = new Object();
-    private final ArrayList<CompletionHandler<Run>> completionListeners = new ArrayList<>();
+    private final List<CompletionHandler<Run>> completionListeners = new ArrayList<>();
 
     protected final Manager manager;
 
     protected GameState.GameMode gameMode;
-    private final ArrayList<Executable> games = new ArrayList<>();
+    private final List<Executable> games = new ArrayList<>();
 
     private boolean disposed = false;
-    private final ArrayList<Class<? extends Player>> players;
+    private final List<PlayerHandlerFactory> playerFactories;
 
     public Run(Manager manager, RunConfiguration runConfig) {
-        this.players = new ArrayList<>(runConfig.players);
+        this.playerFactories = new ArrayList<>(runConfig.playerFactories);
         gameMode = runConfig.gameMode;
         this.manager = manager;
     }
@@ -45,7 +47,7 @@ public abstract class Run {
         }
     }
 
-    public ArrayList<Executable> getGames() {
+    public List<Executable> getGames() {
         return games;
     }
 
@@ -76,8 +78,8 @@ public abstract class Run {
         return completed;
     }
 
-    public ArrayList<Class<? extends Player>> getPlayers() {
-        return players;
+    public List<PlayerHandlerFactory> getPlayerFactories() {
+        return playerFactories;
     }
 
     protected void complete() {
@@ -105,7 +107,7 @@ public abstract class Run {
                 ", completionListeners=" + completionListeners +
                 ", gameMode=" + gameMode +
                 ", games=" + games +
-                ", players=" + players +
+                ", players=" + playerFactories +
                 '}';
     }
 }

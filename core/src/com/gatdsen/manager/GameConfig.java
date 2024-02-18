@@ -1,11 +1,10 @@
 package com.gatdsen.manager;
 
-import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.config.RunConfiguration;
 import com.gatdsen.simulation.GameState.GameMode;
 
 import java.io.Serializable;
-import java.util.*;
 
 public final class GameConfig implements Serializable {
 
@@ -15,19 +14,18 @@ public final class GameConfig implements Serializable {
     public final transient InputProcessor inputProcessor;
     public final String mapName;
     public final boolean replay;
-    public final Class<? extends Player>[] players;
+    public final PlayerHandlerFactory[] playerFactories;
     public final int playerCount;
 
-    @SuppressWarnings("unchecked")
     public GameConfig(RunConfiguration runConfig) {
-        this.gameMode = runConfig.gameMode;
-        this.gui = runConfig.gui;
-        this.animationLogProcessor = runConfig.animationLogProcessor;
-        this.inputProcessor = runConfig.inputProcessor;
-        this.mapName = runConfig.mapName;
-        this.replay = runConfig.replay;
-        this.players = runConfig.players.toArray(new Class[0]);
-        this.playerCount = runConfig.players.size();
+        gameMode = runConfig.gameMode;
+        gui = runConfig.gui;
+        animationLogProcessor = runConfig.animationLogProcessor;
+        inputProcessor = runConfig.inputProcessor;
+        mapName = runConfig.mapName;
+        replay = runConfig.replay;
+        playerFactories = runConfig.playerFactories.toArray(new PlayerHandlerFactory[0]);
+        playerCount = playerFactories.length;
     }
 
     private GameConfig(GameConfig original) {
@@ -37,7 +35,7 @@ public final class GameConfig implements Serializable {
         inputProcessor = original.inputProcessor;
         mapName = original.mapName;
         replay = original.replay;
-        players = original.players;
+        playerFactories = original.playerFactories;
         playerCount = original.playerCount;
     }
 

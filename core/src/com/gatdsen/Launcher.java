@@ -1,9 +1,10 @@
 package com.gatdsen;
 
-import com.gatdsen.manager.Manager;
 import com.gatdsen.manager.Run;
 import com.gatdsen.manager.player.Bot;
 import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.config.RunConfiguration;
 import com.gatdsen.networking.ProcessPlayerHandler;
 import com.gatdsen.simulation.GameState.GameMode;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.List;
 
 public abstract class Launcher {
 
@@ -76,7 +78,7 @@ public abstract class Launcher {
         runConfig.gui = !params.hasOption("n");
         runConfig.mapName = params.getOptionValue("m", null);
         if (params.hasOption("p")) {
-            runConfig.players = Manager.getPlayers(params.getOptionValue("p").trim().split("\\s+"), !runConfig.gui);
+            runConfig.playerFactories = List.of(PlayerHandlerFactory.getPlayerFactories(params.getOptionValue("p").trim().split("\\s+")));
         }
         if (params.hasOption("r")) {
             runConfig.replay = true;
@@ -116,18 +118,23 @@ public abstract class Launcher {
             case Tournament_Phase_1:
                 builder.append("\nScores:\n");
                 int i = 0;
-                for (Class<? extends Player> cur : run.getPlayers()) {
-                    String name = "";
-                    int matrikel = 0;
-                    if (Bot.class.isAssignableFrom(cur))
-                        try {
-                            Bot player = (Bot) cur.getDeclaredConstructors()[0].newInstance();
-                            name = player.getStudentName();
-                            matrikel = player.getMatrikel();
-                        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                            System.err.println("Unable to fetch Player instance");
+                for (PlayerHandlerFactory cur : run.getPlayerFactories()) {
+                    boolean isBot = false;
+                    if (cur instanceof LocalPlayerHandlerFactory) {
+                        Class<? extends Player> playerClass = ((LocalPlayerHandlerFactory) cur).getPlayerClass();
+                        if (Bot.class.isAssignableFrom(playerClass)) {
+                            try {
+                                Bot player = (Bot) playerClass.getDeclaredConstructors()[0].newInstance();
+                                isBot = true;
+                                builder.append(String.format("%-10s (%s, %d)", cur.getName(), player.getStudentName(), player.getMatrikel()));
+                            } catch (InvocationTargetException | InstantiationException | IllegalAccessException ignored) {
+                            }
                         }
-                    builder.append(String.format("%-10s (%s, %d) :  %-6f%n", cur.getName(), name, matrikel, run.getScores()[i++]));
+                    }
+                    if (!isBot) {
+                        builder.append(String.format("%-10s", cur.getName()));
+                    }
+                    builder.append(String.format(" :  %-6f%n", run.getScores()[i++]));
                 }
                 builder.append("\n");
                 break;
@@ -139,18 +146,23 @@ public abstract class Launcher {
                 StringBuilder scoreBuilder = new StringBuilder();
                 scoreBuilder.append("\nScores:\n");
                 int j = 0;
-                for (Class<? extends Player> cur : run.getPlayers()) {
-                    String name = "";
-                    int matrikel = 0;
-                    if (Bot.class.isAssignableFrom(cur))
-                        try {
-                            Bot player = (Bot) cur.getDeclaredConstructors()[0].newInstance();
-                            name = player.getStudentName();
-                            matrikel = player.getMatrikel();
-                        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                            System.err.println("Unable to fetch Player instance");
+                for (PlayerHandlerFactory cur : run.getPlayerFactories()) {
+                    boolean isBot = false;
+                    if (cur instanceof LocalPlayerHandlerFactory) {
+                        Class<? extends Player> playerClass = ((LocalPlayerHandlerFactory) cur).getPlayerClass();
+                        if (Bot.class.isAssignableFrom(playerClass)) {
+                            try {
+                                Bot player = (Bot) playerClass.getDeclaredConstructors()[0].newInstance();
+                                isBot = true;
+                                builder.append(String.format("%-10s (%s, %d)", cur.getName(), player.getStudentName(), player.getMatrikel()));
+                            } catch (InvocationTargetException | InstantiationException | IllegalAccessException ignored) {
+                            }
                         }
-                    scoreBuilder.append(String.format("%-10s (%-10s, %-6d) :  %-6f%n", cur.getName(), name, matrikel, run.getScores()[j++]));
+                    }
+                    if (!isBot) {
+                        builder.append(String.format("%-10s", cur.getName()));
+                    }
+                    builder.append(String.format(" :  %-6f%n", run.getScores()[j++]));
                 }
                 System.out.println(scoreBuilder);
                 if (run.getScores()[0] >= 420) {
@@ -160,7 +172,7 @@ public abstract class Launcher {
                 }
                 break;
             default:
-                builder.append(Arrays.toString(run.getPlayers().toArray()));
+                builder.append(Arrays.toString(run.getPlayerFactories().toArray()));
                 builder.append("\n");
                 builder.append(Arrays.toString(run.getScores()));
                 break;

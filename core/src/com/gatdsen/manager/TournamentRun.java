@@ -1,6 +1,6 @@
 package com.gatdsen.manager;
 
-import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.config.RunConfiguration;
 
 import java.util.*;
@@ -84,9 +84,9 @@ public class TournamentRun extends Run {
         }
 
         private void startGames() {
-            config.players = new ArrayList<>();
-            config.players.add(players.get(p1));
-            config.players.add(players.get(p2));
+            config.playerFactories = new ArrayList<>();
+            config.playerFactories.add(playerFactories.get(p1));
+            config.playerFactories.add(playerFactories.get(p2));
             config.mapName = "lukeMap"; //ToDo make dynamic
             game1 = new Game(config.asGameConfig());
             game1.addCompletionListener(this::onGameComplete);
@@ -108,9 +108,9 @@ public class TournamentRun extends Run {
                 completed++;
                 winner = (int) (game.getScores()[0] - game.getScores()[1]);
                 if (completed >= 3) {
-                    System.out.printf("|%s-%s|%n",players.get(p1).getName(),players.get(p2).getName());
+                    System.out.printf("|%s-%s|%n", playerFactories.get(p1).getName(), playerFactories.get(p2).getName());
                     if (winner == 0)
-                        System.err.printf("Warning no Winner in Best of 3 %s vs %s", config.players.get(0).getName(), config.players.get(1).getName());
+                        System.err.printf("Warning no Winner in Best of 3 %s vs %s", config.playerFactories.get(0).getName(), config.playerFactories.get(1).getName());
                     for (CompletionHandler<BracketNode> handler : handlers) {
                         handler.onComplete(this);
                     }
@@ -145,7 +145,7 @@ public class TournamentRun extends Run {
 
 
 
-    private final List<Class<? extends Player>> players;
+    private final List<PlayerHandlerFactory> playerFactories;
 
     int completedGames = 0;
 
@@ -159,9 +159,9 @@ public class TournamentRun extends Run {
 
     protected TournamentRun(Manager manager, RunConfiguration runConfig) {
         super(manager, runConfig);
-        players = runConfig.players;
+        playerFactories = runConfig.playerFactories;
 
-        int playerCount = players.size();
+        int playerCount = playerFactories.size();
         scores = new float[playerCount];
         if (playerCount < 4) {
             System.err.println("A Tournament requires at least 4 players");
@@ -298,9 +298,9 @@ public class TournamentRun extends Run {
         ArrayList<BracketNode> nextLayer;
         curLayer.add(winnerFinal);
 
-        System.out.println("Winner:" + players.get(winner).getName());
+        System.out.println("Winner:" + playerFactories.get(winner).getName());
         System.out.printf("Final: " + printBracket(finalGame));
-        System.out.println("3rd:" + players.get(redemptionFinal.getWinner()).getName());
+        System.out.println("3rd:" + playerFactories.get(redemptionFinal.getWinner()).getName());
         System.out.printf("Redemption: " + printBracket(redemptionFinal));
         System.out.println("MainBracket:");
         while (!curLayer.isEmpty()){
@@ -334,7 +334,7 @@ public class TournamentRun extends Run {
     private String printBracket(BracketNode node){
         int s1 = (node.winner + 3)/2;
         int s2 = 3-s1;
-        return String.format("|%s-%s:%d-%d|", players.get(node.p1).getName(),players.get(node.p2).getName(), s1, s2);
+        return String.format("|%s-%s:%d-%d|", playerFactories.get(node.p1).getName(), playerFactories.get(node.p2).getName(), s1, s2);
     }
 
     private void setLooserScore(BracketNode node, float score) {
@@ -354,7 +354,7 @@ public class TournamentRun extends Run {
     public String toString() {
         return "TournamentRun{" +
                 "super=" + super.toString() +
-                ", players=" + players +
+                ", players=" + playerFactories +
                 ", completedGames=" + completedGames +
                 ", finalGame=" + finalGame +
                 ", looserBracket=" + redemptionFinal +

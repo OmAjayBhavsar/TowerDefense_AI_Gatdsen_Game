@@ -4,7 +4,8 @@ import com.gatdsen.manager.AnimationLogProcessor;
 import com.gatdsen.manager.GameConfig;
 import com.gatdsen.manager.InputProcessor;
 import com.gatdsen.manager.player.IdleBot;
-import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.simulation.GameState.GameMode;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public final class RunConfiguration {
         inputProcessor = original.inputProcessor;
         mapName = original.mapName;
         replay = original.replay;
-        players = new ArrayList<>(original.players);
+        playerFactories = new ArrayList<>(original.playerFactories);
     }
 
     public GameMode gameMode = GameMode.Normal;
@@ -35,7 +36,7 @@ public final class RunConfiguration {
     public InputProcessor inputProcessor = null;
     public String mapName = null;
     public boolean replay = false;
-    public List<Class<? extends Player>> players = new ArrayList<>();
+    public List<PlayerHandlerFactory> playerFactories = new ArrayList<>();
 
     public boolean validate() {
         boolean isValid = true;
@@ -45,7 +46,7 @@ public final class RunConfiguration {
                     System.err.println("RunConfiguration: No map name was provided.");
                     isValid = false;
                 }
-                if (players.size() != 2) {
+                if (playerFactories.size() != 2) {
                     System.err.println("RunConfiguration: Only two players are allowed in normal game mode.");
                     isValid = false;
                 }
@@ -55,7 +56,7 @@ public final class RunConfiguration {
                     System.err.println("RunConfiguration: A map can't be provided for the christmas task.");
                     isValid = false;
                 }
-                if (players.size() != 1) {
+                if (playerFactories.size() != 1) {
                     System.err.println("RunConfiguration: Only one player is allowed for the christmas task.");
                     isValid = false;
                 }
@@ -70,11 +71,11 @@ public final class RunConfiguration {
         RunConfiguration config = copy();
         switch (gameMode) {
             case Normal:
-                config.players = players;
+                config.playerFactories = playerFactories;
                 break;
             case Christmas_Task:
                 config.mapName = "map2";
-                config.players.add(IdleBot.class);
+                config.playerFactories.add(LocalPlayerHandlerFactory.IDLE_BOT);
                 break;
             default:
                 throw new RuntimeException("RunConfiguration: Gamemode " + gameMode + " is not unlocked yet.");
@@ -98,7 +99,7 @@ public final class RunConfiguration {
                 ", inputProcessor=" + inputProcessor +
                 ", mapName=\"" + mapName + "\"" +
                 ", replay=" + replay +
-                ", players=" + players +
+                ", players=" + playerFactories +
                 "}";
     }
 }

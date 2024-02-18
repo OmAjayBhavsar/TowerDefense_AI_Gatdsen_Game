@@ -6,17 +6,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
-import com.gatdsen.manager.Manager;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.config.RunConfiguration;
-import com.gatdsen.manager.player.Player;
 
 import java.util.ArrayList;
 
 public class PlayerAttribute extends Attribute {
 
     int playerIndex;
-    SelectBox<Manager.NamedPlayerClass> playerSelectBox;
-    Manager.NamedPlayerClass[] availablePlayers;
+    SelectBox<PlayerHandlerFactory> playerSelectBox;
+    PlayerHandlerFactory[] availablePlayers;
 
     /**
      * Konstruktor für die PlayerAttribute-Klasse.
@@ -25,7 +24,7 @@ public class PlayerAttribute extends Attribute {
      */
     public PlayerAttribute(int playerIndex) {
         this.playerIndex = playerIndex;
-        availablePlayers = Manager.getPossiblePlayers();
+        availablePlayers = PlayerHandlerFactory.getAvailablePlayerFactories();
     }
 
     /**
@@ -58,13 +57,13 @@ public class PlayerAttribute extends Attribute {
      */
     @Override
     public RunConfiguration getConfig(RunConfiguration runConfiguration) {
-        if (runConfiguration.players == null) {
-            runConfiguration.players = new ArrayList<>();
+        if (runConfiguration.playerFactories == null) {
+            runConfiguration.playerFactories = new ArrayList<>();
         }
-        while (runConfiguration.players.size() <= playerIndex) {
-            runConfiguration.players.add(null);
+        while (runConfiguration.playerFactories.size() <= playerIndex) {
+            runConfiguration.playerFactories.add(null);
         }
-        runConfiguration.players.set(playerIndex, playerSelectBox.getSelected().getClassRef());
+        runConfiguration.playerFactories.set(playerIndex, playerSelectBox.getSelected());
         return runConfiguration;
     }
 
@@ -75,18 +74,10 @@ public class PlayerAttribute extends Attribute {
      */
     @Override
     public void setConfig(RunConfiguration runConfiguration) {
-        if (runConfiguration.players == null || runConfiguration.players.size() <= playerIndex) {
+        if (runConfiguration.playerFactories == null || runConfiguration.playerFactories.size() <= playerIndex) {
             playerSelectBox.setSelected(null);
             return;
         }
-        Class<? extends Player> targetClass = runConfiguration.players.get(playerIndex);
-        Manager.NamedPlayerClass result = null;
-        for (Manager.NamedPlayerClass availablePlayer : availablePlayers) {
-            if (availablePlayer.getClassRef() == targetClass) {
-                result = availablePlayer;
-                break;
-            }
-        }
-        playerSelectBox.setSelected(result);
+        playerSelectBox.setSelected(runConfiguration.playerFactories.get(playerIndex));
     }
 }
