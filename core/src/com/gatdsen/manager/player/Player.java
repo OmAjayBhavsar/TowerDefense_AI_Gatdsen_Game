@@ -2,7 +2,6 @@ package com.gatdsen.manager.player;
 
 import com.gatdsen.manager.Controller;
 import com.gatdsen.manager.StaticGameState;
-import com.gatdsen.manager.player.data.PlayerInformation;
 
 /**
  * Die Basisklasse für alle Implementierungen von Spielern.
@@ -47,12 +46,4 @@ public abstract class Player {
      * @return Die Art der Implementierung des Spielers
      */
     public abstract PlayerType getType();
-
-    /**
-     * Wird für interne Zwecke verwendet und besitzt keine Relevanz für die Bot-Entwicklung.
-     * @return Die Informationen über den Spieler
-     */
-    public PlayerInformation getPlayerInformation() {
-        return new PlayerInformation(getType(), getName());
-    }
 }

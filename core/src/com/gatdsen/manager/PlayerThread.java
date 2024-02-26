@@ -7,6 +7,7 @@ import com.gatdsen.manager.player.analyzer.PlayerClassAnalyzer;
 import com.gatdsen.manager.player.Bot;
 import com.gatdsen.manager.player.HumanPlayer;
 import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.simulation.GameState;
 
 import java.lang.reflect.InvocationTargetException;
@@ -56,7 +57,7 @@ public final class PlayerThread {
         }
         PlayerClassAnalyzer analyzer = new PlayerClassAnalyzer(playerClass);
         Controller controller = createController();
-        controller.commands.add(new PlayerInformationCommand(player.getPlayerInformation(), analyzer.getSeedModifier()));
+        controller.commands.add(new PlayerInformationCommand(PlayerInformation.fromPlayer(player), analyzer.getSeedModifier()));
         if (player.getType().equals(Player.PlayerType.BOT)) {
             String[] illegalImports = analyzer.getIllegalImports();
             if (illegalImports.length > 0) {
