@@ -7,7 +7,9 @@ import com.gatdsen.simulation.IntVector2;
  */
 public class TowerAction extends TeamAction{
     private final int type;
+    private final int id;
     private final IntVector2 pos;
+
 
     /**
      * Speichert das Ereignis, dass ein Turm eine Aktion ausführt
@@ -22,11 +24,22 @@ public class TowerAction extends TeamAction{
         super(delay, team);
         this.type = type;
         this.pos = pos;
+        this.id = id;
+    }
+
+
+    /**
+     * @return ID des Turms
+     */
+    public int getId() {
+        return id;
     }
 
     /**
      * @return Position des Turms
      */
+
+
     public IntVector2 getPos() {
         return pos;
     }
@@ -37,6 +50,8 @@ public class TowerAction extends TeamAction{
     public int getType() {
         return type;
     }
+
+
 
     @Override
     public String toString() {
