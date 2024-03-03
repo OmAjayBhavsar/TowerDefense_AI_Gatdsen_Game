@@ -6,7 +6,7 @@ import com.gatdsen.simulation.IntVector2;
 
 /**
  * Die Klasse EnemyDestroyShieldAction ist eine Unterklasse von {@link EnemyAction EnemyAction}
- * und repräsentiert eine Aktion, bei der der Schild eines Gegners zerstört wird.
+ * und repräsentiert eine Aktion, bei der Schild eines Gegners zerstört wird.
  */
 public class EnemyDestroyShieldAction extends EnemyAction {
 
