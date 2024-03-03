@@ -7,6 +7,7 @@ import com.gatdsen.simulation.PlayerState;
 public class ShieldEnemy extends Enemy {
 
     boolean isShielded = true;
+
     /**
      * Erstellt einen neuen Gegner.
      *
@@ -14,17 +15,12 @@ public class ShieldEnemy extends Enemy {
      * @param level       Die Stufe des Gegners.
      * @param posTile     Die Position des Gegners.
      */
-
-
     public ShieldEnemy(PlayerState playerState, int level, PathTile posTile) {
         super(playerState, level, posTile);
         type = Type.SHIELD_ENEMY;
         health = 200 * level;
         damage = 5 * level;
     }
-
-
-
 
     @Override
     protected Enemy copy(PathTile posTile) {

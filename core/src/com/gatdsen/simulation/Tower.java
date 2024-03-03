@@ -300,7 +300,6 @@ public abstract class Tower {
     }
 
     protected Action updateEnemyHealth(Enemy enemy, Action head) {
-
         return enemy.updateHealth(getDamage(), head);
     }
 

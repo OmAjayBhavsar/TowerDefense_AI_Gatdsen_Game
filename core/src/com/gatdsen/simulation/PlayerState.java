@@ -389,7 +389,6 @@ public class PlayerState implements Serializable {
         else enemyLevel = 1 + wave / 20;
 
         spawnEnemies.push(new BasicEnemy(this, enemyLevel, spawnTile));
-
     }
 
     /**
