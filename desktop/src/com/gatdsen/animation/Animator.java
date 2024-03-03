@@ -606,7 +606,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         batch.setProjectionMatrix(camera.combined);
         //tells the batch to render in the way specified by the camera
         // e.g. Coordinate-system and Viewport scaling
-        viewport.apply();
+        viewport.apply(true);
 
         //ToDo: make one step in the scheduled actions
 
