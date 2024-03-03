@@ -68,6 +68,11 @@ public class BasicTower extends Tower {
         return 0;
     }
 
+    @Override
+    public void incrementRechargeTime() {
+        cooldown += 2;
+    }
+
     /**
      * @return Den Preis des BasicTowers
      */

@@ -198,6 +198,8 @@ public abstract class Tower {
      */
     public abstract int getRechargeTime();
 
+    public abstract void incrementRechargeTime();
+
     /**
      * Gibt den Preis des Towers zurück
      *
@@ -298,6 +300,7 @@ public abstract class Tower {
     }
 
     protected Action updateEnemyHealth(Enemy enemy, Action head) {
+
         return enemy.updateHealth(getDamage(), head);
     }
 
@@ -324,6 +327,7 @@ public abstract class Tower {
             Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 1);
             path.setDuration(0);
             head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));
+
 
             head = updateEnemyHealth(target, head);
             cooldown = getRechargeTime();

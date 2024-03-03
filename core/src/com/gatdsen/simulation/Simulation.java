@@ -83,6 +83,10 @@ public class Simulation {
             head = playerState.spawnEnemies(head, gameState.getTurn());
         }
 
+        for (PlayerState playerState : playerStates) {
+            head = playerState.updateSpawnCoins(1, head);
+        }
+
         int winner = -1;
         int livingPlayers = playerStates.length;
         for (int i = 0; i < playerStates.length; i++) {

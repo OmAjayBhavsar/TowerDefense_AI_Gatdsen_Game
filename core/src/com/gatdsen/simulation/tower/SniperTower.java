@@ -69,6 +69,11 @@ public class SniperTower extends Tower {
         return 3;
     }
 
+    @Override
+    public void incrementRechargeTime() {
+        cooldown += 3;
+    }
+
     /**
      * @return Den Preis des SniperTower
      */
