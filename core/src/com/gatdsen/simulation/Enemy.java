@@ -8,6 +8,13 @@ import java.io.Serializable;
  * Die Klasse Enemy repräsentiert einen Gegner im Spiel.
  */
 public abstract class Enemy implements Serializable {
+
+    public enum Type {
+        BASIC_ENEMY,
+        EMP_ENEMY,
+        SHIELD_ENEMY,
+        ARMOR_ENEMY
+    }
     protected final PlayerState playerState;
 
     private static int idCounter = 0;
@@ -114,4 +121,7 @@ public abstract class Enemy implements Serializable {
     public int getId() {
         return id;
     }
+
+
+
 }

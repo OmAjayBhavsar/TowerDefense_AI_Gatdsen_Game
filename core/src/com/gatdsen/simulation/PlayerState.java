@@ -1,6 +1,9 @@
 package com.gatdsen.simulation;
 import com.gatdsen.simulation.action.*;
+import com.gatdsen.simulation.enemy.ArmorEnemy;
 import com.gatdsen.simulation.enemy.BasicEnemy;
+import com.gatdsen.simulation.enemy.EmpEnemy;
+import com.gatdsen.simulation.enemy.ShieldEnemy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -338,8 +341,37 @@ public class PlayerState implements Serializable {
     }
 
     /**
-     * Initialisiert die Gegner, die gespawnt werden sollen
+     * Sendet einen Gegner zum Gegenspieler
+     * @param type          Typ des Gegners
+     * @param head          Kopf der Action-Liste
+     * @return neuer Kopf der Action-Liste
      */
+    Action sendEnemy(Enemy.Type type, GameState gameState, Action head) {
+        //Change Condition
+        if (spawnCoins < 5) {
+            gameState.getPlayerStates()[(index + 1) % 2].SpawnEnemy(type);
+            //Add level param
+            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), 1, 1, index, -1));
+        }
+        return head;
+    }
+
+
+    /**
+     * Initialisiert die Gegner, die gespawnt werden sollen
+     * @param type          Typ des Gegners
+     */
+    void SpawnEnemy(Enemy.Type type){
+        switch(type){
+            case BASIC_ENEMY: spawnEnemies.push(new BasicEnemy(this, 1, spawnTile));
+            break;
+            case EMP_ENEMY: spawnEnemies.push(new EmpEnemy(this, 1, spawnTile));
+            break;
+            case SHIELD_ENEMY: spawnEnemies.push(new ShieldEnemy(this, 1, spawnTile));
+            break;
+            case ARMOR_ENEMY: spawnEnemies.push(new ArmorEnemy(this, 1, spawnTile));
+        }
+    }
 
     void SpawnEnemy(int wave){
         if (wave%10 == 0) spawnEnemies.push(new BasicEnemy(this, wave/2, spawnTile));
