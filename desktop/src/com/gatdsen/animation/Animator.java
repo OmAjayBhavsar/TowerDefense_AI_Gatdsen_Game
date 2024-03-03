@@ -51,7 +51,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     public TileMap[] playerMaps;
 
-    private static GameTower[][][] towers;
+    private SortedMap<Integer, GameTower> towers;
     public SortedMap<Integer, GameEnemy> enemies;
 
     // TODO: BlockingQueue<ActionLog> muss BlockingQueue<Action> sein - gez. Corny
@@ -246,7 +246,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             TowerPlaceAction placeAction = (TowerPlaceAction) action;
 
             SummonAction<GameTower> summonTower = new SummonAction<GameTower>(action.getDelay(), target -> {
-                towers[placeAction.getTeam()][placeAction.getPos().x][placeAction.getPos().y] = target;
+                animator.towers.put(placeAction.getId(), target);
             }, () -> {
                 GameTower tower = new GameTower(1, placeAction.getType());
                 tower.setRelPos(placeAction.getPos().x * animator.playerMaps[0].getTileSize() + animator.playerMaps[placeAction.getTeam()].getPos().x,
@@ -261,7 +261,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
         private static ExpandedAction convertTowerAttackAction(com.gatdsen.simulation.action.Action action, Animator animator) {
             TowerAttackAction towerAttack = (TowerAttackAction) action;
-            GameTower tower = towers[towerAttack.getTeam()][towerAttack.getPos().x][towerAttack.getPos().y];
+            GameTower tower = animator.towers.get(towerAttack.getId());
 
             ExecutorAction attack = new ExecutorAction(towerAttack.getDelay(), () -> {
                 tower.attack();
@@ -336,11 +336,11 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             DestroyAction<GameTower> destroyTower = new DestroyAction<GameTower>(
                     destroyAction.getDelay(),
-                    towers[destroyAction.getTeam()][destroyAction.getPos().x][destroyAction.getPos().y],
+                    animator.towers.get(destroyAction.getId()),
                     null,
                     (GameTower tower) -> {
-                        animator.root.remove(towers[destroyAction.getTeam()][destroyAction.getPos().x][destroyAction.getPos().y]);
-                        towers[destroyAction.getTeam()][destroyAction.getPos().x][destroyAction.getPos().y] = null;
+                        animator.root.remove(animator.towers.get(destroyAction.getId()));
+                        animator.towers.remove(destroyAction.getId());
                     }
             );
 
@@ -434,7 +434,7 @@ public class Animator implements Screen, AnimationLogProcessor {
         this.batch = new SpriteBatch();
         this.root = new Entity();
 
-        towers = new GameTower[2][100][100];
+        towers = new TreeMap<>();
         enemies = new TreeMap<>();
         setupView(viewport);
 
