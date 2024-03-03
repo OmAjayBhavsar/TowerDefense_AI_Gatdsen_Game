@@ -1,5 +1,6 @@
 package com.gatdsen.simulation.action;
 
+import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.IntVector2;
 
 /**
@@ -9,6 +10,7 @@ public class EnemyAction extends TeamAction {
     private final IntVector2 pos;
     private final int level;
 
+    private final Enemy.Type type;
     private final int id;
 
     /**
@@ -20,10 +22,11 @@ public class EnemyAction extends TeamAction {
      * @param team  Das Team, dem der Gegner angehört.
      * @param id    Die ID des Gegners, der die Action ausführt.
      */
-    public EnemyAction(float delay, IntVector2 pos, int level, int team, int id) {
+    public EnemyAction(float delay, IntVector2 pos, int level, int team, Enemy.Type type, int id) {
         super(delay, team);
         this.pos = pos;
         this.level = level;
+        this.type = type;
         this.id = id;
     }
 
