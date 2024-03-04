@@ -185,7 +185,7 @@ public class Hud implements Disposable {
         healthPlayer1Label.setAlignment(Align.center);
         Label invisibleLabel = new Label("", skin);
         nextRoundButton = new TextButton("Zug beenden", skin);
-        backToMainMenuButton = new TextButton("Hauptmenue", skin);
+        backToMainMenuButton = new TextButton("Hauptmenü", skin);
         restartGameButton = new TextButton("Neustart", skin);
         nextRoundButton.addListener(new ChangeListener() {
             /**
