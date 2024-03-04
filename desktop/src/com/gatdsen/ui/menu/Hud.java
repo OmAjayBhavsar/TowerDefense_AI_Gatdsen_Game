@@ -26,6 +26,8 @@ import com.gatdsen.ui.GADS;
 import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.hud.*;
 
+import java.util.ArrayList;
+
 /**
  * Class for taking care of the User Interface.
  * Input Handling during the game.
@@ -64,8 +66,9 @@ public class Hud implements Disposable {
     public Group hudGroup = new Group();
     public TileMap tileMap;
     private SelectBox<Tower.TowerType> towerSelectBox;
+    private SelectBox<String> towerSellUpgrade;
     private SelectBox fireModeSelectBox;
-
+    private ArrayList<int[][]> towerMaps = new ArrayList<>();
 
     /**
      * Initialisiert das HUD-Objekt
@@ -79,7 +82,6 @@ public class Hud implements Disposable {
         this.inGameScreen = ingameScreen;
         hudViewport = new FitViewport(gameViewport.getWorldWidth() / 10, gameViewport.getWorldHeight() / 10);
         this.uiMessenger = new UiMessenger(this);
-        float animationSpeedupValue = 8;
         turnChangeDuration = 2;
         turnChangeSprite = AssetContainer.IngameAssets.turnChange;
         stage = new Stage(hudViewport);
@@ -171,9 +173,9 @@ public class Hud implements Disposable {
         player0BalanceLabel.setAlignment(Align.center);
         Label player1BalanceLabel = new Label("$" + player1Balance, skin);
         player1BalanceLabel.setAlignment(Align.center);
-        Label currentPlayer0 = new Label("Spieler 0", skin);
+        Label currentPlayer0 = new Label("Spieler 1", skin);
         currentPlayer0.setAlignment(Align.center);
-        Label currentPlayer1 = new Label("Spieler 1", skin);
+        Label currentPlayer1 = new Label("Spieler 2", skin);
         currentPlayer1.setAlignment(Align.center);
         Label currentRoundLabel = new Label("Runde: " + roundCounter, skin);
         currentRoundLabel.setAlignment(Align.center);
@@ -220,24 +222,6 @@ public class Hud implements Disposable {
         layoutTable.add(nextRoundButton).pad(padding).expandX().row();
         layoutTable.add(invisibleLabel);
     }
-
-    /*
-    /**
-     * Erstellt einen FastForwardButton und gibt ihn zurück
-     *
-     * @param uiMessenger Der UiMessenger für die Kommunikation
-     * @param speedUp     Die Geschwindigkeitssteigerung für die Schnellvorlauf-Funktion
-     * @return Ein neues FastForwardButton-Objekt
-
-    private FastForwardButton setupFastForwardButton(UiMessenger uiMessenger, float speedUp) {
-
-        FastForwardButton button = new FastForwardButton(new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButton),
-                new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButtonPressed),
-                new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButtonChecked),
-                uiMessenger, speedUp);
-        return button;
-    }
-    */
 
     /**
      * Gibt den InputHandler zurück
@@ -479,6 +463,8 @@ public class Hud implements Disposable {
         teamButtons = new TextButton[numberOfTeams];
 
         for (int i = 0; i < numberOfTeams; i++) {
+            int[][] towerMap = new int[gameState.getBoardSizeX()][gameState.getBoardSizeY()];
+            towerMaps.add(towerMap);
             teamButtons[i] = tileMapButton(i, tileMap);
             teamButtons[i].setSize((gameState.getBoardSizeX() * tileSize) / 10.0f, (gameState.getBoardSizeY() * tileSize) / 10.0f);
             hudGroup.addActor(teamButtons[i]);
@@ -517,13 +503,54 @@ public class Hud implements Disposable {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 int posX = (int) ((x / tileMap.getTileSize()) * 10);
                 int posY = (int) ((y / tileMap.getTileSize()) * 10);
-                if (button == Input.Buttons.RIGHT && tileMap.getTile(posX, posY) == 0) {
-                    inputHandler.playerFieldRightClicked(team, posX, posY, true, false);
+                if (button == Input.Buttons.RIGHT && tileMap.getTile(posX, posY) == 0 && towerMaps.get(team)[posX][posY] == 1) {
+                    closeSelectBox();
+                    towerSellUpgrade = new SelectBox<>(skin);
+                    towerSellUpgrade.setItems("Upgrade", "Verkaufen");
+                    towerSellUpgrade.setSize(140, 20);
+                    towerSellUpgrade.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
+                    hudGroup.addActor(towerSellUpgrade);
+                    towerSellUpgrade.addListener(new ChangeListener() {
+                        @Override
+                        public void changed(ChangeEvent changeEvent, Actor actor) {
+                            String selectedItem = towerSellUpgrade.getSelected();
+                            switch (selectedItem) {
+                                case ("Upgrade"):
+                                    inputHandler.playerFieldRightClicked(team, posX, posY, true, false);
+                                case ("Verkaufen"):
+                                    inputHandler.playerFieldRightClicked(team, posX, posY, false, true);
+                                default:
+                                    break;
+                            }
+                            if (towerSellUpgrade != null) {
+                                towerSellUpgrade.remove();
+                            }
+                        }
+                    });
                     return true;
-                } else if (button == Input.Buttons.RIGHT && tileMap.getTile(posX, posY) == 1) { //ToDo tile ID adjust, is still wrong, waiting for code from animation
-                    inputHandler.playerFieldRightClicked(team, posX, posY, false, true);
+                } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 0 && towerMaps.get(team)[posX][posY] == 1) {
+                    Skin skin = AssetContainer.MainMenuAssets.skin;
+                    closeSelectBox();
+                    fireModeSelectBox = new SelectBox<>(skin);
+                    Tower.TargetOption[] targetOption = Tower.TargetOption.values();
+                    fireModeSelectBox.setItems((Object[]) targetOption);
+                    fireModeSelectBox.setSize(140, 20);
+                    fireModeSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
+                    hudGroup.addActor(fireModeSelectBox);
+                    fireModeSelectBox.addListener(new ChangeListener() {
+                        @Override
+                        public void changed(ChangeEvent event, Actor actor) {
+                            Tower.TargetOption targetOption;
+                            targetOption = (Tower.TargetOption) fireModeSelectBox.getSelected();
+                            inputHandler.playerFieldLeftClicked(team, posX, posY, null, targetOption);
+                            if (fireModeSelectBox != null) {
+                                fireModeSelectBox.remove();
+                            }
+                        }
+                    });
                     return true;
                 } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 0) {
+                    closeSelectBox();
                     Skin skin = AssetContainer.MainMenuAssets.skin;
                     towerSelectBox = new SelectBox<>(skin);
                     Tower.TowerType[] towerTypes = Tower.TowerType.values();
@@ -537,29 +564,11 @@ public class Hud implements Disposable {
                             Tower.TowerType towerType;
                             towerType = towerSelectBox.getSelected();
                             inputHandler.playerFieldLeftClicked(team, posX, posY, towerType, null);
+                            if (team >= 0 && team < towerMaps.size()) {
+                                towerMaps.get(team)[posX][posY] = 1;
+                            }
                             if (towerSelectBox != null) {
                                 towerSelectBox.remove();
-                            }
-                        }
-                    });
-                    return true;
-                } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 1) { //ToDo tile ID adjust, is still wrong, waiting for code from animation
-                    Skin skin = AssetContainer.MainMenuAssets.skin;
-                    fireModeSelectBox = new SelectBox<>(skin);
-                    fireModeSelectBox = new SelectBox<>(skin);
-                    Tower.TargetOption[] targetOption = Tower.TargetOption.values();
-                    fireModeSelectBox.setItems(targetOption);
-                    fireModeSelectBox.setSize(140, 20);
-                    fireModeSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
-                    hudGroup.addActor(fireModeSelectBox);
-                    fireModeSelectBox.addListener(new ChangeListener() {
-                        @Override
-                        public void changed(ChangeEvent event, Actor actor) {
-                            Tower.TargetOption targetOption;
-                            targetOption = (Tower.TargetOption) fireModeSelectBox.getSelected();
-                            inputHandler.playerFieldLeftClicked(team, posX, posY, null, targetOption);
-                            if (fireModeSelectBox != null) {
-                                fireModeSelectBox.remove();
                             }
                         }
                     });
@@ -577,6 +586,18 @@ public class Hud implements Disposable {
      */
     public void show() {
         Gdx.input.setInputProcessor(stage);
+    }
+
+    private void closeSelectBox(){
+        if (towerSelectBox != null) {
+            towerSelectBox.remove();
+        }
+        if (towerSellUpgrade != null) {
+            towerSellUpgrade.remove();
+        }
+        if (fireModeSelectBox != null) {
+            fireModeSelectBox.remove();
+        }
     }
 
     /**
