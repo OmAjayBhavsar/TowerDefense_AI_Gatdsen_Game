@@ -24,23 +24,20 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
 
     private final Manager manager;
     private Viewport gameViewport;
-    private float worldWidth = 50 * 200;
-    private float worldHeight = 30 * 200;
-
     private float renderingSpeed = 1;
-
-    //should HUD be handled by GADS
     private Hud hud;
     private Animator animator;
     private final GADS gameManager;
     private Run run;
-
     private DebugView debugView;
 
     public InGameScreen(GADS instance) {
 
         gameManager = instance;
-        gameViewport = new FitViewport(worldWidth, worldHeight + 700);
+
+        int worldWidth = (state.getBoardSizeX() * 2 + 10) * 200; //ToDo Variabel machen
+        int worldHeight = (state.getBoardSizeY() + 5) * 200;
+        gameViewport = new FitViewport(worldWidth, worldHeight + 700); //Vorher statisch gesetzt
 
         hud = new Hud(this, gameViewport, gameManager);
 
@@ -89,8 +86,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
     @Override
     public void init(GameState state, String[] playerNames, String[][] skins) {
         //ToDo the game is starting remove waiting screen etc.
-        gameViewport.setWorldWidth((state.getBoardSizeX() * 2 + 10) * 200);
-        gameViewport.setWorldHeight((state.getBoardSizeY() + 5) * 200);
+       // hud.refreshHudViewport(worldWidth, worldHeight);
 
         animator.init(state, playerNames, skins);
 

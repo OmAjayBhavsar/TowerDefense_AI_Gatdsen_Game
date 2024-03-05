@@ -32,7 +32,7 @@ import com.gatdsen.ui.hud.*;
  * Input Handling during the game.
  * Displaying health, inventory
  */
-public class Hud implements Disposable{
+public class Hud implements Disposable {
 
     private static Stage stage;
     private final InputHandler inputHandler;
@@ -100,10 +100,9 @@ public class Hud implements Disposable{
         healthBarPlayer0.setAnimateDuration(0.25f);
         healthBarPlayer1.setValue(health);
         healthBarPlayer1.setAnimateDuration(0.25f);
-        if (gameState != null){
+        if (gameState != null) {
             roundCounter = gameState.getTurn();
-        }
-        else roundCounter = 1;
+        } else roundCounter = 1;
     }
 
     /**
@@ -178,7 +177,7 @@ public class Hud implements Disposable{
         currentPlayer1.setAlignment(Align.center);
         Label currentRoundLabel = new Label("Runde: " + roundCounter, skin);
         currentRoundLabel.setAlignment(Align.center);
-        Label healthPlayer0Label = new Label("" + healthPlayer0 , skin);
+        Label healthPlayer0Label = new Label("" + healthPlayer0, skin);
         healthPlayer0Label.setAlignment(Align.center);
         Label healthPlayer1Label = new Label("" + healthPlayer1, skin);
         healthPlayer1Label.setAlignment(Align.center);
@@ -432,7 +431,6 @@ public class Hud implements Disposable{
      */
     public void gameEnded(boolean won, int team, boolean isDraw) {
 
-        // ToDo: Remove color
         //create a pixel with a set color that will be used as Background
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         //set the color to black
@@ -462,6 +460,24 @@ public class Hud implements Disposable{
             turnPopupContainer.getActor().remove();
     }
 
+    /*
+    public void refreshHudViewport(int worldWidth, int worldHeight) {
+        hudViewport.setWorldWidth((float) worldWidth / 10);
+        hudViewport.setScreenHeight(worldHeight / 10);
+        layoutTable.setPosition(0, 0);
+        layoutTable.setSize(worldWidth / 10, worldHeight / 10);
+        if (turnPopupContainer.hasChildren()) {
+            ImagePopup imagePopup = turnPopupContainer.getActor();
+            if (imagePopup != null) {
+                imagePopup.setSize(imagePopup.getWidthForContainer(), imagePopup.getHeightForContainer());
+            }
+        }
+        stage.setViewport(hudViewport);
+        //ToDo Hud Anzeige wieder groß machen
+    }
+
+     */
+
     /**
      * Startet ein neues Spiel mit den gegebenen Parametern
      *
@@ -481,10 +497,18 @@ public class Hud implements Disposable{
 
         for (int i = 0; i < numberOfTeams; i++) {
             teamButtons[i] = tileMapButton(i, tileMap);
-            teamButtons[i].setSize((gameState.getBoardSizeX() * tileSize) / 10.0f, (gameState.getBoardSizeY() * tileSize) / 10.0f);
+
+            float buttonWidth = (gameState.getBoardSizeX() * tileSize) / 10.0f;
+            float buttonHeight = (gameState.getBoardSizeY() * tileSize) / 10.0f;
+            float buttonX = (arrayPositionTileMaps[i].x) / 10.0f;
+            float buttonY = (arrayPositionTileMaps[i].y) / 10.0f;
+
+            teamButtons[i].setSize(buttonWidth, buttonHeight);
+            teamButtons[i].setPosition(buttonX, buttonY);
+
             hudGroup.addActor(teamButtons[i]);
-            teamButtons[i].setPosition((arrayPositionTileMaps[i].x) / 10.0f, (arrayPositionTileMaps[i].y) / 10.0f);
             teamButtons[i].setColor(Color.CLEAR);
+
             initPlayerHealth(i);
             initBankBalance(i);
         }
@@ -537,7 +561,7 @@ public class Hud implements Disposable{
 
                     towerSelectBox.setSize(140, 20);
 
-                    towerSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() +y);
+                    towerSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
 
                     hudGroup.addActor(towerSelectBox);
 
@@ -608,6 +632,7 @@ public class Hud implements Disposable{
 
     /**
      * Initialisiert Leben des Spielers und aktualisiert die entsprechende Lebensleiste sowie visuelle Elemente
+     *
      * @param playerID Die ID des Spielers, dessen Leben initialisiert werden soll
      */
     public void initPlayerHealth(int playerID) {
@@ -629,6 +654,7 @@ public class Hud implements Disposable{
 
     /**
      * Setzt die Lebensanzeige des angegebenen Spielers und aktualisiert die entsprechende Lebensleiste sowie visuelle Elemente
+     *
      * @param playerID Die ID des Spielers, dessen Leben gesetzt werden soll.
      * @param health   Der neue Lebenswert für den Spieler.
      */
