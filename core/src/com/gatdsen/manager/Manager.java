@@ -1,5 +1,6 @@
 package com.gatdsen.manager;
 
+import com.gatdsen.manager.concurrent.ResourcePool;
 import com.gatdsen.manager.player.Bot;
 import com.gatdsen.manager.player.HumanPlayer;
 import com.gatdsen.manager.player.IdleBot;
@@ -285,6 +286,7 @@ public class Manager {
             }
         }
         executionManager.interrupt();
+        ResourcePool.getInstance().dispose();
     }
 
     public static int getSystemReservedProcessorCount() {

@@ -1,97 +1,61 @@
 package com.gatdsen.manager.concurrent;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.*;
 
-public class ThreadExecutor {
+/**
+ *
+ */
+public final class ThreadExecutor {
 
-    private final Object lock = new Object();
+    private final int threadCount;
+    private final ExecutorService executor;
+    private final Set<Future<?>> runningTasks = new HashSet<>();
 
-    private final Object completion = new Object();
-
-    private Thread worker;
-
-    private FutureTask<?> target = null;
-
-    public ThreadExecutor() {
-        worker = new Thread(this::waitAndExecute);
-        worker.start();
+    public ThreadExecutor(int threadCount) {
+        this.threadCount = threadCount;
+        executor = Executors.newFixedThreadPool(threadCount);
     }
 
-    private void waitAndExecute() {
-        while (!Thread.interrupted()) {
-            synchronized (lock) {
-                try {
-                    if (target == null)
-                        lock.wait();
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-            target.run();
-            synchronized (lock) {
-                synchronized (completion) {
-                    target = null;
-                    completion.notifyAll();
-                }
-            }
-        }
+    public int getThreadCount() {
+        return threadCount;
     }
 
     public <T> Future<T> execute(Callable<T> callable) {
-        FutureTask<T> target = new FutureTask<>(callable);
-        execute(target);
-        return target;
+        Future<T> future = executor.submit(callable);
+        runningTasks.add(future);
+        return future;
     }
 
     public Future<?> execute(Runnable runnable) {
-        FutureTask<?> target = new FutureTask<>(runnable, null);
-        execute(target);
-        return target;
+        Future<?> future = executor.submit(runnable);
+        runningTasks.add(future);
+        return future;
     }
 
-    private void execute(FutureTask<?> target) {
-        synchronized (lock) {
-            if (this.target != null) return;
-            this.target = target;
-            lock.notify();
-        }
+    /**
+     * Überprüft, ob alle Aufgaben, die von diesem ThreadExecutor gestartet wurden, beendet sind.
+     * @return true, wenn keine Aufgaben mehr laufen, ansonsten false
+     */
+    public boolean isIdling() {
+        runningTasks.removeIf(Future::isDone);
+        return runningTasks.isEmpty();
     }
 
-    @SuppressWarnings("removal")
-    public void forceStop() {
-
-        synchronized (lock) {
-            synchronized (completion) {
-                if (target != null) target.cancel(true);
-                else return;
-                target = null;
-            }
-        }
-        worker.interrupt();
-        worker = new Thread(this::waitAndExecute);
-        worker.start();
-    }
-
-    @SuppressWarnings("removal")
-    public void interrupt() {
-        synchronized (lock) {
-            if (target != null) target.cancel(true);
-            target = null;
-        }
-        worker.interrupt();
-    }
-
-    public void waitForCompletion() {
-        synchronized (completion) {
-            if (target != null) {
-                try {
-                    completion.wait();
-                } catch (InterruptedException ignored) {
-                }
-            }
-        }
-
+    /**
+     * Beendet diesen ThreadExecutor, indem versucht wird alle laufenden Aufgaben abzubrechen.
+     * Es können keine neuen Aufgaben mehr gestartet werden.
+     */
+    public void dispose() {
+        // ExecutorService.shutdownNow() sorgt dafür, dass keine neuen Aufgaben mehr gestartet werden können und
+        // versucht alle laufenden Threads mittels Interrupts zu beenden.
+        // Wir verwenden es statt ExecutorService.shutdown(), da dieses die bereits laufenden Aufgaben zu Ende laufen
+        // lassen würde, wir aber beim Schließen unseres ThreadExecutors alle Aufgaben abbrechen wollen.
+        // ExecutorService.shutdownNow() wartet dabei nicht bis alle Threads beendet werden konnten. Wir wollen darauf
+        // aber auch nicht explizit warten, da wir keine Garantie haben, dass jeder der Threads überhaupt durch ein
+        // Interrupt unterbrochen werden können und diese nicht einfach ignorieren und potenziell für immer
+        // weiterlaufen würden.
+        executor.shutdownNow();
     }
 }

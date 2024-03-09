@@ -1,8 +1,15 @@
 package com.gatdsen.networking;
 
-import com.gatdsen.manager.Manager;
-import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.concurrent.ProcessExecutor;
+import com.gatdsen.manager.concurrent.RMIRegistry;
+import com.gatdsen.manager.concurrent.ResourcePool;
+import com.gatdsen.networking.rmi.PlayerProcessCommunicator;
+import com.gatdsen.networking.rmi.ProcessCommunicator;
 import org.apache.commons.cli.*;
+
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 /**
  * Diese Klasse enthält die main-Methode, welche zum Start eines Bot-Prozesses verwendet wird.
@@ -10,18 +17,11 @@ import org.apache.commons.cli.*;
 public class BotProcessLauncher {
 
     private static final Options cliOptions = new Options();
-
     static {
         cliOptions.addOption(Option
                 .builder("?")
                 .longOpt("help")
                 .desc("Prints this list").build());
-
-        cliOptions.addOption(Option
-                .builder("p")
-                .longOpt("player")
-                .hasArg()
-                .desc("Name of the bot class file without extension in format \"MyBot\" \n Attention: Case-sensitive!").build());
 
         cliOptions.addOption(Option
                 .builder("host")
@@ -32,11 +32,6 @@ public class BotProcessLauncher {
                 .builder("port")
                 .hasArg()
                 .desc("Port of the Java RMI Remote Registry").build());
-
-        cliOptions.addOption(Option
-                .builder("reference")
-                .hasArg()
-                .desc("Name to associate with the Remote Reference in the Java RMI Remote Registry").build());
     }
 
     public static void main(String[] args) {
@@ -58,18 +53,11 @@ public class BotProcessLauncher {
             return;
         }
 
-        if (!params.hasOption("p")) {
-            System.err.println("Missing required option: -p");
-            printHelp();
-            return;
-        }
-        Class<? extends Player> playerClass = Manager.getPlayer(params.getOptionValue("p").trim(), false);
-
         String host = null;
-        int port = ProcessPlayerHandler.registryPort;
         if (params.hasOption("host")) {
             host = params.getOptionValue("host").trim();
         }
+        Integer port = null;
         if (params.hasOption("port")) {
             try {
                 port = Integer.parseInt(params.getOptionValue("port").trim());
@@ -79,15 +67,46 @@ public class BotProcessLauncher {
                 return;
             }
         }
-        if (!params.hasOption("reference")) {
-            System.err.println("Missing required option: -reference");
-            printHelp();
-            return;
-        }
-        String remoteReferenceName = params.getOptionValue("reference").trim();;
 
-        BotProcess botProcess = new BotProcess(playerClass, host, port, remoteReferenceName);
-        botProcess.run();
+        RMIRegistry registry = ResourcePool.getInstance().requestRegistry(host, port);
+        String localReferenceName = String.format(
+                ProcessExecutor.PLAYER_PROCESS_REFERENCE_NAME_FORMAT,
+                ProcessHandle.current().pid()
+        );
+        String remoteReferenceName = String.format(
+                ProcessExecutor.GAME_PROCESS_REFERENCE_NAME_FORMAT,
+                ProcessHandle.current().pid()
+        );
+
+        ProcessCommunicator gameCommunicatorStub = null;
+        long timeout = 5_000;
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime <= timeout) {
+            try {
+                gameCommunicatorStub = (ProcessCommunicator) registry.lookup(remoteReferenceName);
+                break;
+            } catch (NotBoundException ignored) {
+            } catch (RemoteException e) {
+                throw new RuntimeException("The connection with the Remote Object Registry at host \"" + (host == null ? "localhost" : host) + "\" and port \"" + port + "\" failed.", e);
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (gameCommunicatorStub == null) {
+            throw new RuntimeException("There was no Remote Reference bound under the name \"" + remoteReferenceName + "\" at the Remote Object Registry at host \"" + (host == null ? "localhost" : host) + "\" and port \"" + port + "\".");
+        }
+
+        try {
+            registry.rebind(
+                    localReferenceName,
+                    UnicastRemoteObject.exportObject(new PlayerProcessCommunicator(registry, localReferenceName, gameCommunicatorStub), 0)
+            );
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void printHelp() {

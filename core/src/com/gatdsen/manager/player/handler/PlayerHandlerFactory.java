@@ -11,12 +11,13 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Future;
 
 public abstract class PlayerHandlerFactory {
 
     public abstract String getName();
 
-    public abstract PlayerHandler createPlayerHandler(InputProcessor inputProcessor, int gameId, int playerId);
+    public abstract Future<PlayerHandler> createPlayerHandler(InputProcessor inputProcessor, int playerId);
 
     public static PlayerHandlerFactory[] getAvailablePlayerFactories() {
         List<PlayerHandlerFactory> factories = new ArrayList<>();

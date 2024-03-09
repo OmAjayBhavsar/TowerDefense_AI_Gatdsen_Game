@@ -1,16 +1,18 @@
 package com.gatdsen.manager;
 
 import com.gatdsen.manager.command.Command;
-import com.gatdsen.manager.player.Bot;
 import com.gatdsen.manager.player.Player;
-import com.gatdsen.manager.player.PlayerHandler;
+import com.gatdsen.manager.player.handler.PlayerHandler;
 import com.gatdsen.manager.player.data.PlayerInformation;
-import com.gatdsen.networking.ProcessPlayerHandler;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Simulation;
 import com.gatdsen.simulation.action.ActionLog;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,17 +55,33 @@ public class Game extends Executable {
             gameResults.setInitialState(state);
 
         playerHandlers = new PlayerHandler[config.playerCount];
-        Future<?>[] futures = new Future[playerHandlers.length];
+        @SuppressWarnings("unchecked")
+        Future<PlayerHandler>[] playerHandlerFutures = (Future<PlayerHandler>[]) new Future[config.playerCount];
         for (int playerIndex = 0; playerIndex < config.playerCount; playerIndex++) {
-            PlayerHandler playerHandler = config.playerFactories[playerIndex].createPlayerHandler(inputGenerator, gameNumber.get(), playerIndex);
+            playerHandlerFutures[playerIndex] = config.playerFactories[playerIndex].createPlayerHandler(config.inputProcessor, playerIndex);
+        }
+        @SuppressWarnings("unchecked")
+        Future<Long>[] longFutures = (Future<Long>[]) new Future[config.playerCount];
+        int gameNumber = Game.gameNumber.get();
+        for (int playerIndex = 0; playerIndex < config.playerCount; playerIndex++) {
+            PlayerHandler playerHandler;
+            try {
+                playerHandler = playerHandlerFutures[playerIndex].get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
             playerHandlers[playerIndex] = playerHandler;
             playerHandler.setPlayerController(simulation.getController(playerIndex));
-            futures[playerIndex] = playerHandler.create(command -> command.run(playerHandler));
+            longFutures[playerIndex] = playerHandler.create(isDebug, gameNumber);
         }
-        awaitFutures(futures);
-        for (PlayerHandler playerHandler : playerHandlers) {
-            seed += playerHandler.getSeedModifier();
+        for (Future<Long> future : longFutures) {
+            try {
+                seed += future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
         }
+        Future<?>[] futures = new Future[config.playerCount];
         PlayerState[] playerStates = state.getPlayerStates();
         for (int playerIndex = 0; playerIndex < config.playerCount; playerIndex++) {
             // Wenn der PlayerState des Spielers deaktiviert ist, da er bspw. disqualifiziert wurde, wird der Spieler
@@ -73,7 +91,7 @@ public class Game extends Executable {
             }
             PlayerHandler playerHandler = playerHandlers[playerIndex];
             playerHandler.setPlayerController(simulation.getController(playerIndex));
-            futures[playerIndex] = playerHandler.init(state, isDebug, seed, command -> command.run(playerHandler));
+            futures[playerIndex] = playerHandler.init(state, seed);
         }
         awaitFutures(futures);
         gameResults.setPlayerNames(getPlayerNames());
@@ -165,7 +183,7 @@ public class Game extends Executable {
                 if (saveReplay) {
                     gameResults.addActionLog(log);
                 }
-                if (gui && playerHandler.isHumanPlayer()) {
+                if (gui && playerHandler.getPlayerInformation().type.equals(Player.PlayerType.HUMAN)) {
                     //Contains Action produced by entering new turn
                     animationLogProcessor.animate(log);
                 }
@@ -217,7 +235,7 @@ public class Game extends Executable {
         String[] names = new String[playerHandlers.length];
         for (int i = 0; i < playerHandlers.length; i++) {
             PlayerInformation information = playerHandlers[i].getPlayerInformation();
-            names[i] = information != null ? information.getName() : "Player " + i;
+            names[i] = information != null ? information.name : "Player " + i;
         }
         return names;
     }

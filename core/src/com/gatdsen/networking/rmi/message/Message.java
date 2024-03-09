@@ -7,4 +7,24 @@ import java.io.Serializable;
  * werden sollen.
  */
 public interface Message extends Serializable {
+
+    enum Type {
+        ProcessCommunicatorSetupResponse,
+        ProcessCommunicatorShutdownRequest,
+
+        GameCreateRequest,
+        GameCreateResponse,
+
+        PlayerInitRequest,
+        PlayerInitResponse,
+
+        PlayerExecuteTurnRequest,
+        PlayerCommandResponse
+    }
+
+    Type getType();
+
+    interface MessageHandler {
+        void handle(Message message);
+    }
 }

@@ -1,11 +1,11 @@
 package com.gatdsen.manager.player.handler;
 
 import com.gatdsen.manager.InputProcessor;
-import com.gatdsen.manager.LocalPlayerHandler;
 import com.gatdsen.manager.player.*;
-import com.gatdsen.networking.ProcessPlayerHandler;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public final class LocalPlayerHandlerFactory extends PlayerHandlerFactory {
 
@@ -44,10 +44,13 @@ public final class LocalPlayerHandlerFactory extends PlayerHandlerFactory {
     }
 
     @Override
-    public PlayerHandler createPlayerHandler(InputProcessor inputProcessor, int gameId, int playerIndex) {
+    public Future<PlayerHandler> createPlayerHandler(InputProcessor inputProcessor, int playerIndex) {
+        PlayerHandler playerHandler;
         if (Bot.class.isAssignableFrom(playerClass)) {
-            return new ProcessPlayerHandler(playerClass, gameId, playerIndex);
+            playerHandler = new ProcessPlayerHandler(playerIndex, playerClass);
+        } else {
+            playerHandler = new LocalPlayerHandler(playerIndex, playerClass, inputProcessor);
         }
-        return new LocalPlayerHandler(playerClass, playerIndex, inputProcessor);
+        return CompletableFuture.completedFuture(playerHandler);
     }
 }

@@ -6,7 +6,7 @@ import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.config.RunConfiguration;
-import com.gatdsen.networking.ProcessPlayerHandler;
+import com.gatdsen.manager.player.handler.ProcessPlayerHandler;
 import com.gatdsen.simulation.GameState.GameMode;
 import org.apache.commons.cli.*;
 
