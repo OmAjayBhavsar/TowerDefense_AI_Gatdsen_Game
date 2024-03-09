@@ -1,6 +1,7 @@
 package com.gatdsen.simulation;
 
 import com.gatdsen.simulation.action.*;
+import com.gatdsen.simulation.enemy.*;
 
 import java.io.Serializable;
 
@@ -8,6 +9,16 @@ import java.io.Serializable;
  * Die Klasse Enemy repräsentiert einen Gegner im Spiel.
  */
 public abstract class Enemy implements Serializable {
+
+    protected final int team;
+
+    public enum Type {
+        BASIC_ENEMY,
+        EMP_ENEMY,
+        SHIELD_ENEMY,
+        ARMOR_ENEMY
+    }
+
     protected final PlayerState playerState;
 
     private static int idCounter = 0;
@@ -17,15 +28,18 @@ public abstract class Enemy implements Serializable {
     protected int level;
     protected int damage;
     protected PathTile posTile;
+    protected Type type;
 
     /**
      * Erstellt einen neuen Gegner.
+     *
      * @param level   Die Stufe des Gegners.
      * @param posTile Die Position des Gegners.
      */
     public Enemy(PlayerState playerState, int level, PathTile posTile) {
         id = idCounter++;
         this.playerState = playerState;
+        this.team = playerState.getIndex();
         this.posTile = posTile;
         this.level = level;
         // IdCounter wird zurückgesetzt, wenn Integer.MAX_VALUE erreicht wird.
@@ -50,7 +64,15 @@ public abstract class Enemy implements Serializable {
      * @return Die letzte Action.
      */
     protected Action updateHealth(int damage, Action head) {
-        if (health - damage <= 0) {
+
+        if (type == Type.ARMOR_ENEMY) {
+            damage = (int) (damage * 0.5);
+        }
+        if (type == Type.SHIELD_ENEMY && ((ShieldEnemy) this).isShielded()) {
+            ((ShieldEnemy) this).setShielded(false);
+            head.addChild(new EnemyDestroyShieldAction(0, posTile.getPosition(), level, team, type, id));
+            return head;
+        } else if (health - damage <= 0) {
             health = 0;
             posTile.getEnemies().remove(this);
 
@@ -58,13 +80,13 @@ public abstract class Enemy implements Serializable {
             chaining:
             | -> head -> update health -> enemy defeat -> |
              */
-            Action updateHealthAction = new EnemyUpdateHealthAction(0, posTile.getPosition(), 0, level, playerState.getIndex(), id);
+            Action updateHealthAction = new EnemyUpdateHealthAction(0, posTile.getPosition(), 0, level, team, type, id);
             head.addChild(updateHealthAction);
-            updateHealthAction.addChild(new EnemyDefeatAction(0, posTile.getPosition(), level, playerState.getIndex(), id));
-            head = playerState.updateCurrency(30 * level, 1, updateHealthAction);
+            updateHealthAction.addChild(new EnemyDefeatAction(0, posTile.getPosition(), level, team, type, id));
+            head = playerState.updateMoney(30 * level, updateHealthAction);
         } else {
             health -= damage;
-            head.addChild(new EnemyUpdateHealthAction(0, posTile.getPosition(), health, level, playerState.getIndex(), id));
+            head.addChild(new EnemyUpdateHealthAction(0, posTile.getPosition(), health, level, team, type, id));
         }
         return head;
     }
@@ -77,17 +99,37 @@ public abstract class Enemy implements Serializable {
      * @return Die letzte Action
      */
     protected Action move(Action head) {
+
         if (posTile.getNext() != null) {
             posTile.getEnemies().remove(this);
             posTile = posTile.getNext();
             posTile.getEnemies().add(this);
-            head.addChild(new EnemyMoveAction(0, posTile.getPrev().getPosition(), posTile.getPosition(), level, playerState.getIndex(), id));
+            head.addChild(new EnemyMoveAction(0, posTile.getPrev().getPosition(), posTile.getPosition(), level, team, type, id));
         } else {
             posTile.getEnemies().remove(this);
             head = playerState.setHealth(damage, head);
-            head.addChild(new EnemyDefeatAction(0, posTile.getPosition(), level, playerState.getIndex(), id));
+            head.addChild(new EnemyDefeatAction(0, posTile.getPosition(), level, team, type, id));
         }
+        if (type == Type.EMP_ENEMY) {
+            head = ((EmpEnemy) this).EMP(head);
+        }
+
         return head;
+    }
+
+    protected static int getEnemyTypePrice(Type type, int level) {
+        switch (type) {
+            case BASIC_ENEMY:
+                return BasicEnemy.getPrice(level);
+            case EMP_ENEMY:
+                return EmpEnemy.getPrice(level);
+            case SHIELD_ENEMY:
+                return ShieldEnemy.getPrice(level);
+            case ARMOR_ENEMY:
+                return ArmorEnemy.getPrice(level);
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -114,4 +156,5 @@ public abstract class Enemy implements Serializable {
     public int getId() {
         return id;
     }
+
 }

@@ -106,6 +106,17 @@ public class PlayerController {
     }
 
     /**
+     * Spawned einen Gegner beim Gegenspieler
+     *
+     * @param type Typ des Gegners
+     * @return Der ActionLog der durch das Ausführen des Befehls entstanden ist
+     */
+    public ActionLog sendEnemy(Enemy.Type type) {
+        playerState.sendEnemy(type, state, getRoot());
+        return endCommand();
+    }
+
+    /**
      * Beleidigt den Gegner
      *
      * @return Der ActionLog der durch das Ausführen des Befehls entstanden ist

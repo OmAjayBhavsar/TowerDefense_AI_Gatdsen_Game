@@ -21,17 +21,20 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gatdsen.animation.entity.TileMap;
 import com.gatdsen.manager.run.config.RunConfiguration;
 import com.gatdsen.simulation.GameState;
+import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Tower;
 import com.gatdsen.ui.GADS;
 import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.hud.*;
+
+import java.util.ArrayList;
 
 /**
  * Class for taking care of the User Interface.
  * Input Handling during the game.
  * Displaying health, inventory
  */
-public class Hud implements Disposable{
+public class Hud implements Disposable {
 
     private static Stage stage;
     private final InputHandler inputHandler;
@@ -64,21 +67,22 @@ public class Hud implements Disposable{
     public Group hudGroup = new Group();
     public TileMap tileMap;
     private SelectBox<Tower.TowerType> towerSelectBox;
-    private Tower.TowerType towerType;
+    private SelectBox<String> towerSellUpgrade;
+    private SelectBox fireModeSelectBox;
+    private ArrayList<int[][]> towerMaps = new ArrayList<>();
 
     /**
      * Initialisiert das HUD-Objekt
      *
      * @param ingameScreen Die Instanz der InGameScreen-Klasse
-     * @param gameViewport Die Viewport-Instanz für das Spiel
+     * @param gameInstance Die gameInstance für das Spiel
      */
-    public Hud(InGameScreen ingameScreen, Viewport gameViewport, GADS gameInstance) {
+    public Hud(InGameScreen ingameScreen, GADS gameInstance) {
 
         this.gameInstance = gameInstance;
         this.inGameScreen = ingameScreen;
-        hudViewport = new FitViewport(gameViewport.getWorldWidth() / 10, gameViewport.getWorldHeight() / 10);
+        hudViewport = new FitViewport(600, 400);
         this.uiMessenger = new UiMessenger(this);
-        float animationSpeedupValue = 8;
         turnChangeDuration = 2;
         turnChangeSprite = AssetContainer.IngameAssets.turnChange;
         stage = new Stage(hudViewport);
@@ -99,10 +103,9 @@ public class Hud implements Disposable{
         healthBarPlayer0.setAnimateDuration(0.25f);
         healthBarPlayer1.setValue(health);
         healthBarPlayer1.setAnimateDuration(0.25f);
-        if (gameState != null){
+        if (gameState != null) {
             roundCounter = gameState.getTurn();
-        }
-        else roundCounter = 1;
+        } else roundCounter = 1;
     }
 
     /**
@@ -171,13 +174,13 @@ public class Hud implements Disposable{
         player0BalanceLabel.setAlignment(Align.center);
         Label player1BalanceLabel = new Label("$" + player1Balance, skin);
         player1BalanceLabel.setAlignment(Align.center);
-        Label currentPlayer0 = new Label("Spieler 0", skin);
+        Label currentPlayer0 = new Label("Spieler 1", skin);
         currentPlayer0.setAlignment(Align.center);
-        Label currentPlayer1 = new Label("Spieler 1", skin);
+        Label currentPlayer1 = new Label("Spieler 2", skin);
         currentPlayer1.setAlignment(Align.center);
         Label currentRoundLabel = new Label("Runde: " + roundCounter, skin);
         currentRoundLabel.setAlignment(Align.center);
-        Label healthPlayer0Label = new Label("" + healthPlayer0 , skin);
+        Label healthPlayer0Label = new Label("" + healthPlayer0, skin);
         healthPlayer0Label.setAlignment(Align.center);
         Label healthPlayer1Label = new Label("" + healthPlayer1, skin);
         healthPlayer1Label.setAlignment(Align.center);
@@ -220,24 +223,6 @@ public class Hud implements Disposable{
         layoutTable.add(nextRoundButton).pad(padding).expandX().row();
         layoutTable.add(invisibleLabel);
     }
-
-    /*
-    /**
-     * Erstellt einen FastForwardButton und gibt ihn zurück
-     *
-     * @param uiMessenger Der UiMessenger für die Kommunikation
-     * @param speedUp     Die Geschwindigkeitssteigerung für die Schnellvorlauf-Funktion
-     * @return Ein neues FastForwardButton-Objekt
-
-    private FastForwardButton setupFastForwardButton(UiMessenger uiMessenger, float speedUp) {
-
-        FastForwardButton button = new FastForwardButton(new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButton),
-                new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButtonPressed),
-                new TextureRegionDrawable(AssetContainer.IngameAssets.fastForwardButtonChecked),
-                uiMessenger, speedUp);
-        return button;
-    }
-    */
 
     /**
      * Gibt den InputHandler zurück
@@ -431,8 +416,6 @@ public class Hud implements Disposable{
      */
     public void gameEnded(boolean won, int team, boolean isDraw) {
 
-        // ToDo: Remove color
-        //create a pixel with a set color that will be used as Background
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         //set the color to black
         pixmap.setColor(0, 0, 0, 0.5f);
@@ -474,16 +457,23 @@ public class Hud implements Disposable{
         this.gameState = gameState;
         stage.addActor(hudGroup);
 
+        hudViewport.setWorldWidth((float) ((gameState.getBoardSizeX() * 2 + 10) * 200) /10);
+        hudViewport.setWorldHeight((float) ((gameState.getBoardSizeY() + 5) * 200) /10);
+
         int numberOfTeams = gameState.getPlayerCount();
         TextButton[] teamButtons;
         teamButtons = new TextButton[numberOfTeams];
 
         for (int i = 0; i < numberOfTeams; i++) {
+            int[][] towerMap = new int[gameState.getBoardSizeX()][gameState.getBoardSizeY()];
+            towerMaps.add(towerMap);
             teamButtons[i] = tileMapButton(i, tileMap);
             teamButtons[i].setSize((gameState.getBoardSizeX() * tileSize) / 10.0f, (gameState.getBoardSizeY() * tileSize) / 10.0f);
             hudGroup.addActor(teamButtons[i]);
             teamButtons[i].setPosition((arrayPositionTileMaps[i].x) / 10.0f, (arrayPositionTileMaps[i].y) / 10.0f);
             teamButtons[i].setColor(Color.CLEAR);
+            initPlayerHealth(i);
+            initBankBalance(i);
         }
         layoutTable.setBackground((Drawable) null);
         if (turnPopupContainer.hasChildren()) {
@@ -517,32 +507,70 @@ public class Hud implements Disposable{
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 int posX = (int) ((x / tileMap.getTileSize()) * 10);
                 int posY = (int) ((y / tileMap.getTileSize()) * 10);
-                if (button == Input.Buttons.RIGHT && tileMap.getTile(posX, posY) == 0) {
-                    inputHandler.playerFieldRightClicked(team, posX, posY);
+                if (button == Input.Buttons.RIGHT && tileMap.getTile(posX, posY) == 0 && towerMaps.get(team)[posX][posY] == 1) {
+                    closeSelectBox();
+                    towerSellUpgrade = new SelectBox<>(skin);
+                    towerSellUpgrade.setItems("Upgrade", "Verkaufen");
+                    towerSellUpgrade.setSize(140, 20);
+                    towerSellUpgrade.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
+                    hudGroup.addActor(towerSellUpgrade);
+                    towerSellUpgrade.addListener(new ChangeListener() {
+                        @Override
+                        public void changed(ChangeEvent changeEvent, Actor actor) {
+                            String selectedItem = towerSellUpgrade.getSelected();
+                            switch (selectedItem) {
+                                case ("Upgrade"):
+                                    inputHandler.playerFieldRightClicked(team, posX, posY, true, false);
+                                case ("Verkaufen"):
+                                    inputHandler.playerFieldRightClicked(team, posX, posY, false, true);
+                                default:
+                                    break;
+                            }
+                            if (towerSellUpgrade != null) {
+                                towerSellUpgrade.remove();
+                            }
+                        }
+                    });
+                    return true;
+                } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 0 && towerMaps.get(team)[posX][posY] == 1) {
+                    Skin skin = AssetContainer.MainMenuAssets.skin;
+                    closeSelectBox();
+                    fireModeSelectBox = new SelectBox<>(skin);
+                    Tower.TargetOption[] targetOption = Tower.TargetOption.values();
+                    fireModeSelectBox.setItems((Object[]) targetOption);
+                    fireModeSelectBox.setSize(140, 20);
+                    fireModeSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
+                    hudGroup.addActor(fireModeSelectBox);
+                    fireModeSelectBox.addListener(new ChangeListener() {
+                        @Override
+                        public void changed(ChangeEvent event, Actor actor) {
+                            Tower.TargetOption targetOption;
+                            targetOption = (Tower.TargetOption) fireModeSelectBox.getSelected();
+                            inputHandler.playerFieldLeftClicked(team, posX, posY, null, targetOption);
+                            if (fireModeSelectBox != null) {
+                                fireModeSelectBox.remove();
+                            }
+                        }
+                    });
                     return true;
                 } else if (button == Input.Buttons.LEFT && tileMap.getTile(posX, posY) == 0) {
+                    closeSelectBox();
                     Skin skin = AssetContainer.MainMenuAssets.skin;
-
-                    if (towerSelectBox != null) {
-                        towerSelectBox.remove();
-                    }
                     towerSelectBox = new SelectBox<>(skin);
-
-
                     Tower.TowerType[] towerTypes = Tower.TowerType.values();
                     towerSelectBox.setItems(towerTypes);
-
                     towerSelectBox.setSize(140, 20);
-
-                    towerSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() +y);
-
+                    towerSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
                     hudGroup.addActor(towerSelectBox);
-
                     towerSelectBox.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
+                            Tower.TowerType towerType;
                             towerType = towerSelectBox.getSelected();
-                            inputHandler.playerFieldLeftClicked(team, posX, posY, towerType);
+                            inputHandler.playerFieldLeftClicked(team, posX, posY, towerType, null);
+                            if (team >= 0 && team < towerMaps.size()) {
+                                towerMaps.get(team)[posX][posY] = 1;
+                            }
                             if (towerSelectBox != null) {
                                 towerSelectBox.remove();
                             }
@@ -564,6 +592,40 @@ public class Hud implements Disposable{
         Gdx.input.setInputProcessor(stage);
     }
 
+    private void closeSelectBox(){
+        if (towerSelectBox != null) {
+            towerSelectBox.remove();
+        }
+        if (towerSellUpgrade != null) {
+            towerSellUpgrade.remove();
+        }
+        if (fireModeSelectBox != null) {
+            fireModeSelectBox.remove();
+        }
+    }
+
+    /**
+     * Initialisiert das Bankguthaben des angegebenen Spielers und setzt die Variable "balance" in "initBankbalance" gleich dem Wert aus dem "PlayerState" oben.
+     *
+     * @param playerID Die ID des Spielers, dessen Bankguthaben initialisiert werden soll.
+     */
+    public void initBankBalance(int playerID) {
+        // Zugriff auf den Spielerzustand des GameState
+        PlayerState[] playerStates = gameState.getPlayerStates();
+
+        // Überprüfung der Spieler-ID und Aktualisierung des entsprechenden Bankguthabens
+        if (playerID == 0) {
+            player0Balance = playerStates[0].getMoney();
+        } else if (playerID == 1) {
+            player1Balance = playerStates[1].getMoney();
+        }
+
+        // Layout leeren und HUD-Elemente aktualisieren
+        layoutTable.clear();
+        layoutHudElements();
+    }
+
+
     /**
      * Setzt das Bankguthaben für den angegebenen Spieler
      *
@@ -581,22 +643,32 @@ public class Hud implements Disposable{
         layoutHudElements();
     }
 
-    public void initPlayerHealth(int playerID, int maxHealth) {
+    /**
+     * Initialisiert Leben des Spielers und aktualisiert die entsprechende Lebensleiste sowie visuelle Elemente
+     * @param playerID Die ID des Spielers, dessen Leben initialisiert werden soll
+     */
+    public void initPlayerHealth(int playerID) {
+        float[] playerHealths = gameState.getHealth();
         if (playerID == 0) {
-            healthBarPlayer0.setRange(0, maxHealth);
-            healthBarPlayer0.setValue(maxHealth);
+            healthBarPlayer0.setRange(0, (int) playerHealths[0]);
+            healthBarPlayer0.setValue((int) playerHealths[0]);
             healthBarPlayer0.updateVisualValue();
-            healthPlayer0 = maxHealth;
+            healthPlayer0 = (int) playerHealths[0];
         } else if (playerID == 1) {
-            healthBarPlayer1.setRange(0, maxHealth);
-            healthBarPlayer1.setValue(maxHealth);
+            healthBarPlayer1.setRange(0, (int) playerHealths[1]);
+            healthBarPlayer1.setValue((int) playerHealths[1]);
             healthBarPlayer1.updateVisualValue();
-            healthPlayer1 = maxHealth;
+            healthPlayer1 = (int) playerHealths[1];
         }
         layoutTable.clear();
         layoutHudElements();
     }
 
+    /**
+     * Setzt die Lebensanzeige des angegebenen Spielers und aktualisiert die entsprechende Lebensleiste sowie visuelle Elemente
+     * @param playerID Die ID des Spielers, dessen Leben gesetzt werden soll.
+     * @param health   Der neue Lebenswert für den Spieler.
+     */
     public void setPlayerHealth(int playerID, int health) {
         if (playerID == 0) {
             healthBarPlayer0.setValue(health);

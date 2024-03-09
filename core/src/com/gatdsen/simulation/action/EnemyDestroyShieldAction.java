@@ -3,14 +3,15 @@ package com.gatdsen.simulation.action;
 import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.IntVector2;
 
+
 /**
- * Die Klasse EnemyDefeatAction ist eine Unterklasse von {@link EnemyAction EnemyAction}
- * und repräsentiert eine Aktion, bei der ein Gegner besiegt wird.
+ * Die Klasse EnemyDestroyShieldAction ist eine Unterklasse von {@link EnemyAction EnemyAction}
+ * und repräsentiert eine Aktion, bei der Schild eines Gegners zerstört wird.
  */
-public class EnemyDefeatAction extends EnemyAction {
+public class EnemyDestroyShieldAction extends EnemyAction {
 
     /**
-     * Konstruktor der Klasse EnemyDefeatAction.
+     * Konstruktor der Klasse EnemyDestroyShieldAction.
      *
      * @param delay Verzögerung bis zum Ausführen der Aktion
      * @param pos   Position des Gegners
@@ -18,12 +19,12 @@ public class EnemyDefeatAction extends EnemyAction {
      * @param team  Team des Gegners
      * @param id    ID des Gegners
      */
-    public EnemyDefeatAction(float delay, IntVector2 pos, int level, int team, Enemy.Type type, int id) {
+    public EnemyDestroyShieldAction(float delay, IntVector2 pos, int level, int team, Enemy.Type type, int id) {
         super(delay, pos, level, team, type, id);
     }
 
     @Override
     public String toString() {
-        return "EnemyDefeatAction{} " + super.toString();
+        return "EnemyDestroyShieldAction{} " + super.toString();
     }
 }

@@ -42,7 +42,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         gameManager = instance;
         gameViewport = new FitViewport(worldWidth, worldHeight + 700);
 
-        hud = new Hud(this, gameViewport, gameManager);
+        hud = new Hud(this, gameManager);
 
         debugView = new DebugView(AssetContainer.MainMenuAssets.skin);
 
@@ -89,6 +89,8 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
     @Override
     public void init(GameState state, String[] playerNames, String[][] skins) {
         //ToDo the game is starting remove waiting screen etc.
+        gameViewport.setWorldWidth((state.getBoardSizeX() * 2 + 10) * 200);
+        gameViewport.setWorldHeight((state.getBoardSizeY() + 5) * 200);
 
         animator.init(state, playerNames, skins);
 

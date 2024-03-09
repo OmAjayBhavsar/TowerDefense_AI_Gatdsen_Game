@@ -72,6 +72,11 @@ public class AOETower extends Tower {
         return 0;
     }
 
+    @Override
+    public void incrementRechargeTime() {
+        cooldown += 1;
+    }
+
     /**
      * @return Den Preis des AOETower
      */
