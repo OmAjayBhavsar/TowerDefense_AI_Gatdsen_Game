@@ -1,6 +1,6 @@
 package com.gatdsen.manager.player.handler;
 
-import com.gatdsen.manager.command.CommandHandler;
+import com.gatdsen.manager.command.Command;
 import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.manager.player.data.penalty.DisqualificationPenalty;
 import com.gatdsen.manager.player.data.penalty.MissTurnsPenalty;
@@ -55,7 +55,7 @@ public abstract class PlayerHandler {
 
     public abstract Future<?> init(GameState gameState, long seed);
 
-    public final Future<?> executeTurn(GameState gameState, CommandHandler commandHandler) {
+    public final Future<?> executeTurn(GameState gameState, Command.CommandHandler commandHandler) {
         if (turnsToMiss > 0) {
             turnsToMiss--;
             return CompletableFuture.completedFuture(null);
@@ -63,7 +63,7 @@ public abstract class PlayerHandler {
         return onExecuteTurn(gameState, commandHandler);
     }
 
-    protected abstract Future<?> onExecuteTurn(GameState gameState, CommandHandler commandHandler);
+    protected abstract Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler);
 
     public abstract void dispose();
 }

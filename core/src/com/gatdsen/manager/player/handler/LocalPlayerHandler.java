@@ -3,13 +3,10 @@ package com.gatdsen.manager.player.handler;
 import com.gatdsen.manager.InputProcessor;
 import com.gatdsen.manager.PlayerExecutor;
 import com.gatdsen.manager.command.Command;
-import com.gatdsen.manager.command.CommandHandler;
-import com.gatdsen.manager.concurrent.ThreadExecutor;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.simulation.GameState;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
@@ -42,7 +39,7 @@ public final class LocalPlayerHandler extends PlayerHandler {
     }
 
     @Override
-    protected Future<?> onExecuteTurn(GameState gameState, CommandHandler commandHandler) {
+    protected Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler) {
         return playerExecutor.executeTurn(gameState, commandHandler);
     }
 

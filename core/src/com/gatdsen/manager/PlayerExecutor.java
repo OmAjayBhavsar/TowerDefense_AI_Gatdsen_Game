@@ -1,7 +1,6 @@
 package com.gatdsen.manager;
 
 import com.gatdsen.manager.command.Command;
-import com.gatdsen.manager.command.CommandHandler;
 import com.gatdsen.manager.concurrent.ResourcePool;
 import com.gatdsen.manager.concurrent.ThreadExecutor;
 import com.gatdsen.manager.player.analyzer.PlayerClassAnalyzer;
@@ -92,7 +91,7 @@ public final class PlayerExecutor {
         return handlePlayerFuture(future, System.currentTimeMillis() - startTime, timeout);
     }
 
-    public Future<?> executeTurn(GameState state, CommandHandler commandHandler) {
+    public Future<?> executeTurn(GameState state, Command.CommandHandler commandHandler) {
         StaticGameState staticState = new StaticGameState(state, playerIndex);
         Controller controller = new Controller(
                 player.getType() == Player.PlayerType.HUMAN ? HUMAN_CONTROLLER_USES : BOT_CONTROLLER_USES
@@ -126,7 +125,7 @@ public final class PlayerExecutor {
             // Falls in der waitWhileHandlingCommands()-Methode nicht alle Befehle abgearbeitet wurden, holen wir das
             // hier nach und führen alle in der Controller-Warteschlange verbliebenen Befehle aus.
             while ((command = controller.commands.poll()) != null) {
-                commandHandler.handleCommand(command);
+                commandHandler.handle(command);
             }
             returnFuture.complete(null);
         }).start();
@@ -138,7 +137,7 @@ public final class PlayerExecutor {
      * {@link System#currentTimeMillis()} größer als die übergebene Maximalzeit {@code untilTime} ist, falls diese
      * Instanz sich nicht im Debug-Modus befindet.
      * Währenddessen werden alle Befehle, die in der Warteschlange {@code commands} liegen, mit dem übergebenen
-     * {@link CommandHandler} abgearbeitet.
+     * {@link Command.CommandHandler} abgearbeitet.
      * Es wird die Systemzeit, als die Schleife verlassen wurde, zurückgegeben.
      * @param untilTime Die maximale Wartezeit
      * @param future Der Future, der auf Erfüllung wartet
@@ -146,7 +145,7 @@ public final class PlayerExecutor {
      * @param commandHandler Der Handler, der die Befehle abarbeiten soll
      * @return Die Systemzeit als die Schleife verlassen wurde
      */
-    private long waitWhileHandlingCommands(long untilTime, Future<?> future, BlockingQueue<Command> commands, CommandHandler commandHandler) {
+    private long waitWhileHandlingCommands(long untilTime, Future<?> future, BlockingQueue<Command> commands, Command.CommandHandler commandHandler) {
         long currentTime = System.currentTimeMillis();
         // Ausführen der Schleife, solange der Future noch nicht fertig ist und entweder Debug-Modus aktiv ist oder die
         // aktuelle Zeit kleiner oder gleich der maximalen Zeit ist.
@@ -169,7 +168,7 @@ public final class PlayerExecutor {
             if (command == null) {
                 continue;
             }
-            commandHandler.handleCommand(command);
+            commandHandler.handle(command);
         }
         return currentTime;
     }

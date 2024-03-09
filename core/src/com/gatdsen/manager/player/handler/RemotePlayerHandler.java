@@ -1,7 +1,6 @@
 package com.gatdsen.manager.player.handler;
 
 import com.gatdsen.manager.command.Command;
-import com.gatdsen.manager.command.CommandHandler;
 import com.gatdsen.manager.concurrent.RMICommunicator;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.networking.rmi.message.*;
@@ -68,7 +67,7 @@ public class RemotePlayerHandler extends PlayerHandler {
     }
 
     @Override
-    protected Future<?> onExecuteTurn(GameState gameState, CommandHandler commandHandler) {
+    protected Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler) {
         assert initFuture.isDone() : "PlayerHandler.executeTurn() should only be called after PlayerHandler.init() has completed";
         assert executeTurnFuture == null || executeTurnFuture.isDone() : "PlayerHandler.executeTurn() should only be called once the previously returned Future is done";
         executeTurnFuture = new CompletableFuture<>();
@@ -77,7 +76,7 @@ public class RemotePlayerHandler extends PlayerHandler {
                 throw new UnexpectedMessageException(message, Message.Type.PlayerCommandResponse);
             }
             Command command = ((PlayerCommandResponse) message).command;
-            commandHandler.handleCommand(command);
+            commandHandler.handle(command);
             if (command.endsTurn()) {
                 executeTurnFuture.complete(null);
                 communicator.setMessageHandler(null);

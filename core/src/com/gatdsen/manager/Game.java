@@ -4,15 +4,11 @@ import com.gatdsen.manager.command.Command;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.handler.PlayerHandler;
 import com.gatdsen.manager.player.data.PlayerInformation;
-import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Simulation;
 import com.gatdsen.simulation.action.ActionLog;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;

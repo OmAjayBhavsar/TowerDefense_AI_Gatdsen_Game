@@ -3,14 +3,12 @@ package com.gatdsen.networking.rmi;
 import com.gatdsen.manager.PlayerExecutor;
 import com.gatdsen.manager.concurrent.RMICommunicator;
 import com.gatdsen.manager.concurrent.RMIRegistry;
-import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.networking.rmi.message.*;
 
 import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class PlayerProcessCommunicator implements ProcessCommunicator {
@@ -52,9 +50,7 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
                 PlayerExecuteTurnRequest playerExecuteTurnRequest = (PlayerExecuteTurnRequest) message;
                 playerExecutor.executeTurn(
                         playerExecuteTurnRequest.state,
-                        command -> {
-                            RMICommunicator.communicate(remoteCommunicatorStub, new PlayerCommandResponse(command));
-                        }
+                        command -> RMICommunicator.communicate(remoteCommunicatorStub, new PlayerCommandResponse(command))
                 );
                 break;
             case ProcessCommunicatorShutdownRequest:
