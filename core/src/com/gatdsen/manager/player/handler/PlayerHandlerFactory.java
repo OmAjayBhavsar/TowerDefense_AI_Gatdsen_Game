@@ -2,6 +2,7 @@ package com.gatdsen.manager.player.handler;
 
 import com.gatdsen.manager.InputProcessor;
 import com.gatdsen.manager.player.*;
+import com.gatdsen.simulation.PlayerController;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,7 @@ public abstract class PlayerHandlerFactory {
 
     public abstract String getName();
 
-    public abstract Future<PlayerHandler> createPlayerHandler(InputProcessor inputProcessor, int playerId);
+    public abstract Future<PlayerHandler> createPlayerHandler(int playerIndex, PlayerController controller, InputProcessor inputProcessor);
 
     public static PlayerHandlerFactory[] getAvailablePlayerFactories() {
         List<PlayerHandlerFactory> factories = new ArrayList<>();

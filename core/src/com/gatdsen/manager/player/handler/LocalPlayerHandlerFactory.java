@@ -2,6 +2,7 @@ package com.gatdsen.manager.player.handler;
 
 import com.gatdsen.manager.InputProcessor;
 import com.gatdsen.manager.player.*;
+import com.gatdsen.simulation.PlayerController;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CompletableFuture;
@@ -44,12 +45,12 @@ public final class LocalPlayerHandlerFactory extends PlayerHandlerFactory {
     }
 
     @Override
-    public Future<PlayerHandler> createPlayerHandler(InputProcessor inputProcessor, int playerIndex) {
+    public Future<PlayerHandler> createPlayerHandler(int playerIndex, PlayerController controller, InputProcessor inputProcessor) {
         PlayerHandler playerHandler;
         if (Bot.class.isAssignableFrom(playerClass)) {
-            playerHandler = new ProcessPlayerHandler(playerIndex, playerClass);
+            playerHandler = new ProcessPlayerHandler(playerIndex, playerClass, controller);
         } else {
-            playerHandler = new LocalPlayerHandler(playerIndex, playerClass, inputProcessor);
+            playerHandler = new LocalPlayerHandler(playerIndex, playerClass, controller, inputProcessor);
         }
         return CompletableFuture.completedFuture(playerHandler);
     }

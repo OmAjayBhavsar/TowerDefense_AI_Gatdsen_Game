@@ -14,16 +14,13 @@ import java.util.concurrent.Future;
 public abstract class PlayerHandler {
 
     protected final int playerIndex;
-    protected PlayerController controller;
+    protected final PlayerController controller;
     protected PlayerInformation playerInformation;
 
     protected int turnsToMiss = 0;
 
-    public PlayerHandler(int playerIndex) {
+    public PlayerHandler(int playerIndex, PlayerController controller) {
         this.playerIndex = playerIndex;
-    }
-
-    public final void setPlayerController(PlayerController controller) {
         this.controller = controller;
     }
 

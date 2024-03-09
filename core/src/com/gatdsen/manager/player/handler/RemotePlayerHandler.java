@@ -5,14 +5,12 @@ import com.gatdsen.manager.concurrent.RMICommunicator;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.networking.rmi.message.*;
 import com.gatdsen.simulation.GameState;
+import com.gatdsen.simulation.PlayerController;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public class RemotePlayerHandler extends PlayerHandler {
-
-    public static final String GAME_REMOTE_REFERENCE_NAME_FORMAT = "GameCommunicator_%d_%d";
-    public static final String PLAYER_REMOTE_REFERENCE_NAME_FORMAT = "PlayerCommunicator_%d_%d";
 
     private final RMICommunicator communicator;
     private final Class<? extends Player> playerClass;
@@ -20,17 +18,17 @@ public class RemotePlayerHandler extends PlayerHandler {
     private final CompletableFuture<?> initFuture = new CompletableFuture<>();
     private CompletableFuture<?> executeTurnFuture = null;
 
-    public RemotePlayerHandler(int playerIndex) {
-        super(playerIndex);
+    public RemotePlayerHandler(int playerIndex, PlayerController controller) {
+        super(playerIndex, controller);
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public RemotePlayerHandler(RMICommunicator communicator, int playerIndex) {
-        this(communicator, playerIndex, null);
+    public RemotePlayerHandler(RMICommunicator communicator, int playerIndex, PlayerController controller) {
+        this(communicator, playerIndex, null, controller);
     }
 
-    protected RemotePlayerHandler(RMICommunicator communicator, int playerIndex, Class<? extends Player> playerClass) {
-        super(playerIndex);
+    protected RemotePlayerHandler(RMICommunicator communicator, int playerIndex, Class<? extends Player> playerClass, PlayerController controller) {
+        super(playerIndex, controller);
         this.communicator = communicator;
         this.playerClass = playerClass;
     }

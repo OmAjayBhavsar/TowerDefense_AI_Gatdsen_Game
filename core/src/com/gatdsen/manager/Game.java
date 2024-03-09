@@ -54,7 +54,11 @@ public class Game extends Executable {
         @SuppressWarnings("unchecked")
         Future<PlayerHandler>[] playerHandlerFutures = (Future<PlayerHandler>[]) new Future[config.playerCount];
         for (int playerIndex = 0; playerIndex < config.playerCount; playerIndex++) {
-            playerHandlerFutures[playerIndex] = config.playerFactories[playerIndex].createPlayerHandler(config.inputProcessor, playerIndex);
+            playerHandlerFutures[playerIndex] = config.playerFactories[playerIndex].createPlayerHandler(
+                    playerIndex,
+                    simulation.getController(playerIndex),
+                    config.inputProcessor
+            );
         }
         @SuppressWarnings("unchecked")
         Future<Long>[] longFutures = (Future<Long>[]) new Future[config.playerCount];
@@ -67,7 +71,6 @@ public class Game extends Executable {
                 throw new RuntimeException(e);
             }
             playerHandlers[playerIndex] = playerHandler;
-            playerHandler.setPlayerController(simulation.getController(playerIndex));
             longFutures[playerIndex] = playerHandler.create(isDebug, gameNumber);
         }
         for (Future<Long> future : longFutures) {
@@ -85,9 +88,7 @@ public class Game extends Executable {
             if (playerStates[playerIndex].isDeactivated()) {
                 continue;
             }
-            PlayerHandler playerHandler = playerHandlers[playerIndex];
-            playerHandler.setPlayerController(simulation.getController(playerIndex));
-            futures[playerIndex] = playerHandler.init(state, seed);
+            futures[playerIndex] = playerHandlers[playerIndex].init(state, seed);
         }
         awaitFutures(futures);
         gameResults.setPlayerNames(getPlayerNames());
@@ -156,7 +157,6 @@ public class Game extends Executable {
                 }
 
                 PlayerHandler playerHandler = playerHandlers[playerIndex];
-                playerHandler.setPlayerController(simulation.getController(playerIndex));
                 futures[playerIndex] = playerHandler.executeTurn(
                         state,
                         (Command command) -> {

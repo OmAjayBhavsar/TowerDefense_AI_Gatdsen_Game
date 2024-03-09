@@ -6,6 +6,7 @@ import com.gatdsen.manager.command.Command;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.simulation.GameState;
+import com.gatdsen.simulation.PlayerController;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -16,8 +17,8 @@ public final class LocalPlayerHandler extends PlayerHandler {
     private final InputProcessor inputGenerator;
     private PlayerExecutor playerExecutor;
 
-    public LocalPlayerHandler(int playerIndex, Class<? extends Player> playerClass, InputProcessor inputGenerator) {
-        super(playerIndex);
+    public LocalPlayerHandler(int playerIndex, Class<? extends Player> playerClass, PlayerController controller, InputProcessor inputGenerator) {
+        super(playerIndex, controller);
         this.playerClass = playerClass;
         this.inputGenerator = inputGenerator;
     }
