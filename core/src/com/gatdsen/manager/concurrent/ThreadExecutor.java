@@ -1,7 +1,5 @@
 package com.gatdsen.manager.concurrent;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.*;
 
 /**
@@ -11,7 +9,6 @@ public final class ThreadExecutor {
 
     private final int threadCount;
     private final ExecutorService executor;
-    private final Set<Future<?>> runningTasks = new HashSet<>();
 
     public ThreadExecutor(int threadCount) {
         this.threadCount = threadCount;
@@ -23,24 +20,11 @@ public final class ThreadExecutor {
     }
 
     public <T> Future<T> execute(Callable<T> callable) {
-        Future<T> future = executor.submit(callable);
-        runningTasks.add(future);
-        return future;
+        return executor.submit(callable);
     }
 
     public Future<?> execute(Runnable runnable) {
-        Future<?> future = executor.submit(runnable);
-        runningTasks.add(future);
-        return future;
-    }
-
-    /**
-     * Überprüft, ob alle Aufgaben, die von diesem ThreadExecutor gestartet wurden, beendet sind.
-     * @return true, wenn keine Aufgaben mehr laufen, ansonsten false
-     */
-    public boolean isIdling() {
-        runningTasks.removeIf(Future::isDone);
-        return runningTasks.isEmpty();
+        return executor.submit(runnable);
     }
 
     /**
