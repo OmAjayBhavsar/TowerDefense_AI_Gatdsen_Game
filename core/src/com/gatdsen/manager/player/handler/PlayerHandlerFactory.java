@@ -16,6 +16,17 @@ import java.util.concurrent.Future;
 
 public abstract class PlayerHandlerFactory {
 
+    /**
+     * Diese Klasse wird im UI in der PlayerAttribute Klasse bei der Auswahl von Spielerklassen verwendet, wobei jede
+     * dieser Klassen einem Eintrag zugeordnet wird. Für die Anzeige wird dabei die String-Repräsentation der jeweiligen
+     * Klassen verwendet, daher gibt diese toString() Methode den Namen zurück, damit die Spielernamen korrekt angezeigt
+     * werden können.
+     */
+    @Override
+    public String toString() {
+        return getName();
+    }
+
     public abstract String getName();
 
     public abstract Future<PlayerHandler> createPlayerHandler(int playerIndex, PlayerController controller, InputProcessor inputProcessor);
