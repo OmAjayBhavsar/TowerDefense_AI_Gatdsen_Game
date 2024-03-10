@@ -15,20 +15,29 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
 
     private final RMIRegistry registry;
     private final String localReferenceName;
-    private final ProcessCommunicator remoteCommunicatorStub;
+    private ProcessCommunicator remoteCommunicatorStub = null;
 
     private PlayerExecutor playerExecutor;
 
-    public PlayerProcessCommunicator(RMIRegistry registry, String localReferenceName, ProcessCommunicator remoteCommunicatorStub) {
+    public PlayerProcessCommunicator(RMIRegistry registry, String localReferenceName) {
         this.registry = registry;
         this.localReferenceName = localReferenceName;
+        Runtime.getRuntime().addShutdownHook(new Thread(this::dispose));
+    }
+
+    public void setRemoteCommunicatorStub(ProcessCommunicator remoteCommunicatorStub) {
+        if (this.remoteCommunicatorStub != null) {
+            throw new IllegalStateException("RemoteCommunicatorStub already set");
+        }
         this.remoteCommunicatorStub = remoteCommunicatorStub;
         RMICommunicator.communicate(remoteCommunicatorStub, new ProcessCommunicatorSetupResponse());
-        Runtime.getRuntime().addShutdownHook(new Thread(this::dispose));
     }
 
     @Override
     public void communicate(Message message) {
+        if (remoteCommunicatorStub == null) {
+            throw new UnexpectedMessageException(message);
+        }
         switch (message.getType()) {
             case GameCreateRequest:
                 GameCreateRequest gameCreateRequest = (GameCreateRequest) message;

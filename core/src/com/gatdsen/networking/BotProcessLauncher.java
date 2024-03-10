@@ -73,11 +73,17 @@ public class BotProcessLauncher {
                 ProcessExecutor.PLAYER_PROCESS_REFERENCE_NAME_FORMAT,
                 ProcessHandle.current().pid()
         );
+        PlayerProcessCommunicator localCommunicatorObject = new PlayerProcessCommunicator(registry, localReferenceName);
+        try {
+            registry.rebind(localReferenceName, UnicastRemoteObject.exportObject(localCommunicatorObject, 0));
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+
         String remoteReferenceName = String.format(
                 ProcessExecutor.GAME_PROCESS_REFERENCE_NAME_FORMAT,
                 ProcessHandle.current().pid()
         );
-
         ProcessCommunicator gameCommunicatorStub = null;
         long timeout = 5_000;
         long startTime = System.currentTimeMillis();
@@ -98,15 +104,7 @@ public class BotProcessLauncher {
         if (gameCommunicatorStub == null) {
             throw new RuntimeException("There was no Remote Reference bound under the name \"" + remoteReferenceName + "\" at the Remote Object Registry at host \"" + (host == null ? "localhost" : host) + "\" and port \"" + port + "\".");
         }
-
-        try {
-            registry.rebind(
-                    localReferenceName,
-                    UnicastRemoteObject.exportObject(new PlayerProcessCommunicator(registry, localReferenceName, gameCommunicatorStub), 0)
-            );
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+        localCommunicatorObject.setRemoteCommunicatorStub(gameCommunicatorStub);
     }
 
     private static void printHelp() {
