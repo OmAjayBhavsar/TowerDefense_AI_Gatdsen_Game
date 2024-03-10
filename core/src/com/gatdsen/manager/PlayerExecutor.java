@@ -3,9 +3,9 @@ package com.gatdsen.manager;
 import com.gatdsen.manager.command.Command;
 import com.gatdsen.manager.concurrent.ResourcePool;
 import com.gatdsen.manager.concurrent.ThreadExecutor;
+import com.gatdsen.manager.player.HumanPlayer;
 import com.gatdsen.manager.player.analyzer.PlayerClassAnalyzer;
 import com.gatdsen.manager.player.Bot;
-import com.gatdsen.manager.player.HumanPlayer;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.manager.player.data.PlayerType;
@@ -101,8 +101,7 @@ public final class PlayerExecutor {
             Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
             player.executeTurn(staticState, controller);
         });
-        CompletableFuture<?> returnFuture = new CompletableFuture<>();
-        new Thread(() -> {
+        return executor.execute(() -> {
             Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
             long timeout = 0;
             switch (PlayerType.fromPlayer(player)) {
@@ -128,9 +127,7 @@ public final class PlayerExecutor {
             while ((command = controller.commands.poll()) != null) {
                 commandHandler.handle(command);
             }
-            returnFuture.complete(null);
-        }).start();
-        return returnFuture;
+        });
     }
 
     /**
