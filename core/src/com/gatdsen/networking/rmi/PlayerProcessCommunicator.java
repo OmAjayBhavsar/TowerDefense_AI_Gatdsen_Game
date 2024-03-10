@@ -63,12 +63,13 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
                 );
                 break;
             case ProcessCommunicatorShutdownRequest:
-                //dispose();
+                System.exit(0);
                 break;
         }
     }
 
     private void dispose() {
+        playerExecutor.dispose();
         try {
             UnicastRemoteObject.unexportObject(this, true);
         } catch (NoSuchObjectException e) {
