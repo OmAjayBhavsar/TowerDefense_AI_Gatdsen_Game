@@ -35,15 +35,4 @@ public abstract class Player {
      * @param controller Der {@link Controller Controller}, um Aktionen auszuführen
      */
     public abstract void executeTurn(StaticGameState state, Controller controller);
-
-    public enum PlayerType {
-        HUMAN,
-        BOT
-    }
-
-    /**
-     * Wird für interne Zwecke verwendet und besitzt keine Relevanz für die Bot-Entwicklung.
-     * @return Die Art der Implementierung des Spielers
-     */
-    public abstract PlayerType getType();
 }

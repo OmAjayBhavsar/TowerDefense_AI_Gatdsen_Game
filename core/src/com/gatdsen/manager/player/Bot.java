@@ -29,15 +29,6 @@ public abstract class Bot extends Player {
 
     /**
      * Wird für interne Zwecke verwendet und besitzt keine Relevanz für die Bot-Entwicklung.
-     * @return Die Art der Implementierung des Spielers, hier ein Bot
-     */
-    @Override
-    public final PlayerType getType() {
-        return PlayerType.BOT;
-    }
-
-    /**
-     * Wird für interne Zwecke verwendet und besitzt keine Relevanz für die Bot-Entwicklung.
      * @param seed Der Seed, der für das aktuelle Spiel gilt und als Basis für den Zufallszahlengenerator des Bots ver-
      *             wendet werden kann.
      */

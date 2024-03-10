@@ -233,11 +233,6 @@ public class HumanPlayer extends Player {
         }
     }
 
-    @Override
-    public PlayerType getType() {
-        return PlayerType.HUMAN;
-    }
-
     public int getTurnDuration() {
         return turnDuration;
     }

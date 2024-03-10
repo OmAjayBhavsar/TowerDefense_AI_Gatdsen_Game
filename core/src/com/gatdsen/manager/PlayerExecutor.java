@@ -8,6 +8,7 @@ import com.gatdsen.manager.player.Bot;
 import com.gatdsen.manager.player.HumanPlayer;
 import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.data.PlayerInformation;
+import com.gatdsen.manager.player.data.PlayerType;
 import com.gatdsen.manager.player.data.penalty.DisqualificationPenalty;
 import com.gatdsen.manager.player.data.penalty.MissTurnsPenalty;
 import com.gatdsen.manager.player.data.penalty.Penalty;
@@ -62,7 +63,7 @@ public final class PlayerExecutor {
     }
 
     public Penalty init(GameState state, long seed) {
-        if (player.getType() == Player.PlayerType.BOT) {
+        if (PlayerType.fromPlayer(player) == PlayerType.BOT) {
             String[] illegalImports = playerClassAnalyzer.getIllegalImports();
             if (illegalImports.length > 0) {
                 String reason = "Bot \"" + player.getName() + "\" has been disqualified for using the following illegal package or class imports: \"" + String.join("\", \"", illegalImports) + "\"";
@@ -73,12 +74,12 @@ public final class PlayerExecutor {
         StaticGameState staticState = new StaticGameState(state, playerIndex);
         Future<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Init_Thread_Player_" + player.getName());
-            if (player.getType() == Player.PlayerType.BOT) {
+            if (PlayerType.fromPlayer(player) == PlayerType.BOT) {
                 ((Bot) player).setRandomSeed(seed);
             }
             player.init(staticState);
         });
-        long timeout = player.getType() == Player.PlayerType.HUMAN ? HUMAN_EXECUTE_INIT_TIMEOUT : BOT_EXECUTE_INIT_TIMEOUT;
+        long timeout = PlayerType.fromPlayer(player) == PlayerType.HUMAN ? HUMAN_EXECUTE_INIT_TIMEOUT : BOT_EXECUTE_INIT_TIMEOUT;
         long startTime = System.currentTimeMillis();
         try {
             if (isDebug) {
@@ -94,7 +95,7 @@ public final class PlayerExecutor {
     public Future<?> executeTurn(GameState state, Command.CommandHandler commandHandler) {
         StaticGameState staticState = new StaticGameState(state, playerIndex);
         Controller controller = new Controller(
-                player.getType() == Player.PlayerType.HUMAN ? HUMAN_CONTROLLER_USES : BOT_CONTROLLER_USES
+                PlayerType.fromPlayer(player) == PlayerType.HUMAN ? HUMAN_CONTROLLER_USES : BOT_CONTROLLER_USES
         );
         Future<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
@@ -104,7 +105,7 @@ public final class PlayerExecutor {
         new Thread(() -> {
             Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
             long timeout = 0;
-            switch (player.getType()) {
+            switch (PlayerType.fromPlayer(player)) {
                 case HUMAN:
                     inputGenerator.activateTurn((HumanPlayer) player, playerIndex);
                     timeout = HUMAN_EXECUTE_TURN_TIMEOUT;
@@ -115,7 +116,7 @@ public final class PlayerExecutor {
             }
             long startTime = System.currentTimeMillis();
             long endTime = waitWhileHandlingCommands(startTime + timeout, future, controller.commands, commandHandler);
-            Penalty penalty = handlePlayerFuture(future, endTime - startTime, player.getType() == Player.PlayerType.HUMAN ? timeout : BOT_EXECUTE_TURN_TIMEOUT);
+            Penalty penalty = handlePlayerFuture(future, endTime - startTime, PlayerType.fromPlayer(player) == PlayerType.HUMAN ? timeout : BOT_EXECUTE_TURN_TIMEOUT);
             if (penalty == null) {
                 controller.endTurn();
             } else {
@@ -175,7 +176,7 @@ public final class PlayerExecutor {
 
     private Penalty handlePlayerFuture(Future<?> future, long turnDuration, long allowedTimeout) {
         Penalty penalty = null;
-        switch (player.getType()) {
+        switch (PlayerType.fromPlayer(player)) {
             case HUMAN:
                 handleHumanPlayerFuture(future);
                 break;

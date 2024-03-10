@@ -7,19 +7,20 @@ import java.io.Serializable;
 
 public class PlayerInformation implements Serializable {
 
-    public final Player.PlayerType type;
+    public final PlayerType type;
     public final String name;
 
-    public PlayerInformation(Player.PlayerType type, String name) {
+    public PlayerInformation(PlayerType type, String name) {
         this.type = type;
         this.name = name;
     }
 
     public static PlayerInformation fromPlayer(Player player) {
+        PlayerType type = PlayerType.fromPlayer(player);
         if (player instanceof Bot) {
             Bot bot = (Bot) player;
-            return new BotInformation(bot.getType(), bot.getName(), bot.getStudentName(), bot.getMatrikel());
+            return new BotInformation(type, bot.getName(), bot.getStudentName(), bot.getMatrikel());
         }
-        return new PlayerInformation(player.getType(), player.getName());
+        return new PlayerInformation(type, player.getName());
     }
 }

@@ -2,6 +2,7 @@ package com.gatdsen.manager;
 
 import com.gatdsen.manager.command.Command;
 import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.player.data.PlayerType;
 import com.gatdsen.manager.player.handler.PlayerHandler;
 import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.simulation.GameState;
@@ -179,7 +180,7 @@ public class Game extends Executable {
                 if (saveReplay) {
                     gameResults.addActionLog(log);
                 }
-                if (gui && playerHandler.getPlayerInformation().type.equals(Player.PlayerType.HUMAN)) {
+                if (gui && playerHandler.getPlayerInformation().type == PlayerType.HUMAN) {
                     //Contains Action produced by entering new turn
                     animationLogProcessor.animate(log);
                 }
