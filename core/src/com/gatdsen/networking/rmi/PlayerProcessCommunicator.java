@@ -41,7 +41,7 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
         switch (message.getType()) {
             case GameCreateRequest:
                 GameCreateRequest gameCreateRequest = (GameCreateRequest) message;
-                playerExecutor = new PlayerExecutor(gameCreateRequest.isDebug, gameCreateRequest.playerIndex, gameCreateRequest.playerClass);
+                playerExecutor = new PlayerExecutor(gameCreateRequest.isDebug, gameCreateRequest.playerId, gameCreateRequest.playerClass);
                 RMICommunicator.communicate(
                         remoteCommunicatorStub,
                         new GameCreateResponse(

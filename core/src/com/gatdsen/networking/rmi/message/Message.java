@@ -3,11 +3,14 @@ package com.gatdsen.networking.rmi.message;
 import java.io.Serializable;
 
 /**
- * Dieses Interface wird von allen Datenklassen implementiert, welche vom Hauptprozess an den Bot-Prozess übertragen
- * werden sollen.
+ * Dieses Interface repräsentiert eine Nachricht, die zwischen Parteien wie bspw. zwei verschiedenen Prozessen zur
+ * Kommunikation ausgetauscht werden können.
  */
 public interface Message extends Serializable {
 
+    /**
+     * Dieser Enum repräsentiert den Typ einer Nachricht.
+     */
     enum Type {
         ProcessCommunicatorSetupResponse,
         ProcessCommunicatorShutdownRequest,
@@ -22,9 +25,17 @@ public interface Message extends Serializable {
         PlayerCommandResponse
     }
 
-    Type getType();
-
-    interface MessageHandler {
+    /**
+     * Dieses Interface kann zur Repräsentation eines Callbacks genutzt werden, der aufgerufen wird, wenn eine Nachricht
+     * empfangen wird und behandelt werden muss.
+     */
+    interface Handler {
         void handle(Message message);
     }
+
+    /**
+     * Gibt den Typ der Nachricht zurück.
+     * @return Der Typ der Nachricht
+     */
+    Type getType();
 }

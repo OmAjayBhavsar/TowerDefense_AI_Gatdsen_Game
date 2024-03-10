@@ -1,7 +1,7 @@
 package com.gatdsen.networking.rmi.message;
 
 /**
- * Diese Exception kann von {@link com.gatdsen.networking.rmi.message.Message.MessageHandler} geworfen werden, wenn eine
+ * Diese Exception kann von {@link Message.Handler} geworfen werden, wenn eine
  * Nachricht empfangen wurde, die nicht erwartet wurde.
  */
 public final class UnexpectedMessageException extends RuntimeException {

@@ -11,13 +11,13 @@ import com.gatdsen.networking.rmi.message.UnexpectedMessageException;
  */
 public class SimpleProcessCommunicator implements ProcessCommunicator {
 
-    private Message.MessageHandler messageHandler = null;
+    private Message.Handler messageHandler = null;
 
     /**
      * Setzt den Callback, der aufgerufen wird, wenn eine Nachricht empfangen wird.
      * @param messageHandler Der Callback
      */
-    public void setMessageHandler(Message.MessageHandler messageHandler) {
+    public void setMessageHandler(Message.Handler messageHandler) {
         this.messageHandler = messageHandler;
     }
 

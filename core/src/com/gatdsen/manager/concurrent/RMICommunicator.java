@@ -50,7 +50,7 @@ public final class RMICommunicator {
         }
     }
 
-    public void setMessageHandler(Message.MessageHandler messageHandler) {
+    public void setMessageHandler(Message.Handler messageHandler) {
         localCommunicatorObject.setMessageHandler(messageHandler);
     }
 
