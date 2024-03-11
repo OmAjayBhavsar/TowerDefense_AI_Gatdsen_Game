@@ -153,7 +153,7 @@ public class InputHandler implements InputProcessor, com.gatdsen.manager.InputPr
         if (upgradeTower){
             currentPlayer.upgradeTower(x, y);
         } else if (sellTower) {
-            //ToDo implement SellTower action
+            currentPlayer.sellTower(x,y);
         }
     }
 
