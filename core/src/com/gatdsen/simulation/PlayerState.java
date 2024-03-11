@@ -188,13 +188,18 @@ public class PlayerState implements Serializable {
 
     /**
      * Gibt das Spielfeld des Spielers zurück
-     *
      * @return Spielfeld
      */
     public Tile[][] getBoard() {
         return board;
     }
-
+    /**
+     * Gibt das Ende des Pfades zurück
+     * @return Ende des Pfades
+     */
+    public PathTile getCheese(){
+        return endTile;
+    }
     /**
      * Gibt den Index des Spielers zurück
      *
@@ -369,9 +374,6 @@ public class PlayerState implements Serializable {
      */
     void spawnEnemy(Enemy.Type type) {
         switch (type) {
-            case BASIC_ENEMY:
-                spawnEnemies.push(new BasicEnemy(this, 1, spawnTile));
-                break;
             case EMP_ENEMY:
                 spawnEnemies.push(new EmpEnemy(this, 1, spawnTile));
                 break;
@@ -415,7 +417,9 @@ public class PlayerState implements Serializable {
      * @return der neue Action Head
      */
     Action moveEnemies(Action head) {
-        /*System.out.println("MoveEnemies");
+        /*
+        TODO: All enemies should be moved at the same time
+        System.out.println("MoveEnemies");
         PathTile actual = endTile;
         while (actual.getPrev() != null) {
             if (!actual.getEnemies().isEmpty()) {

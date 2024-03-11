@@ -53,6 +53,11 @@ public class PathTile extends Tile {
         return false;
     }
 
+    @Override
+    public boolean isPath() {
+        return true;
+    }
+
     /**
      * Setzt das next-Attribut des PathTiles.
      *
