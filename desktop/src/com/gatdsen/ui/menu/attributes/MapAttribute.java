@@ -24,8 +24,8 @@ public class MapAttribute extends Attribute {
     @Override
     public Actor getContent(Skin skin) {
         Table mapTable = new Table();
-        Label textLabelMap = new Label("Karte:", skin);
-        textLabelMap.setAlignment(Align.center);
+        Label textLabelMap = new Label("Karte: ", skin);
+        textLabelMap.setAlignment(Align.right);
         mapSelectBox = new SelectBox<>(skin);
         String[] sortedMapNames = MapRetriever.getInstance().getMapNames();
         Arrays.sort(sortedMapNames);
