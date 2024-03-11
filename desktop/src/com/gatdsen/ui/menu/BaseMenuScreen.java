@@ -97,7 +97,8 @@ public abstract class BaseMenuScreen extends ConfigScreen {
             backButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    gameInstance.setScreen(GADS.ScreenState.MAINSCREEN, null);
+                    GADS.ScreenState prevScreenState  = getPrev();
+                    gameInstance.setScreen(prevScreenState , null);
                 }
             });
             navigationTable.add(backButton).colspan(4).pad(10).width(200);
