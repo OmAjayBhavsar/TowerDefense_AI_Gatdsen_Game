@@ -4,10 +4,9 @@ import java.util.ArrayList;
 
 public abstract class Executable {
 
-
     protected static final int REQUIRED_THREAD_COUNT = 2;
 
-    enum Status {
+    public enum Status {
         INITIALIZED,
         SCHEDULED,
         ACTIVE,
