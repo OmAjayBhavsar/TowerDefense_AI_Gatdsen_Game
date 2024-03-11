@@ -12,7 +12,7 @@ import static com.gatdsen.ui.assets.AssetContainer.IngameAssets.gameEnemyAnimati
 
 public class GameEnemy extends AnimatedEntity {
     private Integer level;
-    private BitmapFont fonte;
+    static private BitmapFont fonte = new BitmapFont();
     public Healthbar healthbar;
 
     public GameEnemy(int level, int maxHealth) {
@@ -20,7 +20,6 @@ public class GameEnemy extends AnimatedEntity {
         this.level = level;
         healthbar = new Healthbar(maxHealth);
         this.add(healthbar);
-        fonte = new BitmapFont();
 
         fonte.setColor(Color.WHITE);
         fonte.getData().setScale(5);
