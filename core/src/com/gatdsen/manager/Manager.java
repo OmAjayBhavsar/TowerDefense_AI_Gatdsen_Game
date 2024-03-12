@@ -1,20 +1,13 @@
 package com.gatdsen.manager;
 
 import com.gatdsen.manager.concurrent.ResourcePool;
-import com.gatdsen.manager.player.Bot;
-import com.gatdsen.manager.player.HumanPlayer;
-import com.gatdsen.manager.player.IdleBot;
-import com.gatdsen.manager.player.Player;
-import com.gatdsen.manager.run.config.RunConfiguration;
+import com.gatdsen.manager.game.Executable;
+import com.gatdsen.manager.game.GameResults;
+import com.gatdsen.manager.run.Run;
+import com.gatdsen.manager.run.RunConfiguration;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -119,7 +112,7 @@ public class Manager {
         }
     }
 
-    protected void schedule(Executable game) {
+    public void schedule(Executable game) {
         synchronized (schedulingLock) {
             if (pendingShutdown) return;
             if (game.getStatus() == Executable.Status.ABORTED) return;
@@ -151,7 +144,7 @@ public class Manager {
         run.dispose();
     }
 
-    protected void stop(Executable game) {
+    public void stop(Executable game) {
         synchronized (schedulingLock) {
             synchronized (game.schedulingLock) {
                 switch (game.getStatus()) {

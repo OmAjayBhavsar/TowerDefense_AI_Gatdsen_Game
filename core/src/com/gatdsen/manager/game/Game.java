@@ -1,7 +1,7 @@
-package com.gatdsen.manager;
+package com.gatdsen.manager.game;
 
+import com.gatdsen.manager.CompletionHandler;
 import com.gatdsen.manager.command.Command;
-import com.gatdsen.manager.player.Player;
 import com.gatdsen.manager.player.data.PlayerType;
 import com.gatdsen.manager.player.handler.PlayerHandler;
 import com.gatdsen.manager.player.data.PlayerInformation;
@@ -10,6 +10,7 @@ import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Simulation;
 import com.gatdsen.simulation.action.ActionLog;
 
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,11 +36,9 @@ public class Game extends Executable {
 
     private long seed = BASE_SEED;
 
-    private float[] scores;
-
     private Thread simulationThread;
 
-    protected Game(GameConfig config) {
+    public Game(GameConfig config) {
         super(config);
         gameResults = new GameResults(config);
         gameResults.setStatus(getStatus());
@@ -92,7 +91,9 @@ public class Game extends Executable {
             futures[playerIndex] = playerHandlers[playerIndex].init(state, seed);
         }
         awaitFutures(futures);
-        gameResults.setPlayerNames(getPlayerNames());
+        gameResults.setPlayerInformation(
+                Arrays.stream(playerHandlers).map(PlayerHandler::getPlayerInformation).toArray(PlayerInformation[]::new)
+        );
         config = null;
     }
 
@@ -103,7 +104,12 @@ public class Game extends Executable {
             gameNumber.getAndIncrement();
             create();
             //Init the Log Processor
-            if (gui) animationLogProcessor.init(state.copy(), getPlayerNames(), new String[][]{});
+            if (gui) {
+                animationLogProcessor.init(
+                        state.copy(),
+                        Arrays.stream(gameResults.getPlayerInformation()).map(PlayerInformation::getName).toArray(String[]::new),
+                        new String[][]{});
+            }
             //Run the Game
             simulationThread = new Thread(this::run);
             simulationThread.setName("Game_Simulation_Thread");
@@ -115,14 +121,7 @@ public class Game extends Executable {
     @Override
     protected void setStatus(Status newStatus) {
         super.setStatus(newStatus);
-        if (gameResults!= null) gameResults.setStatus(newStatus);
-    }
-
-    /**
-     * @return The state of the underlying simulation
-     */
-    public GameState getState() {
-        return state;
+        gameResults.setStatus(newStatus);
     }
 
     /**
@@ -180,7 +179,7 @@ public class Game extends Executable {
                 if (saveReplay) {
                     gameResults.addActionLog(log);
                 }
-                if (gui && playerHandler.getPlayerInformation().type == PlayerType.HUMAN) {
+                if (gui && playerHandler.getPlayerInformation().getType() == PlayerType.HUMAN) {
                     //Contains Action produced by entering new turn
                     animationLogProcessor.animate(log);
                 }
@@ -199,7 +198,7 @@ public class Game extends Executable {
                 animationLogProcessor.awaitNotification();
             }
         }
-        scores = state.getHealth();
+        gameResults.setScores(state.getHealth());
         setStatus(Status.COMPLETED);
         for (CompletionHandler<Executable> completionListener : completionListeners) {
             completionListener.onComplete(this);
@@ -213,7 +212,6 @@ public class Game extends Executable {
         if (simulationThread != null) {
             simulationThread.interrupt();
         }
-        if (state!=null) scores = state.getHealth();
         simulation = null;
         state = null;
         simulationThread = null;
@@ -228,15 +226,6 @@ public class Game extends Executable {
         }
     }
 
-    protected String[] getPlayerNames() {
-        String[] names = new String[playerHandlers.length];
-        for (int i = 0; i < playerHandlers.length; i++) {
-            PlayerInformation information = playerHandlers[i].getPlayerInformation();
-            names[i] = information != null ? information.name : "Player " + i;
-        }
-        return names;
-    }
-
     private void awaitFutures(Future<?>[] futures) {
         for (Future<?> future : futures) {
             if (future == null) {
@@ -248,10 +237,6 @@ public class Game extends Executable {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    public float[] getScores() {
-        return scores;
     }
 
     public boolean shouldSaveReplay() {
@@ -273,7 +258,6 @@ public class Game extends Executable {
                 ", gameResults=" + gameResults +
                 ", simulation=" + simulation +
                 ", state=" + state +
-                /*", players=" + Arrays.toString(players) +*/
                 ", simulationThread=" + simulationThread +
                 ", pendingShutdown=" + pendingShutdown +
                 ", config=" + config +

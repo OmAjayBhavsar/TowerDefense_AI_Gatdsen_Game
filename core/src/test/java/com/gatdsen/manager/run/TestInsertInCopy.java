@@ -1,5 +1,6 @@
-package com.gatdsen.manager;
+package com.gatdsen.manager.run;
 
+import com.gatdsen.manager.run.ParallelMultiGameRun;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

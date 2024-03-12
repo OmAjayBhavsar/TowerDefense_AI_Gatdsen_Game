@@ -1,7 +1,11 @@
-package com.gatdsen.manager;
+package com.gatdsen.manager.run;
 
+import com.gatdsen.manager.*;
+import com.gatdsen.manager.game.Executable;
+import com.gatdsen.manager.game.Game;
+import com.gatdsen.manager.game.GameResults;
+import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
-import com.gatdsen.manager.run.config.RunConfiguration;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -102,11 +106,11 @@ public class TournamentRun extends Run {
         }
 
         void onGameComplete(Executable exec) {
-            Game game = (Game) exec;
             System.out.println("Completed: " + TournamentRun.this.completed.incrementAndGet());
             synchronized (handlerLock) {
                 completed++;
-                winner = (int) (game.getScores()[0] - game.getScores()[1]);
+                GameResults results = exec.getGameResults();
+                winner = (int) (results.getScores()[0] - results.getScores()[1]);
                 if (completed >= 3) {
                     System.out.printf("|%s-%s|%n", playerFactories.get(p1).getName(), playerFactories.get(p2).getName());
                     if (winner == 0)
@@ -124,7 +128,6 @@ public class TournamentRun extends Run {
                 if (completed >= 3) handler.onComplete(this);
             }
         }
-
     }
 
     private class LooserBracket extends BracketNode{
@@ -155,14 +158,13 @@ public class TournamentRun extends Run {
     private BracketNode winnerFinal;
     private BracketNode looserFinal;
 
-    private final float[] scores;
-
     protected TournamentRun(Manager manager, RunConfiguration runConfig) {
         super(manager, runConfig);
         playerFactories = runConfig.playerFactories;
 
         int playerCount = playerFactories.size();
-        scores = new float[playerCount];
+        results.setPlayerInformation(new PlayerInformation[playerCount]);
+        results.setScores(new float[playerCount]);
         if (playerCount < 4) {
             System.err.println("A Tournament requires at least 4 players");
             return;
@@ -208,7 +210,7 @@ public class TournamentRun extends Run {
                 looserLeaf.setRight(b2);
             }
 
-            looserHeadGames.add(makeTurnament(looserLeafGames, runConfig));
+            looserHeadGames.add(makeTournament(looserLeafGames, runConfig));
             winnerLeafGames = newWinnerLeafGames;
             capacity*=2;
         }
@@ -233,8 +235,7 @@ public class TournamentRun extends Run {
 
         int pIndex = 0;
 
-        for (BracketNode cur: winnerLeafGames
-             ) {
+        for (BracketNode cur: winnerLeafGames) {
             cur.makeLeaf(pIndex++, pIndex++);
         }
 
@@ -253,16 +254,16 @@ public class TournamentRun extends Run {
 
     }
 
-    private BracketNode makeTurnament(List<BracketNode> leafs, RunConfiguration runConfig){
+    private BracketNode makeTournament(List<BracketNode> leafs, RunConfiguration runConfig){
         assert  ((leafs.size() & leafs.size() - 1) == 0);
         List<BracketNode> newNodes;
         while (leafs.size() > 1){
             newNodes = new ArrayList<>();
             BracketNode last = null;
-            for (BracketNode cur: leafs
-                 ) {
-                if (last == null) last = cur;
-                else {
+            for (BracketNode cur: leafs) {
+                if (last == null) {
+                    last = cur;
+                } else {
                     BracketNode next = new BracketNode(runConfig.copy());
                     newNodes.add(cur);
                     next.setLeft(last);
@@ -282,17 +283,19 @@ public class TournamentRun extends Run {
 
     @Override
     protected void complete() {
-
         int winner = finalGame.getWinner();
         int second = finalGame.getLooser();
-        scores[redemptionFinal.getWinner()] = 3f;
-        if(scores[redemptionFinal.getLooser()] == 0f) scores[redemptionFinal.getLooser()] = 4f;
+        results.setScore(redemptionFinal.getWinner(), 3f);
+
+        if (results.getScore(redemptionFinal.getLooser()) == 0f) {
+            results.setScore(redemptionFinal.getLooser(), 4f);
+        }
         setLooserScore(finalGame.left.left, 5f);
         setLooserScore(finalGame.left.right, 5f);
         setLooserScore(finalGame.right.left, 5f);
         setLooserScore(finalGame.right.right, 5f);
-        scores[winner] = 1f;
-        scores[second] = 2f;
+        results.setScore(winner, 1f);
+        results.setScore(second, 2f);
 
         ArrayList<BracketNode> curLayer = new ArrayList<>();
         ArrayList<BracketNode> nextLayer;
@@ -339,15 +342,9 @@ public class TournamentRun extends Run {
 
     private void setLooserScore(BracketNode node, float score) {
         if (node == null) return;
-        scores[node.getLooser()] = score;
+        results.setScore(node.getLooser(), score);
         setLooserScore(node.left, score + 1);
         setLooserScore(node.right, score + 1);
-
-    }
-
-    @Override
-    public float[] getScores() {
-        return scores;
     }
 
     @Override
@@ -358,7 +355,6 @@ public class TournamentRun extends Run {
                 ", completedGames=" + completedGames +
                 ", finalGame=" + finalGame +
                 ", looserBracket=" + redemptionFinal +
-                ", scores=" + Arrays.toString(scores) +
                 '}';
     }
 }

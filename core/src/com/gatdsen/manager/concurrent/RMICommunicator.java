@@ -59,7 +59,7 @@ public final class RMICommunicator {
     }
 
     public void dispose() {
-        communicate(remoteCommunicatorStub, new ProcessCommunicatorShutdownRequest());
+        communicate(new ProcessCommunicatorShutdownRequest());
         try {
             UnicastRemoteObject.unexportObject(localCommunicatorObject, true);
         } catch (NoSuchObjectException ignored) {

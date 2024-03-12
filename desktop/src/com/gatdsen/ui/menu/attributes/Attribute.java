@@ -2,7 +2,7 @@ package com.gatdsen.ui.menu.attributes;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.gatdsen.manager.run.config.RunConfiguration;
+import com.gatdsen.manager.run.RunConfiguration;
 
 public abstract class Attribute {
     /**

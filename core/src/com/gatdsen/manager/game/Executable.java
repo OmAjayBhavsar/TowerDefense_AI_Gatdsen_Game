@@ -1,10 +1,15 @@
-package com.gatdsen.manager;
+package com.gatdsen.manager.game;
+
+import com.gatdsen.manager.AnimationLogProcessor;
+import com.gatdsen.manager.CompletionHandler;
+import com.gatdsen.manager.InputProcessor;
+import com.gatdsen.manager.Manager;
 
 import java.util.ArrayList;
 
 public abstract class Executable {
 
-    protected static final int REQUIRED_THREAD_COUNT = 2;
+    public static final int REQUIRED_THREAD_COUNT = 2;
 
     public enum Status {
         INITIALIZED,
@@ -15,7 +20,7 @@ public abstract class Executable {
         ABORTED
     }
 
-    protected final Object schedulingLock = new Object();
+    public final Object schedulingLock = new Object();
 
     private Status status = Status.INITIALIZED;
 
@@ -62,7 +67,7 @@ public abstract class Executable {
         return status;
     }
 
-    protected void schedule() {
+    public void schedule() {
         synchronized (schedulingLock) {
             if (status == Status.INITIALIZED)
                 setStatus(Status.SCHEDULED);
@@ -77,14 +82,14 @@ public abstract class Executable {
         Manager.getManager().stop(this);
     }
 
-    protected void pause() {
+    public void pause() {
         synchronized (schedulingLock) {
             if (status == Status.ACTIVE)
                 setStatus(Status.PAUSED);
         }
     }
 
-    protected void resume() {
+    public void resume() {
         synchronized (schedulingLock) {
             if (status != Status.PAUSED) return;
             setStatus(Status.ACTIVE);
@@ -92,14 +97,12 @@ public abstract class Executable {
         }
     }
 
-    protected void abort() {
+    public void abort() {
         synchronized (schedulingLock) {
             setStatus(Status.ABORTED);
             dispose();
         }
     }
-
-    protected abstract String[] getPlayerNames();
 
     public abstract boolean shouldSaveReplay();
 

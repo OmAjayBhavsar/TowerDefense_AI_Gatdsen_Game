@@ -10,19 +10,16 @@ import java.util.concurrent.Future;
 
 public final class LocalPlayerHandlerFactory extends PlayerHandlerFactory {
 
-    public static final LocalPlayerHandlerFactory HUMAN_PLAYER = new LocalPlayerHandlerFactory(HumanPlayer.class, "HumanPlayer");
-    public static final LocalPlayerHandlerFactory IDLE_BOT = new LocalPlayerHandlerFactory(IdleBot.class, "IdleBot");
-    public static final LocalPlayerHandlerFactory[] INTERNAL_PLAYERS = {HUMAN_PLAYER, IDLE_BOT};
+    public static final LocalPlayerHandlerFactory HUMAN_PLAYER = new LocalPlayerHandlerFactory(PlayerClassReference.HUMAN_PLAYER);
+    public static final LocalPlayerHandlerFactory IDLE_BOT = new LocalPlayerHandlerFactory(PlayerClassReference.IDLE_BOT);
 
-    private final Class<? extends Player> playerClass;
+    private final PlayerClassReference playerClassReference;
     private final String playerName;
-    private final String fileName;
 
-    public LocalPlayerHandlerFactory(Class<? extends Player> playerClass, String fileName) {
-        this.playerClass = playerClass;
-        this.fileName = fileName;
+    public LocalPlayerHandlerFactory(PlayerClassReference playerClassReference) {
+        this.playerClassReference = playerClassReference;
         try {
-            Player playerInstance = playerClass.getConstructor(new Class[]{}).newInstance();
+            Player playerInstance = playerClassReference.getPlayerClass().getConstructor(new Class[]{}).newInstance();
             playerName = playerInstance.getName();
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Insufficient Privileges for instantiating bots", e);
@@ -32,7 +29,7 @@ public final class LocalPlayerHandlerFactory extends PlayerHandlerFactory {
     }
 
     public Class<? extends Player> getPlayerClass() {
-        return playerClass;
+        return playerClassReference.getPlayerClass();
     }
 
     @Override
@@ -40,17 +37,13 @@ public final class LocalPlayerHandlerFactory extends PlayerHandlerFactory {
         return playerName;
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
     @Override
     public Future<PlayerHandler> createPlayerHandler(int playerIndex, PlayerController controller, InputProcessor inputProcessor) {
         PlayerHandler playerHandler;
-        if (Bot.class.isAssignableFrom(playerClass)) {
-            playerHandler = new ProcessPlayerHandler(playerIndex, playerClass, controller);
+        if (Bot.class.isAssignableFrom(playerClassReference.getPlayerClass())) {
+            playerHandler = new ProcessPlayerHandler(playerIndex, playerClassReference, controller);
         } else {
-            playerHandler = new LocalPlayerHandler(playerIndex, playerClass, controller, inputProcessor);
+            playerHandler = new LocalPlayerHandler(playerIndex, playerClassReference, controller, inputProcessor);
         }
         return CompletableFuture.completedFuture(playerHandler);
     }

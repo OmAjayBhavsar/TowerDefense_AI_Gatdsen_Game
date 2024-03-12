@@ -13,19 +13,19 @@ import java.util.concurrent.Future;
 
 public final class LocalPlayerHandler extends PlayerHandler {
 
-    private final Class<? extends Player> playerClass;
+    private final PlayerClassReference playerClassReference;
     private final InputProcessor inputGenerator;
     private PlayerExecutor playerExecutor;
 
-    public LocalPlayerHandler(int playerIndex, Class<? extends Player> playerClass, PlayerController controller, InputProcessor inputGenerator) {
+    public LocalPlayerHandler(int playerIndex, PlayerClassReference playerClassReference, PlayerController controller, InputProcessor inputGenerator) {
         super(playerIndex, controller);
-        this.playerClass = playerClass;
+        this.playerClassReference = playerClassReference;
         this.inputGenerator = inputGenerator;
     }
 
     @Override
     public Future<Long> create(boolean isDebug, int gameId) {
-        playerExecutor = new PlayerExecutor(isDebug, playerIndex, playerClass, inputGenerator);
+        playerExecutor = new PlayerExecutor(isDebug, playerIndex, playerClassReference.getPlayerClass(), inputGenerator);
         playerInformation = playerExecutor.getPlayerInformation();
         return CompletableFuture.completedFuture(playerExecutor.getPlayerClassAnalyzer().getSeedModifier());
     }

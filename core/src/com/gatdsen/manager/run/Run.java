@@ -1,8 +1,9 @@
-package com.gatdsen.manager;
+package com.gatdsen.manager.run;
 
-import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.CompletionHandler;
+import com.gatdsen.manager.game.Executable;
+import com.gatdsen.manager.Manager;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
-import com.gatdsen.manager.run.config.RunConfiguration;
 import com.gatdsen.simulation.GameState;
 
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ public abstract class Run {
 
     private boolean disposed = false;
     private final List<PlayerHandlerFactory> playerFactories;
+
+    protected final RunResults results = new RunResults();
 
     public Run(Manager manager, RunConfiguration runConfig) {
         this.playerFactories = new ArrayList<>(runConfig.playerFactories);
@@ -91,7 +94,9 @@ public abstract class Run {
         }
     }
 
-    public abstract float[] getScores();
+    public RunResults getResults() {
+        return results;
+    }
 
     public void addCompletionListener(CompletionHandler<Run> handler) {
         synchronized (schedulingLock) {
@@ -108,6 +113,7 @@ public abstract class Run {
                 ", gameMode=" + gameMode +
                 ", games=" + games +
                 ", players=" + playerFactories +
+                ", results=" + results +
                 '}';
     }
 }

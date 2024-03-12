@@ -1,7 +1,9 @@
-package com.gatdsen.manager;
+package com.gatdsen.manager.game;
 
+import com.gatdsen.manager.AnimationLogProcessor;
+import com.gatdsen.manager.InputProcessor;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
-import com.gatdsen.manager.run.config.RunConfiguration;
+import com.gatdsen.manager.run.RunConfiguration;
 import com.gatdsen.simulation.GameState.GameMode;
 
 import java.io.Serializable;

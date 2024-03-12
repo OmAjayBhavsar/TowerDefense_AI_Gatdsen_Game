@@ -13,7 +13,7 @@ import java.util.concurrent.Future;
 public class RemotePlayerHandler extends PlayerHandler {
 
     private final RMICommunicator communicator;
-    private final Class<? extends Player> playerClass;
+    private final PlayerClassReference playerClassReference;
     private final CompletableFuture<Long> createFuture = new CompletableFuture<>();
     private final CompletableFuture<?> initFuture = new CompletableFuture<>();
     private CompletableFuture<?> executeTurnFuture = null;
@@ -27,10 +27,10 @@ public class RemotePlayerHandler extends PlayerHandler {
         this(communicator, playerIndex, null, controller);
     }
 
-    protected RemotePlayerHandler(RMICommunicator communicator, int playerIndex, Class<? extends Player> playerClass, PlayerController controller) {
+    protected RemotePlayerHandler(RMICommunicator communicator, int playerIndex, PlayerClassReference playerClassReference, PlayerController controller) {
         super(playerIndex, controller);
         this.communicator = communicator;
-        this.playerClass = playerClass;
+        this.playerClassReference = playerClassReference;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class RemotePlayerHandler extends PlayerHandler {
             createFuture.complete(response.seedModifier);
             communicator.setMessageHandler(null);
         });
-        communicator.communicate(new GameCreateRequest(isDebug, gameId, playerIndex, playerClass));
+        communicator.communicate(new GameCreateRequest(isDebug, gameId, playerIndex, playerClassReference));
         return createFuture;
     }
 

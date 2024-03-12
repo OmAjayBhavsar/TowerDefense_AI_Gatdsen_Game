@@ -1,11 +1,13 @@
-package com.gatdsen.manager;
+package com.gatdsen.manager.run;
 
 
-import com.gatdsen.manager.player.IdleBot;
-import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.game.Executable;
+import com.gatdsen.manager.game.Game;
+import com.gatdsen.manager.game.GameResults;
+import com.gatdsen.manager.Manager;
+import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
-import com.gatdsen.manager.run.config.RunConfiguration;
 import com.gatdsen.simulation.GameState;
 
 import java.util.*;
@@ -17,7 +19,6 @@ public class ParallelMultiGameRun extends Run {
 
     int gameCount = 0;
 
-    private final float[] scores;
     private final Map<Game, Integer[]> playerIndices = new HashMap<>();
 
     protected ParallelMultiGameRun(Manager manager, RunConfiguration runConfig) {
@@ -28,7 +29,6 @@ public class ParallelMultiGameRun extends Run {
 
             if (runConfig.playerFactories.size() != 1) {
                 System.err.println("Exam Admission only accepts exactly 1 player");
-                scores = new float[1];
                 complete();
                 return;
             }
@@ -39,11 +39,13 @@ public class ParallelMultiGameRun extends Run {
             runConfig.mapName = "MangoMap";
         }
         ArrayList<Integer> indices = new ArrayList<>();
-        for (int i = 0; i < runConfig.playerFactories.size(); i++) {
+        int playerCount = runConfig.playerFactories.size();
+        for (int i = 0; i < playerCount; i++) {
             indices.add(i);
         }
-        scores = new float[runConfig.playerFactories.size()];
-        List<List<Integer>> listOfMatchUps = subsetK(indices, runConfig.playerFactories.size());
+        results.setPlayerInformation(new PlayerInformation[playerCount]);
+        results.setScores(new float[playerCount]);
+        List<List<Integer>> listOfMatchUps = subsetK(indices, playerCount);
         List<List<Integer>> permListOfMatchUps = new ArrayList<>();
         for (List<Integer> matchUp : listOfMatchUps) {
             permListOfMatchUps.addAll(permutations(matchUp));
@@ -89,12 +91,15 @@ public class ParallelMultiGameRun extends Run {
     }
 
     public void onGameCompletion(Executable exec) {
-        Game game = (Game) exec;
-        Integer[] matchup = playerIndices.get(game);
-        int i = 0;
-        synchronized (scores) {
-            for (float score : game.getScores()) {
-                scores[matchup[i++]] += score;
+        Integer[] matchup = playerIndices.get((Game) exec);
+        synchronized (results) {
+            GameResults gameResults = exec.getGameResults();
+            PlayerInformation[] playerInformation = gameResults.getPlayerInformation();
+            float[] scores = gameResults.getScores();
+            for (int i = 0; i < scores.length; i++) {
+                int index = matchup[i];
+                results.setPlayerInformation(index, playerInformation[i]);
+                results.setScore(index, results.getScore(index) + scores[i]);
             }
             if ((completed*100)/gameCount < (completed*100 + 100)/gameCount)
                 System.out.printf("MultiGameRun(%d)-Completion: %d %% \n", hashCode(),(completed*100)/gameCount);
@@ -102,18 +107,14 @@ public class ParallelMultiGameRun extends Run {
         }
         System.out.println();
         if (completed == gameCount) {
+            float[] scores = results.getScores();
             for (int j = 0; j < scores.length; j++) {
                 scores[j] /= gameCount;
             }
+            results.setScores(scores);
             complete();
         }
     }
-
-    @Override
-    public float[] getScores() {
-        return scores;
-    }
-
 
     protected static <T> List<List<T>> subsetK(List<T> list, int subSetSize) {
         ArrayList<List<T>> results = new ArrayList<>();
@@ -192,7 +193,6 @@ public class ParallelMultiGameRun extends Run {
                 "super=" + super.toString() +
                 ", completed=" + completed +
                 ", gameCount=" + gameCount +
-                ", scores=" + Arrays.toString(scores) +
                 ", playerIndices=" + playerIndices +
                 '}';
     }

@@ -9,12 +9,12 @@ public final class ProcessPlayerHandler extends RemotePlayerHandler {
 
     private final ProcessExecutor process;
 
-    public ProcessPlayerHandler(int playerIndex, Class<? extends Player> playerClass, PlayerController controller) {
-        this(ResourcePool.getInstance().requestProcessExecutor(), playerIndex, playerClass, controller);
+    public ProcessPlayerHandler(int playerIndex, PlayerClassReference playerClassReference, PlayerController controller) {
+        this(ResourcePool.getInstance().requestProcessExecutor(), playerIndex, playerClassReference, controller);
     }
 
-    public ProcessPlayerHandler(ProcessExecutor process, int playerIndex, Class<? extends Player> playerClass, PlayerController controller) {
-        super(process.communicator, playerIndex, playerClass, controller);
+    public ProcessPlayerHandler(ProcessExecutor process, int playerIndex, PlayerClassReference playerClassReference, PlayerController controller) {
+        super(process.communicator, playerIndex, playerClassReference, controller);
         this.process = process;
     }
 

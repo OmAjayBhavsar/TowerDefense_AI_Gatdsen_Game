@@ -1,9 +1,8 @@
-package com.gatdsen.manager.run.config;
+package com.gatdsen.manager.run;
 
 import com.gatdsen.manager.AnimationLogProcessor;
-import com.gatdsen.manager.GameConfig;
+import com.gatdsen.manager.game.GameConfig;
 import com.gatdsen.manager.InputProcessor;
-import com.gatdsen.manager.player.IdleBot;
 import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.simulation.GameState.GameMode;

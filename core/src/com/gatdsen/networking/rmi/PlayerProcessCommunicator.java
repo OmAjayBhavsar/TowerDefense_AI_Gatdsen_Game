@@ -3,6 +3,7 @@ package com.gatdsen.networking.rmi;
 import com.gatdsen.manager.PlayerExecutor;
 import com.gatdsen.manager.concurrent.RMICommunicator;
 import com.gatdsen.manager.concurrent.RMIRegistry;
+import com.gatdsen.manager.concurrent.ResourcePool;
 import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.networking.rmi.message.*;
 
@@ -17,7 +18,9 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
     private final String localReferenceName;
     private ProcessCommunicator remoteCommunicatorStub = null;
 
-    private PlayerExecutor playerExecutor;
+    private PlayerExecutor playerExecutor = null;
+
+    private boolean isDisposed = false;
 
     public PlayerProcessCommunicator(RMIRegistry registry, String localReferenceName) {
         this.registry = registry;
@@ -41,7 +44,14 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
         switch (message.getType()) {
             case GameCreateRequest:
                 GameCreateRequest gameCreateRequest = (GameCreateRequest) message;
-                playerExecutor = new PlayerExecutor(gameCreateRequest.isDebug, gameCreateRequest.playerId, gameCreateRequest.playerClass);
+                if (playerExecutor != null) {
+                    playerExecutor.dispose();
+                }
+                playerExecutor = new PlayerExecutor(
+                        gameCreateRequest.isDebug,
+                        gameCreateRequest.playerId,
+                        gameCreateRequest.playerClassReference.getPlayerClass()
+                );
                 RMICommunicator.communicate(
                         remoteCommunicatorStub,
                         new GameCreateResponse(
@@ -63,22 +73,27 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
                 );
                 break;
             case ProcessCommunicatorShutdownRequest:
-                System.exit(0);
+                dispose();
                 break;
         }
     }
 
     private void dispose() {
-        playerExecutor.dispose();
+        synchronized (this) {
+            if (isDisposed) {
+                return;
+            }
+            isDisposed = true;
+        }
         try {
             UnicastRemoteObject.unexportObject(this, true);
-        } catch (NoSuchObjectException e) {
-            throw new RuntimeException(e);
+        } catch (NoSuchObjectException ignored) {
         }
         try {
             registry.unbind(localReferenceName);
-        } catch (RemoteException | NotBoundException e) {
-            throw new RuntimeException(e);
+        } catch (RemoteException | NotBoundException ignored) {
         }
+        playerExecutor.dispose();
+        ResourcePool.getInstance().dispose();
     }
 }

@@ -1,9 +1,12 @@
-package com.gatdsen.manager;
+package com.gatdsen.manager.game;
 
+import com.gatdsen.manager.CompletionHandler;
+import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.action.ActionLog;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -14,7 +17,7 @@ public class ReplayGame extends Executable {
     private GameResults replay = null;
     private Thread executionThread;
 
-    protected ReplayGame(GameConfig config) {
+    public ReplayGame(GameConfig config) {
         super(config);
         if (!config.gui) {
             System.err.println("Replays require a gui");
@@ -43,7 +46,11 @@ public class ReplayGame extends Executable {
             if (getStatus() == Status.ABORTED) return;
             setStatus(Status.ACTIVE);
             //Init the Log Processor
-            animationLogProcessor.init(replay.getInitialState().copy(), getPlayerNames(), getSkins());
+            animationLogProcessor.init(
+                    replay.getInitialState().copy(),
+                    Arrays.stream(replay.getPlayerInformation()).map(PlayerInformation::getName).toArray(String[]::new),
+                    getSkins()
+            );
             //Run the Game
             executionThread = new Thread(this::run);
             executionThread.setName("Replay_Execution_Thread");
@@ -76,11 +83,6 @@ public class ReplayGame extends Executable {
 
     private String[][] getSkins() {
         return replay.getSkins();
-    }
-
-    @Override
-    protected String[] getPlayerNames() {
-        return replay.getPlayerNames();
     }
 
     @Override
