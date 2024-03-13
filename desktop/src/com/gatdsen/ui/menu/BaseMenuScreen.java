@@ -10,16 +10,14 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.gatdsen.manager.run.config.RunConfiguration;
 import com.gatdsen.ui.ConfigScreen;
 import com.gatdsen.ui.GADS;
 import com.gatdsen.ui.assets.AssetContainer;
 
 
 public abstract class BaseMenuScreen extends ConfigScreen {
-    protected RunConfiguration passedRunConfig;
     protected Image title;
     protected Viewport menuViewport;
     protected Viewport backgroundViewport;
@@ -41,7 +39,7 @@ public abstract class BaseMenuScreen extends ConfigScreen {
         this.backgroundTextureRegion = AssetContainer.MainMenuAssets.background;
         this.camera = new OrthographicCamera(30, 30 * (Gdx.graphics.getHeight() * 1f / Gdx.graphics.getWidth()));
         menuViewport = new ExtendViewport(titleSprite.getRegionWidth() / 3f, titleSprite.getRegionWidth() + 100, camera);
-        backgroundViewport = new FillViewport(backgroundTextureRegion.getRegionWidth(), backgroundTextureRegion.getRegionHeight());
+        backgroundViewport = new StretchViewport(backgroundTextureRegion.getRegionWidth(), backgroundTextureRegion.getRegionHeight());
         mainMenuStage = new Stage(menuViewport);
         menuSpriteBatch = new SpriteBatch();
         setupMenuScreen();
