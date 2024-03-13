@@ -35,8 +35,8 @@ public class PlayerAttribute extends Attribute {
      */
     @Override
     public Actor getContent(Skin skin) {
-        Label textLabelPlayer = new Label("Spieler " + (playerIndex + 1) + ":", skin);
-        textLabelPlayer.setAlignment(Align.center);
+        Label textLabelPlayer = new Label("Spieler " + (playerIndex + 1) + ": ", skin);
+        textLabelPlayer.setAlignment(Align.right);
         playerSelectBox = new SelectBox<>(skin);
         playerSelectBox.setItems(availablePlayers);
         Table playerChooseTable = new Table();

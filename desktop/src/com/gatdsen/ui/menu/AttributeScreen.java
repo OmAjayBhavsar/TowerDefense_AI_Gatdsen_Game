@@ -70,5 +70,5 @@ public abstract class AttributeScreen extends BaseMenuScreen {
      *
      * @return Ein Array von Attributen
      */
-    abstract Attribute[] getAttributes();
+    protected abstract Attribute[] getAttributes();
 }

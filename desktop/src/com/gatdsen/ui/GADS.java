@@ -26,12 +26,17 @@ public class GADS extends Game {
      */
     public enum ScreenState {
         MAINSCREEN,
+        MULTIPLAYERBASESCREEN,
+        MULTIPLAYERJOINSCREEN,
+        MULTIPLAYERHOSTSCREEN,
         NORMALMODESCREEN,
+        EXAMMENUSCREEN,
         CHRISTMASTASKSCREEN,
         INGAMESCREEN,
         LOADSCREEN,
         VICTORYSCREEN,
         LOSSSCREEN,
+        CAMPAIGNSCREEN,
         DRAWSCREEN
     }
 
@@ -78,6 +83,10 @@ public class GADS extends Game {
                 return new InGameScreen(this);
             case NORMALMODESCREEN:
                 return new GamemodeNormalScreen(this);
+            case EXAMMENUSCREEN:
+                return new ExamMenuScreen(this);
+            case CAMPAIGNSCREEN:
+                return new CampaignMenuScreen(this);
             case CHRISTMASTASKSCREEN:
                 return new ChristmasTaskScreen(this);
             case VICTORYSCREEN:
@@ -86,6 +95,12 @@ public class GADS extends Game {
                 return new DrawScreen(this);
             case LOSSSCREEN:
                 return new LossScreen(this);
+            case MULTIPLAYERBASESCREEN:
+                return new MultiplayerBaseMenuScreen(this);
+            case MULTIPLAYERJOINSCREEN:
+                return new MultiplayerJoinScreen(this);
+            case MULTIPLAYERHOSTSCREEN:
+                return new MultiplayerHostScreen(this);
             default:
                 return null;
         }

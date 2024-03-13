@@ -23,7 +23,7 @@ public class GamemodeNormalScreen extends AttributeScreen {
      * @return Ein Array von Attributen, das angibt, welche Attribute benötigt werden
      */
     @Override
-    Attribute[] getAttributes() {
+    protected Attribute[] getAttributes() {
         return new Attribute[]{new PlayerAttribute(0), new PlayerAttribute(1), new MapAttribute()};
     }
 
