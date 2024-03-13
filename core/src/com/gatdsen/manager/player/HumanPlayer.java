@@ -2,7 +2,7 @@ package com.gatdsen.manager.player;
 
 import com.badlogic.gdx.Input;
 import com.gatdsen.manager.Controller;
-import com.gatdsen.manager.PlayerThread;
+import com.gatdsen.manager.PlayerExecutor;
 import com.gatdsen.manager.StaticGameState;
 import com.gatdsen.simulation.IntVector2;
 import com.gatdsen.simulation.Tower;
@@ -19,35 +19,33 @@ public class HumanPlayer extends Player {
 
         KEY_CHARACTER_TOWER_PLACE,
         KEY_CHARACTER_TOWER_UPGRADE,
+        KEY_CHARACTER_TOWER_SELL,
+        KEY_CHARACTER_TOWER_SET_TARGET,
 
         KEY_CHARACTER_END_TURN;
 
         private static Key fromKeycode(int keycode) {
-            Key key = null;
             switch (keycode) {
                 case HumanPlayer.KEY_CHARACTER_TILE_UP:
-                    key = Key.KEY_CHARACTER_TILE_UP;
-                    break;
+                    return Key.KEY_CHARACTER_TILE_UP;
                 case HumanPlayer.KEY_CHARACTER_TILE_DOWN:
-                    key = Key.KEY_CHARACTER_TILE_DOWN;
-                    break;
+                    return Key.KEY_CHARACTER_TILE_DOWN;
                 case HumanPlayer.KEY_CHARACTER_TILE_LEFT:
-                    key = Key.KEY_CHARACTER_TILE_LEFT;
-                    break;
+                    return Key.KEY_CHARACTER_TILE_LEFT;
                 case HumanPlayer.KEY_CHARACTER_TILE_RIGHT:
-                    key = Key.KEY_CHARACTER_TILE_RIGHT;
-                    break;
+                    return Key.KEY_CHARACTER_TILE_RIGHT;
                 case HumanPlayer.KEY_CHARACTER_TOWER_PLACE:
-                    key = Key.KEY_CHARACTER_TOWER_PLACE;
-                    break;
+                    return Key.KEY_CHARACTER_TOWER_PLACE;
                 case HumanPlayer.KEY_CHARACTER_TOWER_UPGRADE:
-                    key = Key.KEY_CHARACTER_TOWER_UPGRADE;
-                    break;
+                    return Key.KEY_CHARACTER_TOWER_UPGRADE;
+                case HumanPlayer.KEY_CHARACTER_TOWER_SELL:
+                    return Key.KEY_CHARACTER_TOWER_SELL;
+                case HumanPlayer.KEY_CHARACTER_TOWER_SET_TARGET:
+                    return Key.KEY_CHARACTER_TOWER_SET_TARGET;
                 case HumanPlayer.KEY_CHARACTER_END_TURN:
-                    key = Key.KEY_CHARACTER_END_TURN;
-                    break;
+                    return Key.KEY_CHARACTER_END_TURN;
             }
-            return key;
+            return null;
         }
     }
 
@@ -58,6 +56,8 @@ public class HumanPlayer extends Player {
 
     private static final int KEY_CHARACTER_TOWER_PLACE = Input.Keys.P;
     private static final int KEY_CHARACTER_TOWER_UPGRADE = Input.Keys.U;
+    private static final int KEY_CHARACTER_TOWER_SELL = Input.Keys.S;
+    private static final int KEY_CHARACTER_TOWER_SET_TARGET = Input.Keys.C;
 
     private static final int KEY_CHARACTER_END_TURN = Input.Keys.X;
 
@@ -67,21 +67,15 @@ public class HumanPlayer extends Player {
     private static final float[] tickSpeed = new float[Key.values().length]; // in Hz
 
     static {
-        tickSpeed[Key.KEY_CHARACTER_TILE_UP.ordinal()] = 0.1f;
-        tickSpeed[Key.KEY_CHARACTER_TILE_DOWN.ordinal()] = 0.1f;
-        tickSpeed[Key.KEY_CHARACTER_TILE_LEFT.ordinal()] = 0.1f;
-        tickSpeed[Key.KEY_CHARACTER_TILE_RIGHT.ordinal()] = 0.1f;
-
-        tickSpeed[Key.KEY_CHARACTER_TOWER_PLACE.ordinal()] = 0.1f;
-        tickSpeed[Key.KEY_CHARACTER_TOWER_UPGRADE.ordinal()] = 0.1f;
-
-        tickSpeed[Key.KEY_CHARACTER_END_TURN.ordinal()] = 0.1f;
+        for (Key key : Key.values()) {
+            tickSpeed[key.ordinal()] = 0.1f;
+        }
     }
 
     /**
      * Die Dauer des Zuges, die der {@link HumanPlayer} hat, in Sekunden.
      */
-    private static final int turnDuration = PlayerThread.HUMAN_EXECUTE_TURN_TIMEOUT / 1000;
+    private static final int turnDuration = PlayerExecutor.HUMAN_EXECUTE_TURN_TIMEOUT / 1000;
 
     private final IntVector2 selectedTile = new IntVector2(0, 0);
 
@@ -135,6 +129,26 @@ public class HumanPlayer extends Player {
      */
     public void upgradeTower(int x, int y) {
         controller.upgradeTower(x, y);
+    }
+
+    /**
+     * Ruft den {@link Controller} des {@link HumanPlayer} auf, um einen Turm auf dem Spielfeld zu verkaufen.
+     * @param x x-Koordinate, an der sich der Turm befindet
+     * @param y y-Koordinate, an der sich der Turm befindet
+     */
+    public void sellTower(int x, int y) {
+        controller.sellTower(x, y);
+    }
+
+    /**
+     * Ruft den {@link Controller} des {@link HumanPlayer} auf, um die Zieloption, nach welcher Priorität auf Gegner
+     * gezielt werden soll, eines Turms auf dem Spielfeld zu setzen.
+     * @param x x-Koordinate, an der sich der Turm befindet
+     * @param y y-Koordinate, an der sich der Turm befindet
+     * @param targetOption Zieloption, nach der der Turm zielen soll
+     */
+    public void setTowerTarget(int x, int y, Tower.TargetOption targetOption) {
+        controller.setTowerTarget(x, y, targetOption);
     }
 
     /**
@@ -194,6 +208,12 @@ public class HumanPlayer extends Player {
             case KEY_CHARACTER_TOWER_UPGRADE:
                 upgradeTower(selectedTile.x, selectedTile.y);
                 break;
+            case KEY_CHARACTER_TOWER_SELL:
+                sellTower(selectedTile.x, selectedTile.y);
+                break;
+            case KEY_CHARACTER_TOWER_SET_TARGET:
+                setTowerTarget(selectedTile.x, selectedTile.y, Tower.TargetOption.FIRST);
+                break;
             case KEY_CHARACTER_END_TURN:
                 endCurrentTurn();
                 break;
@@ -211,11 +231,6 @@ public class HumanPlayer extends Player {
                 }
             }
         }
-    }
-
-    @Override
-    public PlayerType getType() {
-        return PlayerType.HUMAN;
     }
 
     public int getTurnDuration() {

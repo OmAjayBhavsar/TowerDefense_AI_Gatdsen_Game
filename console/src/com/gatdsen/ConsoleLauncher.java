@@ -1,8 +1,8 @@
 package com.gatdsen;
 
 import com.gatdsen.manager.Manager;
-import com.gatdsen.manager.Run;
-import com.gatdsen.manager.run.config.RunConfiguration;
+import com.gatdsen.manager.run.Run;
+import com.gatdsen.manager.run.RunConfiguration;
 import org.apache.commons.cli.CommandLine;
 
 public final class ConsoleLauncher extends Launcher {

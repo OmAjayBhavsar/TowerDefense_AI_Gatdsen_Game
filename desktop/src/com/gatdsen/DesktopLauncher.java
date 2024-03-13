@@ -4,7 +4,8 @@ import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.gatdsen.manager.*;
-import com.gatdsen.manager.run.config.RunConfiguration;
+import com.gatdsen.manager.run.Run;
+import com.gatdsen.manager.run.RunConfiguration;
 import com.gatdsen.ui.GADS;
 import org.apache.commons.cli.CommandLine;
 
@@ -25,7 +26,7 @@ public final class DesktopLauncher extends Launcher {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setForegroundFPS(60);
             config.setTitle("Gadsen: Tower Defense");
-            config.setWindowIcon(Files.FileType.Classpath, "icon/new_icon.png");
+            config.setWindowIcon(Files.FileType.Classpath, "icon/icon.png");
             new Lwjgl3Application(new GADS(runConfig), config);
         } else {
             Manager.setSystemReservedProcessorCount(1);

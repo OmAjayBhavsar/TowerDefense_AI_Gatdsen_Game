@@ -8,7 +8,8 @@ import com.badlogic.gdx.utils.viewport.*;
 import com.gatdsen.animation.Animator;
 import com.gatdsen.animation.AnimatorCamera;
 import com.gatdsen.manager.*;
-import com.gatdsen.manager.run.config.RunConfiguration;
+import com.gatdsen.manager.run.Run;
+import com.gatdsen.manager.run.RunConfiguration;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.action.Action;
 import com.gatdsen.simulation.action.ActionLog;
@@ -42,7 +43,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         gameManager = instance;
         gameViewport = new FitViewport(worldWidth, worldHeight + 700);
 
-        hud = new Hud(this, gameViewport, gameManager);
+        hud = new Hud(this, gameManager);
 
         debugView = new DebugView(AssetContainer.MainMenuAssets.skin);
 
@@ -89,6 +90,8 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
     @Override
     public void init(GameState state, String[] playerNames, String[][] skins) {
         //ToDo the game is starting remove waiting screen etc.
+        gameViewport.setWorldWidth((state.getBoardSizeX() * 2 + 10) * 200);
+        gameViewport.setWorldHeight((state.getBoardSizeY() + 5) * 200);
 
         animator.init(state, playerNames, skins);
 

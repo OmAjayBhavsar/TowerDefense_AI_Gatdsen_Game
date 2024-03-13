@@ -1,12 +1,12 @@
 package com.gatdsen.simulation;
 
+import com.gatdsen.manager.command.Command;
 import com.gatdsen.simulation.action.Action;
 import com.gatdsen.simulation.action.ActionLog;
 
 /**
- * Stellt eine Zugriffskontrollierte Schnittstelle bereit, um Befehle an Spieler zu senden.
- * Ermöglicht die Kontrolle über den entsprechenden Charakter
- * Ist nur für einen einzigen Zug aktiv und wird danach dauerhaft deaktiviert.
+ * Diese Klasse repräsentiert die Schnittstelle, um von {@link Command}s aus die vom Spieler durchgeführten
+ * Spielentscheidungen an die Simulation zu übergeben, indem sie in {link Action}s umgewandelt werden.
  */
 public class PlayerController {
     private final int playerIndex;
@@ -102,6 +102,17 @@ public class PlayerController {
      */
     public ActionLog setTarget(int x, int y, Tower.TargetOption targetOption) {
         playerState.setTarget(x, y, targetOption, getRoot());
+        return endCommand();
+    }
+
+    /**
+     * Spawned einen Gegner beim Gegenspieler
+     *
+     * @param type Typ des Gegners
+     * @return Der ActionLog der durch das Ausführen des Befehls entstanden ist
+     */
+    public ActionLog sendEnemy(Enemy.Type type) {
+        playerState.sendEnemy(type, state, getRoot());
         return endCommand();
     }
 

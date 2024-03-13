@@ -1,45 +1,27 @@
 package com.gatdsen.networking.rmi;
 
-import com.gatdsen.manager.command.Command;
-import com.gatdsen.networking.data.CommunicatedInformation;
+import com.gatdsen.networking.rmi.message.Message;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
  * Die Schnittstelle für Javas Remote Method Invocation (RMI).
- * Über diese Schnittstelle können die Prozesse miteinander kommunizieren.
- * Sie wird von {@link ProcessCommunicatorImpl} implementiert.
+ * Klassen, die dieses Interface implementieren, können mit Java RMI dafür verwendet werden, um es einem Prozess
+ * durch Exportieren dieses Remote-Objekts zu ermöglichen, Kommunikation von anderen Prozessen zu empfangen, die dieses
+ * Remote-Objekt abrufen.
  */
 public interface ProcessCommunicator extends Remote {
 
     /**
-     * Fügt eine {@link CommunicatedInformation} in die Warteschlange ein.
-     * @param information Die einzufügende Information
+     * Kommuniziert die übergebene Nachricht vom aufrufenden Prozess an den Prozess, zu dem dieses Remote-Objekt
+     * gehört.
+     * Der aufrufende Prozess sendet die Nachricht über den RMI-Stub an den Prozess, der dieses Remote-Objekt
+     * exportiert hat. Wie diese Nachricht dann weiterverarbeitet wird, ist von der Implementierung dieses
+     * Interfaces bzw. der genauen Implementierung dieser Methode abhängig und geschieht innerhalb des ursprünglichen
+     * Prozesses.
+     * @param message Die zu kommunizierende Nachricht
      * @throws RemoteException Wird geworfen, wenn ein Fehler bei der Kommunikation auftritt
      */
-    void queueInformation(CommunicatedInformation information) throws RemoteException;
-
-    /**
-     * Entfernt eine {@link CommunicatedInformation} aus der Warteschlange.
-     * Diese Methode blockiert, bis eine Information verfügbar ist.
-     * @return Die entfernte Information
-     * @throws RemoteException Wird geworfen, wenn ein Fehler bei der Kommunikation auftritt
-     */
-    CommunicatedInformation dequeueInformation() throws RemoteException;
-
-    /**
-     * Fügt einen {@link Command} in die Warteschlange ein.
-     * @param command Der einzufügende Befehl
-     * @throws RemoteException Wird geworfen, wenn ein Fehler bei der Kommunikation auftritt
-     */
-    void queueCommand(Command command) throws RemoteException;
-
-    /**
-     * Entfernt einen {@link Command} aus der Warteschlange.
-     * Diese Methode blockiert, bis ein Befehl verfügbar ist.
-     * @return Der entfernte Befehl
-     * @throws RemoteException Wird geworfen, wenn ein Fehler bei der Kommunikation auftritt
-     */
-    Command dequeueCommand() throws RemoteException;
+    void communicate(Message message) throws RemoteException;
 }

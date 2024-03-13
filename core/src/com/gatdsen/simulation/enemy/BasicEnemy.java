@@ -15,6 +15,7 @@ public class BasicEnemy extends Enemy {
      */
     public BasicEnemy(PlayerState playerState, int level, PathTile posTile) {
         super(playerState, level, posTile);
+        type = Type.BASIC_ENEMY;
         health = 100 * level;
         damage = 10 * level;
     }
@@ -29,6 +30,11 @@ public class BasicEnemy extends Enemy {
     @Override
     protected Enemy copy(PathTile posTile) {
         return new BasicEnemy(playerState, level, posTile);
+    }
+
+
+    public static int getPrice(int level) {
+        return 1000000;
     }
 
 }

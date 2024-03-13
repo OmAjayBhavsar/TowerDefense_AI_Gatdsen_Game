@@ -46,7 +46,33 @@ public class MainScreen extends BaseMenuScreen {
                 gameInstance.setScreen(GADS.ScreenState.CHRISTMASTASKSCREEN, runConfiguration);
             }
         });
-        mainMenuTable.add(christmasTaskButton).colspan(4).pad(10).width(200);
+        mainMenuTable.add(christmasTaskButton).colspan(4).pad(10).width(200).row();
+        TextButton examButton = new TextButton("Klausurzulassung", skin);
+        examButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                runConfiguration.gameMode = GameState.GameMode.Exam_Admission;
+                gameInstance.setScreen(GADS.ScreenState.EXAMMENUSCREEN,runConfiguration);
+            }
+        });
+        mainMenuTable.add(examButton).colspan(4).pad(10).width(200).row();
+        TextButton campaignButton = new TextButton("Kampagne", skin);
+        campaignButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                runConfiguration.gameMode = GameState.GameMode.Campaign;
+                gameInstance.setScreen(GADS.ScreenState.CAMPAIGNSCREEN,runConfiguration);
+            }
+        });
+        mainMenuTable.add(campaignButton).colspan(4).pad(10).width(200).row();
+        TextButton multiplayerButton = new TextButton("Mehrspieler", skin);
+        multiplayerButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gameInstance.setScreen(GADS.ScreenState.MULTIPLAYERBASESCREEN,runConfiguration);
+            }
+        });
+        mainMenuTable.add(multiplayerButton).colspan(4).pad(10).width(200).row();
         return mainMenuTable;
     }
 
