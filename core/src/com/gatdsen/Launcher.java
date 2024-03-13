@@ -12,6 +12,7 @@ import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public abstract class Launcher {
         runConfig.gui = !params.hasOption("n");
         runConfig.mapName = params.getOptionValue("m", null);
         if (params.hasOption("p")) {
-            runConfig.playerFactories = List.of(PlayerHandlerFactory.getPlayerFactories(params.getOptionValue("p").trim().split("\\s+")));
+            runConfig.playerFactories = new ArrayList<>(List.of(PlayerHandlerFactory.getPlayerFactories(params.getOptionValue("p").trim().split("\\s+"))));
         }
         if (params.hasOption("r")) {
             runConfig.replay = true;
