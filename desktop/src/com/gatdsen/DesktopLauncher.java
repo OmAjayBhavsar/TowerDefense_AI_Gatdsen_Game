@@ -25,7 +25,7 @@ public final class DesktopLauncher extends Launcher {
             Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
             config.setForegroundFPS(60);
             config.setTitle("Gadsen: Tower Defense");
-            config.setWindowIcon(Files.FileType.Classpath, "icon/new_icon.png");
+            config.setWindowIcon(Files.FileType.Classpath, "icon/icon.png");
             new Lwjgl3Application(new GADS(runConfig), config);
         } else {
             Manager.setSystemReservedProcessorCount(1);
