@@ -653,21 +653,21 @@ public class Hud implements Disposable {
     }
 
     /**
-     * Initialisiert die Gesundheit eines Spielers mit einem maximalen Gesundheitswert.
-     * @param playerID Die ID des Spielers.
-     * @param maxHealth Der maximale Gesundheitswert für den Spieler.
+     * Initialisiert Leben des Spielers und aktualisiert die entsprechende Lebensleiste sowie visuelle Elemente
+     * @param playerID Die ID des Spielers, dessen Leben initialisiert werden soll
      */
-    public void initPlayerHealth(int playerID, int maxHealth) {
+    public void initPlayerHealth(int playerID) {
+        float[] playerHealths = gameState.getHealth();
         if (playerID == 0) {
-            healthBarPlayer0.setRange(0, maxHealth);
-            healthBarPlayer0.setValue(maxHealth);
+            healthBarPlayer0.setRange(0, (int) playerHealths[0]);
+            healthBarPlayer0.setValue((int) playerHealths[0]);
             healthBarPlayer0.updateVisualValue();
-            healthPlayer0 = maxHealth;
+            healthPlayer0 = (int) playerHealths[0];
         } else if (playerID == 1) {
-            healthBarPlayer1.setRange(0, maxHealth);
-            healthBarPlayer1.setValue(maxHealth);
+            healthBarPlayer1.setRange(0, (int) playerHealths[1]);
+            healthBarPlayer1.setValue((int) playerHealths[1]);
             healthBarPlayer1.updateVisualValue();
-            healthPlayer1 = maxHealth;
+            healthPlayer1 = (int) playerHealths[1];
         }
         layoutTable.clear();
         layoutHudElements();
