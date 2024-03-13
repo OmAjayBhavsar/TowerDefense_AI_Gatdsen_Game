@@ -6,12 +6,18 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public final class ProcessExecutor {
+/**
+ * Diese Klasse repräsentiert einen Prozess, der auf der gleichen Maschine wie das Hauptprogramm ausgeführt wird und
+ * Aufgaben ausführen kann.
+ */
+public final class ProcessExecutor extends Resource {
 
     public static final String GAME_PROCESS_REFERENCE_NAME_FORMAT = "GameProcessCommunicator_%d";
     public static final String PLAYER_PROCESS_REFERENCE_NAME_FORMAT = "PlayerProcessCommunicator_%d";
 
-    public final Process process;
+    /** Der Prozess, der von diesem Executor gestartet wurde */
+    private final Process process;
+    /** Der Kommunikator, der für die Kommunikation mit dem Prozess verwendet wird */
     public final RMICommunicator communicator;
 
     public ProcessExecutor() {
@@ -24,6 +30,13 @@ public final class ProcessExecutor {
         );
     }
 
+    /**
+     * Erstellt einen neuen Prozess, der auf der gleichen Maschine wie das Hauptprogramm ausgeführt wird und Aufgaben
+     * ausführen kann.
+     * @param registryHost Der Host der Remote Object Registry
+     * @param registryPort Der Port der Remote Object Registry
+     * @return Der Prozess, der gestartet wurde
+     */
     private static Process createProcess(String registryHost, int registryPort) {
         ProcessBuilder builder = new ProcessBuilder();
         builder.inheritIO();
@@ -48,14 +61,28 @@ public final class ProcessExecutor {
         }
     }
 
+    /**
+     * Beendet diesen ProcessExecutor, indem dem Kommunikator das Signal zum Beenden gegeben wird:
+     * {@link RMICommunicator#dispose()}. Der Prozess beendet sich anschließend selbst.
+     */
     public void dispose() {
-        communicator.dispose();
-        try {
-            process.waitFor();
-        } catch (InterruptedException ignored) {
-            // Wenn wir beim Warten auf das Ende des Prozesses unterbrochen worden, starten wir die Terminierung dieses
-            // Prozesses manuell, bevor wir diese Methode verlassen.
-            process.destroy();
+        if (!isDisposed()) {
+            process.onExit().thenRun(this::setDisposed);
         }
+        if (!communicator.isDisposed()) {
+            communicator.dispose();
+        }
+    }
+
+    /**
+     * Erzwingt das Beenden dieses ProcessExecutors, indem der Prozess mit {@link Process#destroyForcibly()} terminiert
+     * wird.
+     */
+    public void forceDispose() {
+        if (isDisposed()) {
+            return;
+        }
+        process.onExit().thenRun(this::setDisposed);
+        process.destroyForcibly();
     }
 }

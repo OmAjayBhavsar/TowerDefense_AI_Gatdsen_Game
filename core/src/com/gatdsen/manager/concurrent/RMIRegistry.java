@@ -10,7 +10,7 @@ import java.rmi.registry.Registry;
 /**
  * Diese Klasse repräsentiert eine Verbindung zu einem bestimmten RMI-Registry an einem bestimmten Host und Port.
  */
-public final class RMIRegistry {
+public final class RMIRegistry extends Resource {
 
     // Für den Standard-Host wird "localhost" genutzt
     private static final String defaultRegistryHost = "localhost";
@@ -151,5 +151,12 @@ public final class RMIRegistry {
             port = defaultRegistryPort;
         }
         return String.join(host, ":", String.valueOf(port));
+    }
+
+    /**
+     * Beendet die Verbindung zu dem RMI-Registry.
+     */
+    public void dispose() {
+        setDisposed();
     }
 }

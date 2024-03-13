@@ -160,13 +160,10 @@ public final class PlayerExecutor {
     private Future<?> executeHumanPlayerTurn(GameState state, Command.CommandHandler commandHandler) {
         StaticGameState staticState = new StaticGameState(state, playerIndex);
         Controller controller = new Controller(HUMAN_CONTROLLER_USES);
-        CompletableFuture<?> future = CompletableFuture.runAsync(
-                () -> {
-                    Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
-                    player.executeTurn(staticState, controller);
-                },
-                executor.getExecutorService()
-        );
+        CompletableFuture<?> future = executor.executeCompletable(() -> {
+            Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
+            player.executeTurn(staticState, controller);
+        });
         return executor.execute(() -> {
             inputGenerator.activateTurn((HumanPlayer) player, playerIndex);
             Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
@@ -204,13 +201,10 @@ public final class PlayerExecutor {
     private Future<?> executeBotTurn(GameState state, Command.CommandHandler commandHandler) {
         StaticGameState staticState = new StaticGameState(state, playerIndex);
         Controller controller = new Controller(BOT_CONTROLLER_USES);
-        CompletableFuture<?> future = CompletableFuture.runAsync(
-                () -> {
-                    Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
-                    player.executeTurn(staticState, controller);
-                },
-                executor.getExecutorService()
-        );
+        CompletableFuture<?> future = executor.executeCompletable(() -> {
+            Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
+            player.executeTurn(staticState, controller);
+        });
         return executor.execute(() -> {
             Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
             long startTime = System.currentTimeMillis();
@@ -273,7 +267,7 @@ public final class PlayerExecutor {
      */
     private long waitForFutureWhileHandlingCommands(long untilTime, CompletableFuture<?> future, BlockingQueue<Command> commands, Command.CommandHandler commandHandler) {
         AtomicLong completionTime = new AtomicLong(-1);
-        future.thenAccept((v) -> completionTime.set(System.currentTimeMillis()));
+        future.thenRun(() -> completionTime.set(System.currentTimeMillis()));
         long currentTime = System.currentTimeMillis();
         // Ausführen der Schleife, solange der Future noch nicht fertig ist und entweder Debug-Modus aktiv ist oder die
         // aktuelle Zeit kleiner oder gleich der maximalen Zeit ist.

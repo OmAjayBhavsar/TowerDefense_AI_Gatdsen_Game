@@ -28,10 +28,6 @@ public final class LocalPlayerHandlerFactory extends PlayerHandlerFactory {
         }
     }
 
-    public Class<? extends Player> getPlayerClass() {
-        return playerClassReference.getPlayerClass();
-    }
-
     @Override
     public String getName() {
         return playerName;
@@ -40,10 +36,10 @@ public final class LocalPlayerHandlerFactory extends PlayerHandlerFactory {
     @Override
     public Future<PlayerHandler> createPlayerHandler(int playerIndex, PlayerController controller, InputProcessor inputProcessor) {
         PlayerHandler playerHandler;
-        if (Bot.class.isAssignableFrom(playerClassReference.getPlayerClass())) {
-            playerHandler = new ProcessPlayerHandler(playerIndex, playerClassReference, controller);
-        } else {
+        if (playerClassReference.referencesInternalPlayerClass()) {
             playerHandler = new LocalPlayerHandler(playerIndex, playerClassReference, controller, inputProcessor);
+        } else {
+            playerHandler = new ProcessPlayerHandler(playerIndex, playerClassReference, controller);
         }
         return CompletableFuture.completedFuture(playerHandler);
     }

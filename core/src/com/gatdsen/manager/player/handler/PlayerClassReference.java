@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -31,7 +32,7 @@ public final class PlayerClassReference implements Serializable {
     /** Die Referenz auf den {@link IdleBot} */
     public static final PlayerClassReference IDLE_BOT = new PlayerClassReference("IdleBot", IdleBot.class);
     /** Alle Referenzen auf die intern existierenden Spielerklassen */
-    private static final PlayerClassReference[] INTERNAL_PLAYER_CLASS_REFERENCES = {HUMAN_PLAYER, IDLE_BOT};
+    public static final Map<String, PlayerClassReference> INTERNAL_PLAYER_CLASS_REFERENCES = Map.of(HUMAN_PLAYER.fileName, HUMAN_PLAYER, IDLE_BOT.fileName, IDLE_BOT);
 
     /** Der Dateiname der Klasse - ohne Angabe des Dateipfades oder ".class" Endung */
     private final String fileName;
@@ -66,8 +67,17 @@ public final class PlayerClassReference implements Serializable {
     }
 
     /**
-     *
-     * @return
+     * @return Gibt true zurück, falls die repräsentierte Klasse eine interne Spielerklasse ist, ansonsten false
+     */
+    public boolean referencesInternalPlayerClass() {
+        return INTERNAL_PLAYER_CLASS_REFERENCES.containsKey(fileName);
+    }
+
+    /**
+     * Gibt ein Array mit allen verfügbaren Spielerklassen zurück. Dies sind die internen Spielerklassen und alle
+     * Klassen, die sich im "bots" Verzeichnis befinden, die ".class" Endung haben und eine Unterklasse von {@link Bot}
+     * sind.
+     * @return Ein Array mit allen verfügbaren Spielerklassen
      */
     public static PlayerClassReference[] getAvailablePlayerClassReferences() {
         List<PlayerClassReference> references = new ArrayList<>();
@@ -88,11 +98,15 @@ public final class PlayerClassReference implements Serializable {
         return references.toArray(new PlayerClassReference[0]);
     }
 
+    /**
+     * Gibt die Referenz auf die Spielerklasse mit dem gegebenen Dateinamen zurück.
+     * @param fileName Der Dateiname der Klasse - ohne Angabe des Dateipfades oder ".class" Endung
+     * @return Die Referenz auf die Spielerklasse
+     */
     public static PlayerClassReference getPlayerClassReference(String fileName) {
-        for (PlayerClassReference internalPlayer : INTERNAL_PLAYER_CLASS_REFERENCES) {
-            if (internalPlayer.fileName.equals(fileName)) {
-                return internalPlayer;
-            }
+        PlayerClassReference internalPlayer = INTERNAL_PLAYER_CLASS_REFERENCES.get(fileName);
+        if (internalPlayer != null) {
+            return internalPlayer;
         }
         File botFile = new File("bots/" + fileName + ".class");
         if (!botFile.exists()) {
