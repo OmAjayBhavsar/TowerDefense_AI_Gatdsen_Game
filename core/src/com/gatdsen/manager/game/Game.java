@@ -11,6 +11,7 @@ import com.gatdsen.simulation.Simulation;
 import com.gatdsen.simulation.action.ActionLog;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -159,19 +160,21 @@ public class Game extends Executable {
                 PlayerHandler playerHandler = playerHandlers[playerIndex];
                 futures[playerIndex] = playerHandler.executeTurn(
                         state,
-                        (Command command) -> {
-                            // Contains action produced by the commands execution
-                            ActionLog log = command.run(playerHandler);
-                            if (log == null) {
-                                return;
-                            }
-                            if (saveReplay) {
-                                gameResults.addActionLog(log);
-                            }
-                            if (gui) {
-                                animationLogProcessor.animate(log);
-                                // ToDo: discuss synchronisation for human players
-                                // animationLogProcessor.awaitNotification();
+                        (List<Command> commands) -> {
+                            for (Command command : commands) {
+                                // Contains action produced by the commands execution
+                                ActionLog log = command.run(playerHandler);
+                                if (log == null) {
+                                    continue;
+                                }
+                                if (saveReplay) {
+                                    gameResults.addActionLog(log);
+                                }
+                                if (gui) {
+                                    animationLogProcessor.animate(log);
+                                    // ToDo: discuss synchronisation for human players
+                                    // animationLogProcessor.awaitNotification();
+                                }
                             }
                         }
                 );

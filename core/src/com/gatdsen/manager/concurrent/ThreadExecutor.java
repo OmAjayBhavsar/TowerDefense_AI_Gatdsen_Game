@@ -19,6 +19,10 @@ public final class ThreadExecutor {
         return threadCount;
     }
 
+    public ExecutorService getExecutorService() {
+        return executor;
+    }
+
     public <T> Future<T> execute(Callable<T> callable) {
         return executor.submit(callable);
     }

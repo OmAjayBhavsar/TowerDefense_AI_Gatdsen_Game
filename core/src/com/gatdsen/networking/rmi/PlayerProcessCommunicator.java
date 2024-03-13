@@ -69,7 +69,7 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
                 PlayerExecuteTurnRequest playerExecuteTurnRequest = (PlayerExecuteTurnRequest) message;
                 playerExecutor.executeTurn(
                         playerExecuteTurnRequest.state,
-                        command -> RMICommunicator.communicate(remoteCommunicatorStub, new PlayerCommandResponse(command))
+                        commands -> RMICommunicator.communicate(remoteCommunicatorStub, new PlayerCommandResponse(commands))
                 );
                 break;
             case ProcessCommunicatorShutdownRequest:

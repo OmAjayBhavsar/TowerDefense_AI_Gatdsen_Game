@@ -4,6 +4,7 @@ import com.gatdsen.manager.player.handler.PlayerHandler;
 import com.gatdsen.simulation.action.ActionLog;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Die Basisklasse für alle Befehle.
@@ -23,6 +24,10 @@ public abstract class Command implements Serializable {
 
     public interface CommandHandler {
 
-        void handle(Command command);
+        default void handle(Command command) {
+            handle(List.of(command));
+        }
+
+        void handle(List<Command> commands);
     }
 }

@@ -2,6 +2,8 @@ package com.gatdsen.networking.rmi.message;
 
 import com.gatdsen.manager.command.Command;
 
+import java.util.List;
+
 /**
  * Diese Nachricht wird von einem Spielerprozess an den Spielprozess gesendet, um diesen über einen vom Spieler
  * ausgeführten Befehl zu informieren.
@@ -10,13 +12,13 @@ import com.gatdsen.manager.command.Command;
 public final class PlayerCommandResponse implements Message {
 
     /** Der Befehl, den der Spieler ausgeführt hat */
-    public final Command command;
+    public final List<Command> commands;
 
     /**
-     * @param command Der Befehl, den der Spieler ausgeführt hat
+     * @param commands Der Befehl, den der Spieler ausgeführt hat
      */
-    public PlayerCommandResponse(Command command) {
-        this.command = command;
+    public PlayerCommandResponse(List<Command> commands) {
+        this.commands = commands;
     }
 
     @Override

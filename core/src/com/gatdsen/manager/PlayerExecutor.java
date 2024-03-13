@@ -15,13 +15,16 @@ import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.simulation.GameState;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 public final class PlayerExecutor {
 
-    private static final int BOT_EXECUTE_GRACE_PERIODE = 100;
     public static final int BOT_EXECUTE_INIT_TIMEOUT = 1000;
-    public static final int BOT_EXECUTE_TURN_TIMEOUT = 500 + BOT_EXECUTE_GRACE_PERIODE;
+    public static final int BOT_EXECUTE_TURN_TIMEOUT = 500;
     private static final int BOT_CONTROLLER_USES = 200;
 
     public static final int HUMAN_EXECUTE_INIT_TIMEOUT = 30000;
@@ -63,91 +66,218 @@ public final class PlayerExecutor {
     }
 
     public Penalty init(GameState state, long seed) {
-        if (PlayerType.fromPlayer(player) == PlayerType.BOT) {
-            String[] illegalImports = playerClassAnalyzer.getIllegalImports();
-            if (illegalImports.length > 0) {
-                String reason = "Bot \"" + player.getName() + "\" has been disqualified for using the following illegal package or class imports: \"" + String.join("\", \"", illegalImports) + "\"";
-                System.err.println(reason);
-                return new DisqualificationPenalty(reason);
+        if (PlayerType.fromPlayer(player) == PlayerType.HUMAN) {
+            initHumanPlayer(state);
+            return null;
+        } else {
+            return initBot(state, seed);
+        }
+    }
+
+    private void initHumanPlayer(GameState state) {
+        StaticGameState staticState = new StaticGameState(state, playerIndex);
+        Future<?> future = executor.execute(() -> {
+            Thread.currentThread().setName("Init_Thread_Player_" + player.getName());
+            player.init(staticState);
+        });
+        try {
+            if (isDebug) {
+                future.get();
+            } else {
+                future.get(2 * HUMAN_EXECUTE_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
             }
+        } catch(CancellationException e) {
+            System.out.println("HumanPlayer turn execution was cancelled");
+            e.printStackTrace(System.err);
+        } catch (InterruptedException e) {
+            future.cancel(true);
+            System.out.println("HumanPlayer was interrupted");
+            e.printStackTrace(System.err);
+        } catch (ExecutionException e) {
+            System.out.println("HumanPlayer failed with exception: " + e.getCause());
+            e.printStackTrace(System.err);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            System.out.println("HumanPlayer computation surpassed timeout");
+        }
+    }
+
+    private Penalty initBot(GameState state, long seed) {
+        String[] illegalImports = playerClassAnalyzer.getIllegalImports();
+        if (illegalImports.length > 0) {
+            String reason = "Bot \"" + player.getName() + "\" has been disqualified for using the following illegal package or class imports: \"" + String.join("\", \"", illegalImports) + "\"";
+            System.err.println(reason);
+            return new DisqualificationPenalty(reason);
         }
         StaticGameState staticState = new StaticGameState(state, playerIndex);
         Future<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Init_Thread_Player_" + player.getName());
-            if (PlayerType.fromPlayer(player) == PlayerType.BOT) {
-                ((Bot) player).setRandomSeed(seed);
-            }
+            ((Bot) player).setRandomSeed(seed);
             player.init(staticState);
         });
-        long timeout = PlayerType.fromPlayer(player) == PlayerType.HUMAN ? HUMAN_EXECUTE_INIT_TIMEOUT : BOT_EXECUTE_INIT_TIMEOUT;
         long startTime = System.currentTimeMillis();
         try {
             if (isDebug) {
                 future.get();
             } else {
-                future.get(timeout, TimeUnit.MILLISECONDS);
+                future.get(2 * BOT_EXECUTE_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
             }
-        } catch (ExecutionException | InterruptedException | TimeoutException ignored) {
+        } catch(CancellationException e) {
+            e.printStackTrace(System.err);
+            System.out.println("Bot \"" + player.getName() + "\" turn execution was cancelled");
+        } catch (InterruptedException e) {
+            future.cancel(true);
+            e.printStackTrace(System.err);
+            System.out.println("Bot \"" + player.getName() + "\" was interrupted");
+        } catch (ExecutionException e) {
+            e.getCause().printStackTrace(System.err);
+            String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for failing with exception: " + e.getCause();
+            System.err.println(reason);
+            return new MissTurnsPenalty(reason);
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            isDisqualified = true;
+            String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for surpassing computation timeout by taking more than " + (2 * BOT_EXECUTE_INIT_TIMEOUT) + "ms!";
+            System.err.println(reason);
+            return new DisqualificationPenalty(reason);
         }
-        return handlePlayerFuture(future, System.currentTimeMillis() - startTime, timeout);
+        long duration = System.currentTimeMillis() - startTime;
+        if (!isDebug && duration > BOT_EXECUTE_INIT_TIMEOUT) {
+            String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for surpassing computation timeout by taking " + (duration - BOT_EXECUTE_INIT_TIMEOUT) + "ms longer than allowed!";
+            return new MissTurnsPenalty(reason);
+        }
+        return null;
     }
 
     public Future<?> executeTurn(GameState state, Command.CommandHandler commandHandler) {
+        if (PlayerType.fromPlayer(player) == PlayerType.HUMAN) {
+            return executeHumanPlayerTurn(state, commandHandler);
+        } else {
+            return executeBotTurn(state, commandHandler);
+        }
+    }
+
+    private Future<?> executeHumanPlayerTurn(GameState state, Command.CommandHandler commandHandler) {
         StaticGameState staticState = new StaticGameState(state, playerIndex);
-        Controller controller = new Controller(
-                PlayerType.fromPlayer(player) == PlayerType.HUMAN ? HUMAN_CONTROLLER_USES : BOT_CONTROLLER_USES
+        Controller controller = new Controller(HUMAN_CONTROLLER_USES);
+        CompletableFuture<?> future = CompletableFuture.runAsync(
+                () -> {
+                    Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
+                    player.executeTurn(staticState, controller);
+                },
+                executor.getExecutorService()
         );
-        Future<?> future = executor.execute(() -> {
-            Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
-            player.executeTurn(staticState, controller);
+        return executor.execute(() -> {
+            inputGenerator.activateTurn((HumanPlayer) player, playerIndex);
+            Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
+            long endTime = waitForFutureWhileHandlingCommands(System.currentTimeMillis() + HUMAN_EXECUTE_TURN_TIMEOUT, future, controller.commands, commandHandler);
+            if (endTime == -1) {
+                future.cancel(true);
+                System.out.println("HumanPlayer computation surpassed timeout");
+            } else {
+                assert future.isDone() : "Future should be done when waitForFutureWhileHandlingCommands() returns a valid end time!";
+                try {
+                    future.get();
+                } catch(CancellationException e) {
+                    System.out.println("HumanPlayer turn execution was cancelled");
+                    e.printStackTrace(System.err);
+                } catch (InterruptedException e) {
+                    future.cancel(true);
+                    System.out.println("HumanPlayer was interrupted");
+                    e.printStackTrace(System.err);
+                } catch (ExecutionException e) {
+                    System.out.println("HumanPlayer failed with exception: " + e.getCause());
+                    e.printStackTrace(System.err);
+                }
+            }
+            controller.endTurn();
+            // Falls in der waitWhileHandlingCommands()-Methode nicht alle Befehle abgearbeitet wurden, holen wir das
+            // hier nach und verarbeiten die in der Controller-Warteschlange verbliebenen Befehle.
+            List<Command> commands = new LinkedList<>();
+            int count = controller.commands.drainTo(commands);
+            if (count > 0) {
+                commandHandler.handle(commands);
+            }
         });
+    }
+
+    private Future<?> executeBotTurn(GameState state, Command.CommandHandler commandHandler) {
+        StaticGameState staticState = new StaticGameState(state, playerIndex);
+        Controller controller = new Controller(BOT_CONTROLLER_USES);
+        CompletableFuture<?> future = CompletableFuture.runAsync(
+                () -> {
+                    Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
+                    player.executeTurn(staticState, controller);
+                },
+                executor.getExecutorService()
+        );
         return executor.execute(() -> {
             Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
-            long timeout = 0;
-            switch (PlayerType.fromPlayer(player)) {
-                case HUMAN:
-                    inputGenerator.activateTurn((HumanPlayer) player, playerIndex);
-                    timeout = HUMAN_EXECUTE_TURN_TIMEOUT;
-                    break;
-                case BOT:
-                    timeout = 2 * BOT_EXECUTE_TURN_TIMEOUT;
-                    break;
-            }
             long startTime = System.currentTimeMillis();
-            long endTime = waitWhileHandlingCommands(startTime + timeout, future, controller.commands, commandHandler);
-            Penalty penalty = handlePlayerFuture(future, endTime - startTime, PlayerType.fromPlayer(player) == PlayerType.HUMAN ? timeout : BOT_EXECUTE_TURN_TIMEOUT);
+            long endTime = waitForFutureWhileHandlingCommands(startTime + 2 * BOT_EXECUTE_TURN_TIMEOUT, future, controller.commands, commandHandler);
+            Penalty penalty = null;
+            if (endTime == -1) {
+                future.cancel(true);
+                isDisqualified = true;
+                String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for surpassing computation timeout by taking more than " + (2 * BOT_EXECUTE_TURN_TIMEOUT) + "ms!";
+                System.err.println(reason);
+                penalty = new DisqualificationPenalty(reason);
+            } else {
+                assert future.isDone() : "Future should be done when waitForFutureWhileHandlingCommands() returns a valid end time!";
+                try {
+                    future.get();
+                } catch(CancellationException e) {
+                    e.printStackTrace(System.err);
+                    System.out.println("Bot \"" + player.getName() + "\" turn execution was cancelled");
+                } catch (InterruptedException e) {
+                    e.printStackTrace(System.err);
+                    System.out.println("Bot \"" + player.getName() + "\" was interrupted");
+                } catch (ExecutionException e) {
+                    e.getCause().printStackTrace(System.err);
+                    String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for failing with exception: " + e.getCause();
+                    System.err.println(reason);
+                    penalty = new MissTurnsPenalty(reason);
+                }
+                long turnDuration = endTime - startTime;
+                if (!isDebug && turnDuration > BOT_EXECUTE_TURN_TIMEOUT) {
+                    String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for surpassing computation timeout by taking " + (turnDuration - BOT_EXECUTE_TURN_TIMEOUT) + "ms longer than allowed!";
+                    penalty = new MissTurnsPenalty(reason);
+                }
+            }
             if (penalty == null) {
                 controller.endTurn();
             } else {
                 controller.endTurn(penalty);
             }
-            Command command;
             // Falls in der waitWhileHandlingCommands()-Methode nicht alle Befehle abgearbeitet wurden, holen wir das
-            // hier nach und führen alle in der Controller-Warteschlange verbliebenen Befehle aus.
-            while ((command = controller.commands.poll()) != null) {
-                commandHandler.handle(command);
+            // hier nach und verarbeiten die in der Controller-Warteschlange verbliebenen Befehle.
+            List<Command> commands = new LinkedList<>();
+            int count = controller.commands.drainTo(commands);
+            if (count > 0) {
+                commandHandler.handle(commands);
             }
         });
     }
 
     /**
-     * Hilfsmethode, die wartet bis entweder der Future erfüllt ist ({@link Future#isDone()} gibt true zurück) oder
-     * {@link System#currentTimeMillis()} größer als die übergebene Maximalzeit {@code untilTime} ist, falls diese
-     * Instanz sich nicht im Debug-Modus befindet.
+     * Hilfsmethode, die wartet bis entweder der Future erfüllt ist oder {@link System#currentTimeMillis()} größer als
+     * die übergebene Maximalzeit {@code untilTime} ist, falls diese Instanz sich nicht im Debug-Modus befindet.
      * Währenddessen werden alle Befehle, die in der Warteschlange {@code commands} liegen, mit dem übergebenen
      * {@link Command.CommandHandler} abgearbeitet.
-     * Es wird die Systemzeit, als die Schleife verlassen wurde, zurückgegeben.
      * @param untilTime Die maximale Wartezeit
      * @param future Der Future, der auf Erfüllung wartet
      * @param commands Die Warteschlange, die abgearbeitet werden soll
      * @param commandHandler Der Handler, der die Befehle abarbeiten soll
-     * @return Die Systemzeit als die Schleife verlassen wurde
+     * @return Die Zeit, zu der der Future erfüllt wurde oder -1, falls der Future über die maximale Wartezeit hinaus
+     * noch nicht erfüllt wurde
      */
-    private long waitWhileHandlingCommands(long untilTime, Future<?> future, BlockingQueue<Command> commands, Command.CommandHandler commandHandler) {
+    private long waitForFutureWhileHandlingCommands(long untilTime, CompletableFuture<?> future, BlockingQueue<Command> commands, Command.CommandHandler commandHandler) {
+        AtomicLong completionTime = new AtomicLong(-1);
+        future.thenAccept((v) -> completionTime.set(System.currentTimeMillis()));
         long currentTime = System.currentTimeMillis();
         // Ausführen der Schleife, solange der Future noch nicht fertig ist und entweder Debug-Modus aktiv ist oder die
         // aktuelle Zeit kleiner oder gleich der maximalen Zeit ist.
-        while (!future.isDone() && (isDebug || (currentTime = System.currentTimeMillis()) <= untilTime)) {
+        while (completionTime.get() == -1 && (isDebug || (currentTime = System.currentTimeMillis()) <= untilTime)) {
             Command command = null;
             try {
                 if (isDebug) {
@@ -168,75 +298,7 @@ public final class PlayerExecutor {
             }
             commandHandler.handle(command);
         }
-        return currentTime;
-    }
-
-    private Penalty handlePlayerFuture(Future<?> future, long turnDuration, long allowedTimeout) {
-        Penalty penalty = null;
-        switch (PlayerType.fromPlayer(player)) {
-            case HUMAN:
-                handleHumanPlayerFuture(future);
-                break;
-            case BOT:
-                penalty = handleBotPlayerFuture(future, turnDuration, allowedTimeout);
-                break;
-        }
-        return penalty;
-    }
-
-    private void handleHumanPlayerFuture(Future<?> future) {
-        if (future.isDone()) {
-            try {
-                future.get();
-            } catch(CancellationException e) {
-                System.out.println("HumanPlayer turn execution was cancelled");
-                e.printStackTrace(System.err);
-            } catch (InterruptedException e) {
-                future.cancel(true);
-                System.out.println("HumanPlayer was interrupted");
-                e.printStackTrace(System.err);
-            } catch (ExecutionException e) {
-                System.out.println("HumanPlayer failed with exception: " + e.getCause());
-                e.printStackTrace(System.err);
-            }
-        } else {
-            future.cancel(true);
-            System.out.println("HumanPlayer computation surpassed timeout");
-        }
-    }
-
-    private void handleHumanPlayer() throws CancellationException, InterruptedException, ExecutionException {
-
-    }
-
-    private Penalty handleBotPlayerFuture(Future<?> future, long turnDuration, long allowedTimeout) {
-        if (future.isDone()) {
-            try {
-                future.get();
-            } catch(CancellationException e) {
-                e.printStackTrace(System.err);
-                System.out.println("Bot \"" + player.getName() + "\" turn execution was cancelled");
-            } catch (InterruptedException e) {
-                e.printStackTrace(System.err);
-                System.out.println("Bot \"" + player.getName() + "\" was interrupted");
-            } catch (ExecutionException e) {
-                e.getCause().printStackTrace(System.err);
-                String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for failing with exception: " + e.getCause();
-                System.err.println(reason);
-                return new MissTurnsPenalty(reason);
-            }
-            if (!isDebug && turnDuration > allowedTimeout) {
-                String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for surpassing computation timeout by taking " + (turnDuration - allowedTimeout) + "ms longer than allowed!";
-                return new MissTurnsPenalty(reason);
-            }
-        } else {
-            future.cancel(true);
-            isDisqualified = true;
-            String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for surpassing computation timeout by taking more than " + (2 * allowedTimeout) + "ms!";
-            System.err.println(reason);
-            return new DisqualificationPenalty(reason);
-        }
-        return null;
+        return completionTime.get();
     }
 
     public void dispose() {

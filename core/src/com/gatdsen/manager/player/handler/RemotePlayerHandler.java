@@ -7,6 +7,7 @@ import com.gatdsen.networking.rmi.message.*;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerController;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
@@ -73,11 +74,14 @@ public class RemotePlayerHandler extends PlayerHandler {
             if (message.getType() != Message.Type.PlayerCommandResponse) {
                 throw new UnexpectedMessageException(message, Message.Type.PlayerCommandResponse);
             }
-            Command command = ((PlayerCommandResponse) message).command;
-            commandHandler.handle(command);
-            if (command.endsTurn()) {
-                executeTurnFuture.complete(null);
-                communicator.setMessageHandler(null);
+            List<Command> commands = ((PlayerCommandResponse) message).commands;
+            commandHandler.handle(commands);
+            for (Command command : commands) {
+                if (command.endsTurn()) {
+                    executeTurnFuture.complete(null);
+                    communicator.setMessageHandler(null);
+                    return;
+                }
             }
         });
         communicator.communicate(new PlayerExecuteTurnRequest(gameState));
