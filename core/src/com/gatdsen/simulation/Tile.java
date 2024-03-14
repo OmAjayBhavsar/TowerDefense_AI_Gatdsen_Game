@@ -33,6 +33,11 @@ public abstract class Tile implements Serializable {
     public abstract boolean isBuildable();
 
     /**
+     * @return True, wenn das Tile ein Pfad ist
+     */
+    public abstract boolean isPath();
+
+    /**
      * @return die Position des Tiles als IntVector2
      */
     public IntVector2 getPosition() {

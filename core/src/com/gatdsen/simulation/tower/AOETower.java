@@ -81,7 +81,7 @@ public class AOETower extends Tower {
      * @return Den Preis des AOETower
      */
     @Override
-    public int getPrice() {
+    public int getUpgradePrice() {
         switch (level) {
             case 1: return 100;
             case 2: return 130;

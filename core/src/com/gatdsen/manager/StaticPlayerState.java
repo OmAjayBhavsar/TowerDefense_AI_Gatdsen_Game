@@ -56,4 +56,7 @@ public final class StaticPlayerState {
     public Tile[][] getBoard() {
         return state.getBoard();
     }
+    public PathTile getCheese(){
+        return state.getCheese();
+    }
 }

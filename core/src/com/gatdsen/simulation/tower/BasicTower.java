@@ -77,7 +77,7 @@ public class BasicTower extends Tower {
      * @return Den Preis des BasicTowers
      */
     @Override
-    public int getPrice() {
+    public int getUpgradePrice() {
         switch (level) {
             case 1: return 80;
             case 2: return 100;
