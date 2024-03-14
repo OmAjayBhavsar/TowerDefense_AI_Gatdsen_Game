@@ -289,7 +289,8 @@ public class GADSAssetManager {
             for (String name :
                     namedFrames.keySet()) {
                 if (skins.containsKey(name)) {
-                    System.err.println("Warning: Skin with name " + name + " is hidden by another skin!");
+                    // TODO: Should this be logged?
+                    //System.err.println("Warning: Skin with name " + name + " is hidden by another skin!");
                     continue;
                 }
                 Map<Integer, Texture> indexedFrames = namedFrames.get(name);
@@ -307,7 +308,8 @@ public class GADSAssetManager {
             }
 
         } else {
-            System.err.println("Warning: No Skin-Dir found at " + skinDir.getAbsolutePath());
+            // TODO: Should this be logged?
+            //System.err.println("Warning: No Skin-Dir found at " + skinDir.getAbsolutePath());
         }
         IngameAssets.skins = skins;
     }
