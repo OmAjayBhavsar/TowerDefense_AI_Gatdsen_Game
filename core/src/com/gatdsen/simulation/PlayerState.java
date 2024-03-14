@@ -228,6 +228,14 @@ public class PlayerState implements Serializable {
     }
 
     /**
+     * Gibt die aktuelle SpawnCoins des Spielers zurück
+     * @return SpawnCoins
+     */
+    public int getSpawnCoins() {
+        return spawnCoins;
+    }
+
+    /**
      * Platziert einen Tower auf dem Spielfeld
      *
      * @param x    x-Koordinate des Towers
