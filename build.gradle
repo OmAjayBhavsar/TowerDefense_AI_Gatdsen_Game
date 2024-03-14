@@ -38,10 +38,13 @@ allprojects {
     }
 
     tasks.withType(Javadoc) {
-        options.encoding = 'UTF-8'
+        options.encoding = "UTF-8"
         exclude("**/test/**")
         options.tags = ["Weihnachtsaufgabe"]
         failOnError = false
+    }
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
     }
 }
 

@@ -1,0 +1,119 @@
+package com.gatdsen.manager.run;
+
+import com.gatdsen.manager.CompletionHandler;
+import com.gatdsen.manager.game.Executable;
+import com.gatdsen.manager.Manager;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
+import com.gatdsen.simulation.GameState;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class Run {
+
+
+    private boolean completed = false;
+
+    private final Object schedulingLock = new Object();
+    private final List<CompletionHandler<Run>> completionListeners = new ArrayList<>();
+
+    protected final Manager manager;
+
+    protected GameState.GameMode gameMode;
+    private final List<Executable> games = new ArrayList<>();
+
+    private boolean disposed = false;
+    private final List<PlayerHandlerFactory> playerFactories;
+
+    protected final RunResults results = new RunResults();
+
+    public Run(Manager manager, RunConfiguration runConfig) {
+        this.playerFactories = new ArrayList<>(runConfig.playerFactories);
+        gameMode = runConfig.gameMode;
+        this.manager = manager;
+    }
+
+    public static Run getRun(Manager manager, RunConfiguration runConfig) {
+        switch (runConfig.gameMode) {
+            case Campaign:
+            case Replay:
+            case Normal:
+            case Christmas_Task:
+                return new SingleGameRun(manager, runConfig);
+            case Exam_Admission:
+            case Tournament_Phase_1:
+                return new ParallelMultiGameRun(manager, runConfig);
+            case Tournament_Phase_2:
+                return new TournamentRun(manager, runConfig);
+            default:
+                throw new IllegalArgumentException(runConfig.gameMode.toString() + " is not processed by the Run interface");
+        }
+    }
+
+    public List<Executable> getGames() {
+        return games;
+    }
+
+    protected void addGame(Executable game) {
+        synchronized (schedulingLock) {
+            if (!disposed) {
+                games.add(game);
+                manager.schedule(game);
+            }
+        }
+    }
+
+    public void dispose() {
+        synchronized (schedulingLock) {
+            disposed = true;
+            for (Executable game : games
+            ) {
+                manager.stop(game);
+            }
+        }
+    }
+
+    public GameState.GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public List<PlayerHandlerFactory> getPlayerFactories() {
+        return playerFactories;
+    }
+
+    protected void complete() {
+        synchronized (schedulingLock) {
+            completed = true;
+            for (CompletionHandler<Run> completionListener : completionListeners) {
+                completionListener.onComplete(this);
+            }
+        }
+    }
+
+    public RunResults getResults() {
+        return results;
+    }
+
+    public void addCompletionListener(CompletionHandler<Run> handler) {
+        synchronized (schedulingLock) {
+            completionListeners.add(handler);
+            if (completed) new Thread(() -> handler.onComplete(this)).start();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Run{" +
+                "completed=" + completed +
+                ", completionListeners=" + completionListeners +
+                ", gameMode=" + gameMode +
+                ", games=" + games +
+                ", players=" + playerFactories +
+                ", results=" + results +
+                '}';
+    }
+}

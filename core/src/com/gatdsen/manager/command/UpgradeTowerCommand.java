@@ -1,6 +1,6 @@
 package com.gatdsen.manager.command;
 
-import com.gatdsen.manager.player.PlayerHandler;
+import com.gatdsen.manager.player.handler.PlayerHandler;
 import com.gatdsen.simulation.action.ActionLog;
 
 /**

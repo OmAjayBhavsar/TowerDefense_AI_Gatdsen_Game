@@ -1,6 +1,7 @@
 package com.gatdsen.manager;
 
 import com.gatdsen.manager.command.*;
+import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.simulation.Tower;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -75,7 +76,7 @@ public final class Controller {
      * @param command the command to be queued
      */
     private void queue(Command command) {
-        if (!isDeactivated()) {
+        if (isActive()) {
             commands.add(command);
         }
     }
@@ -85,41 +86,31 @@ public final class Controller {
      * {@link Command}s mehr ausgeführt werden können.
      */
     void endTurn() {
-        if (!isDeactivated()) {
+        if (isActive()) {
             commands.add(new EndTurnCommand());
             deactivate();
         }
     }
 
     /**
-     * Markiert das Ende des aktuellen Zuges für diesen Controller und deaktiviert diesen, ähnlich wie
-     * {@link Controller#endTurn()}. Zusätzlich wird der Spieler aber muss der Spieler den darauffolgenden Zug aussetzen.
+     * Markiert das Ende des aktuellen Zuges für diesen Controller und deaktiviert diesen, sodass keine weiteren
+     * {@link Command}s mehr ausgeführt werden können, ähnlich wie {@link Controller#endTurn()}.
+     * Zusätzlich wird der Spieler aber mit der übergebenen {@link Penalty} bestraft.
+     * @param penalty Die Strafe, die der Spieler erhält
      */
-    void missNextTurn() {
-        if (!isDeactivated()) {
-            commands.add(new MissNextTurnCommand());
+    void endTurn(Penalty penalty) {
+        if (isActive()) {
+            commands.add(new EndTurnCommand(penalty));
             deactivate();
         }
     }
 
     /**
-     * Markiert das Ende des aktuellen Zuges für diesen Controller und deaktiviert diesen, ähnlich wie
-     * {@link Controller#endTurn()}. Zusätzlich wird der Spieler aber disqualifiziert, sodass das Spiel abgebrochen
-     * werden kann.
+     * Gibt an, ob dieser Controller noch aktiv ist.
+     * @return true, wenn dieser Controller aktiv ist, sonst false
      */
-    void disqualify() {
-        if (!isDeactivated()) {
-            commands.add(new DisqualifyCommand());
-            deactivate();
-        }
-    }
-
-    /**
-     * Gibt an, ob dieser Controller deaktiviert ist.
-     * @return true, wenn dieser Controller deaktiviert ist, sonst false
-     */
-    private boolean isDeactivated() {
-        return uses == -1;
+    private boolean isActive() {
+        return uses != -1;
     }
 
     /**

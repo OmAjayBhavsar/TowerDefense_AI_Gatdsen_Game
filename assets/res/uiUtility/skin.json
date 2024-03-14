@@ -1,6 +1,6 @@
 {
   com.badlogic.gdx.graphics.g2d.BitmapFont: {
-    default: { file: "uiUtility/rainyhearts.fnt" }
+    default: { file: "uiUtility/arial.fnt" }
   },
   com.badlogic.gdx.graphics.Color: {
     white: { r: 1, g: 1, b: 1, a: 1 },
@@ -23,7 +23,7 @@
   selection: { r: 0.3, g: 0.1, b: 0.2, a: 1 },
   semiTransparent: { r: 0.4, g: 0, b: 0, a: 0.6 }
 
-fontColor: lightsilver,
+fontColor: white,
 
     font: white
     fontOver: white

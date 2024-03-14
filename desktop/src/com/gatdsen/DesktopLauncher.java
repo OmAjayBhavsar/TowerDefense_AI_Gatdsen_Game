@@ -4,7 +4,8 @@ import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.gatdsen.manager.*;
-import com.gatdsen.manager.run.config.RunConfiguration;
+import com.gatdsen.manager.run.Run;
+import com.gatdsen.manager.run.RunConfiguration;
 import com.gatdsen.ui.GADS;
 import org.apache.commons.cli.CommandLine;
 

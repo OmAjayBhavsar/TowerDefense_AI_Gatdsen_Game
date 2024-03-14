@@ -1,0 +1,95 @@
+package com.gatdsen.manager.player.handler;
+
+import com.gatdsen.manager.command.Command;
+import com.gatdsen.manager.concurrent.RMICommunicator;
+import com.gatdsen.manager.player.Player;
+import com.gatdsen.networking.rmi.message.*;
+import com.gatdsen.simulation.GameState;
+import com.gatdsen.simulation.PlayerController;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+
+public class RemotePlayerHandler extends PlayerHandler {
+
+    private final RMICommunicator communicator;
+    private final PlayerClassReference playerClassReference;
+    private final CompletableFuture<Long> createFuture = new CompletableFuture<>();
+    private final CompletableFuture<?> initFuture = new CompletableFuture<>();
+    private CompletableFuture<?> executeTurnFuture = null;
+
+    public RemotePlayerHandler(int playerIndex, PlayerController controller) {
+        super(playerIndex, controller);
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public RemotePlayerHandler(RMICommunicator communicator, int playerIndex, PlayerController controller) {
+        this(communicator, playerIndex, null, controller);
+    }
+
+    protected RemotePlayerHandler(RMICommunicator communicator, int playerIndex, PlayerClassReference playerClassReference, PlayerController controller) {
+        super(playerIndex, controller);
+        this.communicator = communicator;
+        this.playerClassReference = playerClassReference;
+    }
+
+    @Override
+    public Future<Long> create(boolean isDebug, int gameId) {
+        assert !createFuture.isDone() : "PlayerHandler.create() should only be called once";
+        communicator.setMessageHandler(message -> {
+            if (message.getType() != Message.Type.GameCreateResponse) {
+                throw new UnexpectedMessageException(message, Message.Type.GameCreateResponse);
+            }
+            GameCreateResponse response = (GameCreateResponse) message;
+            playerInformation = response.playerInformation;
+            createFuture.complete(response.seedModifier);
+            communicator.setMessageHandler(null);
+        });
+        communicator.communicate(new GameCreateRequest(isDebug, gameId, playerIndex, playerClassReference));
+        return createFuture;
+    }
+
+    @Override
+    public Future<?> init(GameState gameState, long seed) {
+        assert createFuture.isDone() : "PlayerHandler.init() should only be called after PlayerHandler.create() has completed";
+        assert !initFuture.isDone() : "PlayerHandler.init() should only be called once";
+        communicator.setMessageHandler(message -> {
+            if (message.getType() != Message.Type.PlayerInitResponse) {
+                throw new UnexpectedMessageException(message, Message.Type.PlayerInitResponse);
+            }
+            initFuture.complete(null);
+            communicator.setMessageHandler(null);
+        });
+        communicator.communicate(new PlayerInitRequest(gameState, seed));
+        return initFuture;
+    }
+
+    @Override
+    protected Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler) {
+        assert initFuture.isDone() : "PlayerHandler.executeTurn() should only be called after PlayerHandler.init() has completed";
+        assert executeTurnFuture == null || executeTurnFuture.isDone() : "PlayerHandler.executeTurn() should only be called once the previously returned Future is done";
+        executeTurnFuture = new CompletableFuture<>();
+        communicator.setMessageHandler(message -> {
+            if (message.getType() != Message.Type.PlayerCommandResponse) {
+                throw new UnexpectedMessageException(message, Message.Type.PlayerCommandResponse);
+            }
+            List<Command> commands = ((PlayerCommandResponse) message).commands;
+            commandHandler.handle(commands);
+            for (Command command : commands) {
+                if (command.endsTurn()) {
+                    executeTurnFuture.complete(null);
+                    communicator.setMessageHandler(null);
+                    return;
+                }
+            }
+        });
+        communicator.communicate(new PlayerExecuteTurnRequest(gameState));
+        return executeTurnFuture;
+    }
+
+    @Override
+    public void dispose() {
+        // TODO: release RMICommunicator back to the ResourcePool
+    }
+}
