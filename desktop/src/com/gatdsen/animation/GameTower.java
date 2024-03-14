@@ -17,16 +17,17 @@ public class GameTower extends AnimatedEntity {
     private Integer level = 1;
     private int type = 1;
     static private BitmapFont fonte = new BitmapFont();
-    private Animation<TextureRegion> idleAnimation = gameTowerAnimations[GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()];
+    private Animation<TextureRegion> idleAnimation;
     public Animation<TextureRegion> attackAnimation;
 
     private boolean attacking = false;
     private GameTowerAnimationType currentAnimation = GameTowerAnimationType.ANIMATION_TYPE_IDLE;
 
     public GameTower(int level, int type) {
-        super(gameTowerAnimations[GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
+        super(gameTowerAnimations[type][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
 
-        attackAnimation = gameTowerAnimations[GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()];
+        idleAnimation = gameTowerAnimations[type][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()];
+        attackAnimation = gameTowerAnimations[type][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()];
         this.level = level;
         this.type = type;
 
