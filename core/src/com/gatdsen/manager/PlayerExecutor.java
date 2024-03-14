@@ -300,7 +300,7 @@ public final class PlayerExecutor {
         return completionTime.get();
     }
 
-    public void dispose() {
-        ResourcePool.getInstance().releaseThreadExecutor(executor, !isDisqualified);
+    public void dispose(boolean reusable) {
+        ResourcePool.getInstance().releaseThreadExecutor(executor, reusable);
     }
 }

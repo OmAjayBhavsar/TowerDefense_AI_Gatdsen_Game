@@ -45,7 +45,7 @@ public final class LocalPlayerHandler extends PlayerHandler {
     }
 
     @Override
-    public void dispose() {
-        playerExecutor.dispose();
+    public void dispose(boolean test) {
+        playerExecutor.dispose(test);
     }
 }

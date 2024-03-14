@@ -45,7 +45,7 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
             case GameCreateRequest:
                 GameCreateRequest gameCreateRequest = (GameCreateRequest) message;
                 if (playerExecutor != null) {
-                    playerExecutor.dispose();
+                    playerExecutor.dispose(false);
                 }
                 playerExecutor = new PlayerExecutor(
                         gameCreateRequest.isDebug,
@@ -93,7 +93,7 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
             registry.unbind(localReferenceName);
         } catch (RemoteException | NotBoundException ignored) {
         }
-        playerExecutor.dispose();
+        playerExecutor.dispose(false);
         ResourcePool.getInstance().dispose();
     }
 }

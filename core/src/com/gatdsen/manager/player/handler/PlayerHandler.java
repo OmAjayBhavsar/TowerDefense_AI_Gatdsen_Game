@@ -62,5 +62,5 @@ public abstract class PlayerHandler {
 
     protected abstract Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler);
 
-    public abstract void dispose();
+    public abstract void dispose(boolean test);
 }

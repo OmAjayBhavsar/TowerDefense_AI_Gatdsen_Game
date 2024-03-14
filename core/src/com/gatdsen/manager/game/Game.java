@@ -77,12 +77,13 @@ public class Game extends Executable {
         for (Future<Long> future : longFutures) {
             try {
                 seed += future.get();
-            } catch (InterruptedException e) {
-                return;
             } catch (ExecutionException e) {
                 throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                return;
             }
         }
+
         Future<?>[] futures = new Future[config.playerCount];
         PlayerState[] playerStates = state.getPlayerStates();
         for (int playerIndex = 0; playerIndex < config.playerCount; playerIndex++) {
@@ -95,7 +96,11 @@ public class Game extends Executable {
         }
         try {
             awaitFutures(futures);
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
+            if (pendingShutdown) {
+                return;
+            }
+            throw new RuntimeException(e);
         }
         gameResults.setPlayerInformation(
                 Arrays.stream(playerHandlers).map(PlayerHandler::getPlayerInformation).toArray(PlayerInformation[]::new)
@@ -195,7 +200,13 @@ public class Game extends Executable {
             try {
                 awaitFutures(futures);
             } catch (InterruptedException e) {
-                return;
+                if (pendingShutdown) {
+                    if (inputGenerator != null) {
+                        inputGenerator.endTurn();
+                    }
+                    return;
+                }
+                throw new RuntimeException(e);
             }
             if (inputGenerator != null) {
                 inputGenerator.endTurn();
@@ -210,10 +221,12 @@ public class Game extends Executable {
                 animationLogProcessor.awaitNotification();
             }
         }
-        gameResults.setScores(state.getHealth());
-        setStatus(Status.COMPLETED);
-        for (CompletionHandler<Executable> completionListener : completionListeners) {
-            completionListener.onComplete(this);
+        if (!pendingShutdown) {
+            gameResults.setScores(state.getHealth());
+            setStatus(Status.COMPLETED);
+            for (CompletionHandler<Executable> completionListener : completionListeners) {
+                completionListener.onComplete(this);
+            }
         }
     }
 
@@ -224,30 +237,41 @@ public class Game extends Executable {
         if (simulationThread != null) {
             simulationThread.interrupt();
         }
+        if (state != null) {
+            gameResults.setScores(state.getHealth());
+        }
         simulation = null;
-        state = null;
         simulationThread = null;
-        gameResults = null;
         synchronized (schedulingLock) {
             if (playerHandlers != null) {
+                boolean reusable = getStatus() == Status.COMPLETED;
                 for (PlayerHandler playerHandler : playerHandlers) {
-                    playerHandler.dispose();
+                    playerHandler.dispose(reusable);
                 }
                 playerHandlers = null;
             }
         }
     }
 
-    private void awaitFutures(Future<?>[] futures) throws InterruptedException {
-        for (Future<?> future : futures) {
-            if (future == null) {
-                continue;
+    private static void awaitFutures(Future<?>[] futures) throws InterruptedException {
+        try {
+            for (Future<?> future : futures) {
+                if (future == null) {
+                    continue;
+                }
+                try {
+                    future.get();
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            try {
-                future.get();
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            for (Future<?> future : futures) {
+                if (future != null) {
+                    future.cancel(true);
+                }
             }
+            throw e;
         }
     }
 

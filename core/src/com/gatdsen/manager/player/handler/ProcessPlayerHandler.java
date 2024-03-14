@@ -19,7 +19,7 @@ public final class ProcessPlayerHandler extends RemotePlayerHandler {
     }
 
     @Override
-    public void dispose() {
-        ResourcePool.getInstance().releaseProcessExecutor(process, !isDisqualified());
+    public void dispose(boolean test) {
+        ResourcePool.getInstance().releaseProcessExecutor(process, test);
     }
 }
