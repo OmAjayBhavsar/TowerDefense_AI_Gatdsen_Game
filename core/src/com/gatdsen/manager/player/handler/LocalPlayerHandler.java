@@ -41,7 +41,7 @@ public final class LocalPlayerHandler extends PlayerHandler {
 
     @Override
     protected Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler) {
-        return playerExecutor.executeTurn(gameState, commandHandler);
+        return playerExecutor.executeTurn(gameState, commandHandler).thenAccept(this::penalize);
     }
 
     @Override

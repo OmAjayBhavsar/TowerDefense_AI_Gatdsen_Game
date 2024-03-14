@@ -5,7 +5,8 @@ import com.gatdsen.simulation.GameState;
 /**
  * Diese Nachricht wird vom Spielprozess an einen Spielerprozess gesendet, um diesen mit den gegebenen Parametern auf
  * die Durchführung eines Spielzugs durch den Spieler vorzubereiten.
- * Als Antwort auf diese Nachricht werden mehrere {@link PlayerCommandResponse} erwartet.
+ * Als Antwort auf diese Nachricht werden mehrere {@link PlayerCommandResponse}, sowie anschließend eine finale
+ * {@link PlayerExecuteTurnResponse} erwartet.
  */
 public final class PlayerExecuteTurnRequest implements Message {
 

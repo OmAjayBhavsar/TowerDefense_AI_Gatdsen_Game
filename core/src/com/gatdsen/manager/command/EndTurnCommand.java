@@ -1,6 +1,5 @@
 package com.gatdsen.manager.command;
 
-import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.manager.player.handler.PlayerHandler;
 import com.gatdsen.simulation.action.ActionLog;
 
@@ -12,21 +11,8 @@ import com.gatdsen.simulation.action.ActionLog;
  */
 public class EndTurnCommand extends Command {
 
-    protected final Penalty penalty;
-
-    public EndTurnCommand() {
-        this(null);
-    }
-
-    public EndTurnCommand(Penalty penalty) {
-        this.penalty = penalty;
-    }
-
     @Override
     protected ActionLog onExecute(PlayerHandler playerHandler) {
-        if (penalty != null) {
-            playerHandler.penalize(penalty);
-        }
         return null;
     }
 
