@@ -46,24 +46,22 @@ public class Hud implements Disposable {
     private final TextureRegion turnChangeSprite;
     private final float turnChangeDuration;
     private final UiMessenger uiMessenger;
-    private float renderingSpeed = 1;
+    private float renderingSpeed;
     private boolean debugVisible;
     private float[] scores;
     private String[] names;
     private final ScoreView scoreView;
-    private TextButton nextRoundButton;
-    private TextButton restartGameButton;
-    private TextButton backToMainMenuButton;
     private final Skin skin = AssetContainer.MainMenuAssets.skin;
     Viewport hudViewport;
-    private int player0Balance = 100;
-    private int player1Balance = 100;
+    private int player0Balance;
+    private int player1Balance;
     protected GADS gameInstance;
     private GameState gameState;
-    private int health = 300;
+    private int health;
+    private int buttonWidth;
     private ProgressBar healthBarPlayer0 = new ProgressBar(0, health, 1, false, skin);
     private ProgressBar healthBarPlayer1 = new ProgressBar(0, health, 1, false, skin);
-    private int roundCounter = 1;
+    private int roundCounter;
     private int healthPlayer0 = health;
     private int healthPlayer1 = health;
     public Group hudGroup = new Group();
@@ -72,6 +70,11 @@ public class Hud implements Disposable {
     private SelectBox<String> towerSellUpgrade;
     private SelectBox fireModeSelectBox;
     private ArrayList<int[][]> towerMaps = new ArrayList<>();
+    private Label player0BalanceLabel;
+    private Label player1BalanceLabel;
+    private Label currentRoundLabel;
+    private Label healthPlayer0Label;
+    private Label healthPlayer1Label;
 
     /**
      * Initialisiert das HUD-Objekt
@@ -107,7 +110,7 @@ public class Hud implements Disposable {
         healthBarPlayer1.setAnimateDuration(0.25f);
         if (gameState != null) {
             roundCounter = gameState.getTurn();
-        } else roundCounter = 1;
+        } else roundCounter = 0;
     }
 
     /**
@@ -166,32 +169,62 @@ public class Hud implements Disposable {
         this.names = names;
     }
 
+
+    /**
+     * Aktualisiert die UI-Elemente des HUD mit den aktuellen Daten.
+     */
+    private void updateUIElements() {
+        if (player0BalanceLabel != null) {
+            player0BalanceLabel.setText("$" + player0Balance);
+        }
+
+        if (player1BalanceLabel != null) {
+            player1BalanceLabel.setText("$" + player1Balance);
+        }
+
+        healthPlayer0Label.setText("" + healthPlayer0);
+        healthPlayer1Label.setText("" + healthPlayer0);
+
+        // ToDo weitere UI-Elemente aktualisieren...
+    }
+
     /**
      * Konfiguriert die HUD-Elemente und deren Anordnung
      */
     public void layoutHudElements() {
         float padding = 10;
+        TextButton restartGameButton;
+        TextButton nextRoundButton;
+        TextButton backToMainMenuButton;
 
         // Erstellen der Elemente
 
-        Label player0BalanceLabel = new Label("$" + player0Balance, skin);
+        player0BalanceLabel = new Label("$" + player0Balance, skin);
         player0BalanceLabel.setAlignment(Align.center);
-        Label player1BalanceLabel = new Label("$" + player1Balance, skin);
+        player1BalanceLabel = new Label("$" + player1Balance, skin);
         player1BalanceLabel.setAlignment(Align.center);
-        Label currentPlayer0 = new Label("Spieler 1", skin);
-        currentPlayer0.setAlignment(Align.center);
-        Label currentPlayer1 = new Label("Spieler 2", skin);
-        currentPlayer1.setAlignment(Align.center);
-        Label currentRoundLabel = new Label("Runde: " + roundCounter, skin);
+        Label currentPlayer0Label = new Label("Spieler 1", skin);
+        currentPlayer0Label.setAlignment(Align.center);
+        Label currentPlayer1Label = new Label("Spieler 2", skin);
+        currentPlayer1Label.setAlignment(Align.center);
+        currentRoundLabel = new Label("Runde: " + roundCounter, skin);
         currentRoundLabel.setAlignment(Align.center);
-        Label healthPlayer0Label = new Label("" + healthPlayer0, skin);
+        healthPlayer0Label = new Label("" + healthPlayer0, skin);
         healthPlayer0Label.setAlignment(Align.center);
-        Label healthPlayer1Label = new Label("" + healthPlayer1, skin);
+        healthPlayer1Label = new Label("" + healthPlayer1, skin);
         healthPlayer1Label.setAlignment(Align.center);
         Label invisibleLabel = new Label("", skin);
+        Label shopLabel1 = new Label("Shop zum Spawnen", skin);
+        shopLabel1.setAlignment(Align.center);
+        Label shopLabel2 = new Label("von Gegnern", skin);
+        shopLabel2.setAlignment(Align.center);
         nextRoundButton = new TextButton("Zug beenden", skin);
         backToMainMenuButton = new TextButton("Hauptmenü", skin);
         restartGameButton = new TextButton("Neustart", skin);
+        Label shopPlayer0Label = new Label("Spieler 1", skin);
+        shopPlayer0Label.setAlignment(Align.center);
+        Label shopPlayer1Label = new Label("Spieler 2", skin);
+        shopPlayer1Label.setAlignment(Align.center);
         nextRoundButton.addListener(new ChangeListener() {
             /**
              * Wird aufgerufen, wenn der Button geklickt wird
@@ -202,8 +235,7 @@ public class Hud implements Disposable {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 inputHandler.endTurn();
-                layoutTable.clear();
-                layoutHudElements();
+                updateUIElements();
             }
         });
         backToMainMenuButton.addListener(new ChangeListener() {
@@ -219,13 +251,13 @@ public class Hud implements Disposable {
             }
         });
 
-        layoutTable.add(currentPlayer0).expandX();
+        layoutTable.add(currentPlayer0Label).expandX();
         layoutTable.add(player0BalanceLabel).pad(padding).expandX();
         layoutTable.add(healthBarPlayer0).pad(padding).expandX();
         layoutTable.add(currentRoundLabel).align(Align.center).pad(padding).expandX();
         layoutTable.add(healthBarPlayer1).pad(padding).expandX();
         layoutTable.add(player1BalanceLabel).pad(padding).expandX();
-        layoutTable.add(currentPlayer1).pad(padding).expandX().row();
+        layoutTable.add(currentPlayer1Label).pad(padding).expandX().row();
         layoutTable.add(invisibleLabel).pad(padding).expandX();
         layoutTable.add(invisibleLabel).pad(padding).expandX();
         layoutTable.add(healthPlayer0Label).pad(padding).expandX();
@@ -238,14 +270,21 @@ public class Hud implements Disposable {
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
-        layoutTable.add(nextRoundButton).pad(padding).expandX().row();
+        layoutTable.add(nextRoundButton).pad(padding).expandX().width(buttonWidth).row();
         layoutTable.add(invisibleLabel).expandY().top().row();
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
-        layoutTable.add(backToMainMenuButton).expandX().row();
+        layoutTable.add(backToMainMenuButton).expandX().width(buttonWidth).row();
         layoutTable.add(invisibleLabel).row();
         layoutTable.add(invisibleLabel).row();
+    }
+
+    /**
+     * setzt und aktualisiert den Rundenzähler
+     */
+    public void setRoundCounter() {
+        currentRoundLabel.setText("Runde: " + roundCounter++);
     }
 
     /**
@@ -366,7 +405,7 @@ public class Hud implements Disposable {
      * @param seconds Die Dauer des Spielzug-Timers in Sekunden
      */
     public void startTurnTimer(int seconds) {
-        roundCounter++;
+        setRoundCounter();
         turnTimer.startTimer(seconds);
     }
 
@@ -461,13 +500,20 @@ public class Hud implements Disposable {
      * @param tileSize              Die Größe der Tiles
      * @param tileMap               Die TileMap des Spiels
      */
-    public void newGame(GameState gameState, Vector2[] arrayPositionTileMaps, int tileSize, TileMap tileMap) {
+    public void init(GameState gameState, Vector2[] arrayPositionTileMaps, int tileSize, TileMap tileMap) {
+
+        renderingSpeed = 1;
+        player0Balance = 100;
+        player1Balance = 100;
+        health = 300;
+        buttonWidth = 150;
+        roundCounter = 0;
 
         this.gameState = gameState;
         stage.addActor(hudGroup);
 
-        hudViewport.setWorldWidth((float) ((gameState.getBoardSizeX() * 2 + 10) * 200) /10);
-        hudViewport.setWorldHeight((float) ((gameState.getBoardSizeY() + 5) * 200) /10);
+        hudViewport.setWorldWidth((float) ((gameState.getBoardSizeX() * 2 + 10) * 200) / 10);
+        hudViewport.setWorldHeight((float) ((gameState.getBoardSizeY() + 5) * 200) / 10);
 
         int numberOfTeams = gameState.getPlayerCount();
         TextButton[] teamButtons;
@@ -601,7 +647,7 @@ public class Hud implements Disposable {
         Gdx.input.setInputProcessor(stage);
     }
 
-    private void closeSelectBox(){
+    private void closeSelectBox() {
         if (towerSelectBox != null) {
             towerSelectBox.remove();
         }
@@ -628,10 +674,7 @@ public class Hud implements Disposable {
         } else if (playerID == 1) {
             player1Balance = playerStates[1].getMoney();
         }
-
-        // Layout leeren und HUD-Elemente aktualisieren
-        layoutTable.clear();
-        layoutHudElements();
+        updateUIElements();
     }
 
 
@@ -648,12 +691,12 @@ public class Hud implements Disposable {
         } else if (playerID == 1) {
             player1Balance = balance;
         }
-        layoutTable.clear();
-        layoutHudElements();
+        updateUIElements();
     }
 
     /**
      * Initialisiert Leben des Spielers und aktualisiert die entsprechende Lebensleiste sowie visuelle Elemente
+     *
      * @param playerID Die ID des Spielers, dessen Leben initialisiert werden soll
      */
     public void initPlayerHealth(int playerID) {
@@ -669,14 +712,14 @@ public class Hud implements Disposable {
             healthBarPlayer1.updateVisualValue();
             healthPlayer1 = (int) playerHealths[1];
         }
-        layoutTable.clear();
-        layoutHudElements();
+        updateUIElements();
     }
 
     /**
      * Aktualisiert den Gesundheitswert eines Spielers.
+     *
      * @param playerID Die ID des Spielers.
-     * @param health Der neue Gesundheitswert.
+     * @param health   Der neue Gesundheitswert.
      */
     public void setPlayerHealth(int playerID, int health) {
         if (playerID == 0) {
@@ -688,7 +731,6 @@ public class Hud implements Disposable {
             healthBarPlayer1.updateVisualValue();
             healthPlayer1 = health;
         }
-        layoutTable.clear();
-        layoutHudElements();
+        updateUIElements();
     }
 }

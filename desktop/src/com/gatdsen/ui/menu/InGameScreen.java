@@ -100,7 +100,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         Vector2[] positionTileMaps = new Vector2[]{animator.playerMaps[0].getPos(), animator.playerMaps[1].getPos()};
 
         hud.setPlayerNames(playerNames);
-        hud.newGame(state, positionTileMaps, tileSize, animator.playerMaps[0]);
+        hud.init(state, positionTileMaps, tileSize, animator.playerMaps[0]);
     }
 
     /**
@@ -148,9 +148,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
      */
     @Override
     public void dispose() {
-        animator.dispose();
         manager.stop(run);
-        hud.dispose();
         gameManager.setScreen(GADS.ScreenState.MAINSCREEN, null);
     }
 
