@@ -89,7 +89,7 @@ public class RemotePlayerHandler extends PlayerHandler {
     }
 
     @Override
-    public void dispose(boolean test) {
+    public void dispose(boolean gameCompleted) {
         // TODO: release RMICommunicator back to the ResourcePool
     }
 }

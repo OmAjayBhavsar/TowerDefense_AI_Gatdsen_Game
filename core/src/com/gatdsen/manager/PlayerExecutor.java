@@ -15,7 +15,6 @@ import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.simulation.GameState;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -38,7 +37,7 @@ public final class PlayerExecutor {
     private final Player player;
     private final InputProcessor inputGenerator;
 
-    private boolean isDisqualified = false;
+    private boolean hasReusableExecutor = true;
 
     public PlayerExecutor(boolean isDebug, int playerIndex, Class<? extends Player> playerClass) {
         this(isDebug, playerIndex, playerClass, null);
@@ -136,7 +135,7 @@ public final class PlayerExecutor {
             return new MissTurnsPenalty(reason);
         } catch (TimeoutException e) {
             future.cancel(true);
-            isDisqualified = true;
+            hasReusableExecutor = false;
             String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for surpassing computation timeout by taking more than " + (2 * BOT_EXECUTE_INIT_TIMEOUT) + "ms!";
             System.err.println(reason);
             return new DisqualificationPenalty(reason);
@@ -212,7 +211,7 @@ public final class PlayerExecutor {
             Penalty penalty = null;
             if (endTime == -1) {
                 future.cancel(true);
-                isDisqualified = true;
+                hasReusableExecutor = false;
                 String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for surpassing computation timeout by taking more than " + (2 * BOT_EXECUTE_TURN_TIMEOUT) + "ms!";
                 System.err.println(reason);
                 penalty = new DisqualificationPenalty(reason);
@@ -300,7 +299,12 @@ public final class PlayerExecutor {
         return completionTime.get();
     }
 
+    /**
+     * Beendet diesen PlayerExecutor und wird genutzt, um die Ressourcen freizugeben, die zur Ausführung des Spielers
+     * genutzt wurden.
+     * @param reusable Gibt an, ob die Ressourcen wiederverwendet werden können
+     */
     public void dispose(boolean reusable) {
-        ResourcePool.getInstance().releaseThreadExecutor(executor, reusable);
+        ResourcePool.getInstance().releaseThreadExecutor(executor, reusable && hasReusableExecutor);
     }
 }

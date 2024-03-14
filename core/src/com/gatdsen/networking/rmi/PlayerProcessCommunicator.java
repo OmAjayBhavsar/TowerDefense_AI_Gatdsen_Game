@@ -45,7 +45,7 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
             case GameCreateRequest:
                 GameCreateRequest gameCreateRequest = (GameCreateRequest) message;
                 if (playerExecutor != null) {
-                    playerExecutor.dispose(false);
+                    playerExecutor.dispose(true);
                 }
                 playerExecutor = new PlayerExecutor(
                         gameCreateRequest.isDebug,
