@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
-import com.gatdsen.manager.run.config.RunConfiguration;
+import com.gatdsen.manager.run.RunConfiguration;
 import com.gatdsen.manager.map.MapRetriever;
 
 import java.util.Arrays;
@@ -24,8 +24,8 @@ public class MapAttribute extends Attribute {
     @Override
     public Actor getContent(Skin skin) {
         Table mapTable = new Table();
-        Label textLabelMap = new Label("Karte:", skin);
-        textLabelMap.setAlignment(Align.center);
+        Label textLabelMap = new Label("Karte: ", skin);
+        textLabelMap.setAlignment(Align.right);
         mapSelectBox = new SelectBox<>(skin);
         String[] sortedMapNames = MapRetriever.getInstance().getMapNames();
         Arrays.sort(sortedMapNames);

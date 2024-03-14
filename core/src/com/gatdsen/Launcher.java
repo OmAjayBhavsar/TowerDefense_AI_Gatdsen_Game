@@ -1,18 +1,20 @@
 package com.gatdsen;
 
-import com.gatdsen.manager.Manager;
-import com.gatdsen.manager.Run;
-import com.gatdsen.manager.player.Bot;
-import com.gatdsen.manager.player.Player;
-import com.gatdsen.manager.run.config.RunConfiguration;
-import com.gatdsen.networking.ProcessPlayerHandler;
+import com.gatdsen.manager.player.data.BotInformation;
+import com.gatdsen.manager.player.data.PlayerInformation;
+import com.gatdsen.manager.run.Run;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
+import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.player.handler.ProcessPlayerHandler;
+import com.gatdsen.manager.run.RunResults;
 import com.gatdsen.simulation.GameState.GameMode;
 import org.apache.commons.cli.*;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public abstract class Launcher {
 
@@ -76,7 +78,7 @@ public abstract class Launcher {
         runConfig.gui = !params.hasOption("n");
         runConfig.mapName = params.getOptionValue("m", null);
         if (params.hasOption("p")) {
-            runConfig.players = Manager.getPlayers(params.getOptionValue("p").trim().split("\\s+"), !runConfig.gui);
+            runConfig.playerFactories = new ArrayList<>(List.of(PlayerHandlerFactory.getPlayerFactories(params.getOptionValue("p").trim().split("\\s+"))));
         }
         if (params.hasOption("r")) {
             runConfig.replay = true;
@@ -107,67 +109,54 @@ public abstract class Launcher {
     }
 
     protected static void printResults(Run run, String key) {
+        RunResults results = run.getResults();
+        PlayerInformation[] playerInformation = results.getPlayerInformation();
+        float[] scores = results.getScores();
         StringBuilder builder = new StringBuilder();
         if (key != null && !key.isEmpty()) {
             builder.append("<").append(key).append(">");
         }
         switch (run.getGameMode()) {
-            case Normal:
-            case Tournament_Phase_1:
-                builder.append("\nScores:\n");
-                int i = 0;
-                for (Class<? extends Player> cur : run.getPlayers()) {
-                    String name = "";
-                    int matrikel = 0;
-                    if (Bot.class.isAssignableFrom(cur))
-                        try {
-                            Bot player = (Bot) cur.getDeclaredConstructors()[0].newInstance();
-                            name = player.getStudentName();
-                            matrikel = player.getMatrikel();
-                        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                            System.err.println("Unable to fetch Player instance");
-                        }
-                    builder.append(String.format("%-10s (%s, %d) :  %-6f%n", cur.getName(), name, matrikel, run.getScores()[i++]));
-                }
-                builder.append("\n");
-                break;
             case Campaign:
-                if (run.getScores()[0] > 0) builder.append("passed");
-                else builder.append("failed");
-                break;
-            case Exam_Admission:
-                StringBuilder scoreBuilder = new StringBuilder();
-                scoreBuilder.append("\nScores:\n");
-                int j = 0;
-                for (Class<? extends Player> cur : run.getPlayers()) {
-                    String name = "";
-                    int matrikel = 0;
-                    if (Bot.class.isAssignableFrom(cur))
-                        try {
-                            Bot player = (Bot) cur.getDeclaredConstructors()[0].newInstance();
-                            name = player.getStudentName();
-                            matrikel = player.getMatrikel();
-                        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                            System.err.println("Unable to fetch Player instance");
-                        }
-                    scoreBuilder.append(String.format("%-10s (%-10s, %-6d) :  %-6f%n", cur.getName(), name, matrikel, run.getScores()[j++]));
-                }
-                System.out.println(scoreBuilder);
-                if (run.getScores()[0] >= 420) {
+                if (scores[0] > 0) {
                     builder.append("passed");
                 } else {
                     builder.append("failed");
                 }
                 break;
+            case Exam_Admission:
+                StringBuilder scoreBuilder = new StringBuilder();
+                appendResults(scoreBuilder, playerInformation, scores);
+                System.out.println(scoreBuilder);
+                if (scores[0] >= 420) {
+                    builder.append("passed");
+                } else {
+                    builder.append("failed");
+                }
+                break;
+            case Normal:
+            case Tournament_Phase_1:
             default:
-                builder.append(Arrays.toString(run.getPlayers().toArray()));
+                appendResults(builder, playerInformation, scores);
                 builder.append("\n");
-                builder.append(Arrays.toString(run.getScores()));
                 break;
         }
         if (key != null && !key.isEmpty()) {
             builder.append("<").append(key).append(">");
         }
         System.out.println(builder);
+    }
+
+    private static void appendResults(StringBuilder builder, PlayerInformation[] playerInformation, float[] scores) {
+        builder.append("\nScores:\n");
+        for (int i = 0; i < playerInformation.length; i++) {
+            if (playerInformation[i] instanceof BotInformation) {
+                BotInformation botInformation = (BotInformation) playerInformation[i];
+                builder.append(String.format("%-10s (%s, %d)", botInformation.getName(), botInformation.getStudentName(), botInformation.getMatrikel()));
+            } else {
+                builder.append(String.format("%-10s", playerInformation[i].getName()));
+            }
+            builder.append(String.format(" :  %-6f%n", scores[i]));
+        }
     }
 }

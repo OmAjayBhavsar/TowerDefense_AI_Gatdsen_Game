@@ -16,7 +16,7 @@ public class ChristmasTaskScreen extends AttributeScreen {
     }
 
     @Override
-    Attribute[] getAttributes() {
+    protected Attribute[] getAttributes() {
         return new Attribute[]{new PlayerAttribute(0)};
     }
 

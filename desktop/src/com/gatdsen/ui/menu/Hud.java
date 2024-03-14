@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gatdsen.animation.entity.TileMap;
-import com.gatdsen.manager.run.config.RunConfiguration;
+import com.gatdsen.manager.run.RunConfiguration;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Tower;
@@ -52,6 +52,8 @@ public class Hud implements Disposable {
     private String[] names;
     private final ScoreView scoreView;
     private TextButton nextRoundButton;
+    private TextButton restartGameButton;
+    private TextButton backToMainMenuButton;
     private final Skin skin = AssetContainer.MainMenuAssets.skin;
     Viewport hudViewport;
     private int player0Balance = 100;
@@ -170,6 +172,8 @@ public class Hud implements Disposable {
     public void layoutHudElements() {
         float padding = 10;
 
+        // Erstellen der Elemente
+
         Label player0BalanceLabel = new Label("$" + player0Balance, skin);
         player0BalanceLabel.setAlignment(Align.center);
         Label player1BalanceLabel = new Label("$" + player1Balance, skin);
@@ -184,9 +188,10 @@ public class Hud implements Disposable {
         healthPlayer0Label.setAlignment(Align.center);
         Label healthPlayer1Label = new Label("" + healthPlayer1, skin);
         healthPlayer1Label.setAlignment(Align.center);
-
         Label invisibleLabel = new Label("", skin);
         nextRoundButton = new TextButton("Zug beenden", skin);
+        backToMainMenuButton = new TextButton("Hauptmenü", skin);
+        restartGameButton = new TextButton("Neustart", skin);
         nextRoundButton.addListener(new ChangeListener() {
             /**
              * Wird aufgerufen, wenn der Button geklickt wird
@@ -201,6 +206,19 @@ public class Hud implements Disposable {
                 layoutHudElements();
             }
         });
+        backToMainMenuButton.addListener(new ChangeListener() {
+            /**
+             * Wird aufgerufen, wenn der Button geklickt wird
+             *
+             * @param event Das ChangeEvent
+             * @param actor Das Actor-Objekt, das das Änderungsereignis ausgelöst hat
+             */
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                inGameScreen.dispose();
+            }
+        });
+
         layoutTable.add(currentPlayer0).expandX();
         layoutTable.add(player0BalanceLabel).pad(padding).expandX();
         layoutTable.add(healthBarPlayer0).pad(padding).expandX();
@@ -221,7 +239,13 @@ public class Hud implements Disposable {
         layoutTable.add(invisibleLabel);
         layoutTable.add(invisibleLabel);
         layoutTable.add(nextRoundButton).pad(padding).expandX().row();
+        layoutTable.add(invisibleLabel).expandY().top().row();
         layoutTable.add(invisibleLabel);
+        layoutTable.add(invisibleLabel);
+        layoutTable.add(invisibleLabel);
+        layoutTable.add(backToMainMenuButton).expandX().row();
+        layoutTable.add(invisibleLabel).row();
+        layoutTable.add(invisibleLabel).row();
     }
 
     /**
@@ -380,20 +404,6 @@ public class Hud implements Disposable {
     }
 
     /**
-     * Passt die Punktzahlen im HUD basierend auf dem gegebenen Array an
-     *
-     * @param scores Ein Array mit den neuen Punktzahlen
-
-    public void adjustScores(float[] scores) {
-    this.scores = scores;
-
-    if (scoreView != null) {
-    scoreView.adjustScores(scores);
-    }
-    }
-     */
-
-    /**
      * Passt die Punktzahl für das angegebene Team im HUD an
      *
      * @param team  Das Team, dessen Punktzahl angepasst wird
@@ -416,6 +426,7 @@ public class Hud implements Disposable {
      */
     public void gameEnded(boolean won, int team, boolean isDraw) {
 
+        //create a pixel with a set color that will be used as Background
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         //set the color to black
         pixmap.setColor(0, 0, 0, 0.5f);
@@ -423,8 +434,6 @@ public class Hud implements Disposable {
         layoutTable.clear();
         layoutTable.setBackground(new TextureRegionDrawable(new Texture(pixmap)));
         pixmap.dispose();
-
-        ImagePopup display;
 
         //determine sprite
         if (isDraw) {
@@ -665,9 +674,9 @@ public class Hud implements Disposable {
     }
 
     /**
-     * Setzt die Lebensanzeige des angegebenen Spielers und aktualisiert die entsprechende Lebensleiste sowie visuelle Elemente
-     * @param playerID Die ID des Spielers, dessen Leben gesetzt werden soll.
-     * @param health   Der neue Lebenswert für den Spieler.
+     * Aktualisiert den Gesundheitswert eines Spielers.
+     * @param playerID Die ID des Spielers.
+     * @param health Der neue Gesundheitswert.
      */
     public void setPlayerHealth(int playerID, int health) {
         if (playerID == 0) {

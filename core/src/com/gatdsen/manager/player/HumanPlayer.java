@@ -2,7 +2,7 @@ package com.gatdsen.manager.player;
 
 import com.badlogic.gdx.Input;
 import com.gatdsen.manager.Controller;
-import com.gatdsen.manager.PlayerThread;
+import com.gatdsen.manager.PlayerExecutor;
 import com.gatdsen.manager.StaticGameState;
 import com.gatdsen.simulation.IntVector2;
 import com.gatdsen.simulation.Tower;
@@ -75,7 +75,7 @@ public class HumanPlayer extends Player {
     /**
      * Die Dauer des Zuges, die der {@link HumanPlayer} hat, in Sekunden.
      */
-    private static final int turnDuration = PlayerThread.HUMAN_EXECUTE_TURN_TIMEOUT / 1000;
+    private static final int turnDuration = PlayerExecutor.HUMAN_EXECUTE_TURN_TIMEOUT / 1000;
 
     private final IntVector2 selectedTile = new IntVector2(0, 0);
 
@@ -231,11 +231,6 @@ public class HumanPlayer extends Player {
                 }
             }
         }
-    }
-
-    @Override
-    public PlayerType getType() {
-        return PlayerType.HUMAN;
     }
 
     public int getTurnDuration() {

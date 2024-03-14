@@ -4,7 +4,7 @@ package com.gatdsen.ui;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.gatdsen.manager.run.config.RunConfiguration;
+import com.gatdsen.manager.run.RunConfiguration;
 import com.gatdsen.ui.assets.GADSAssetManager;
 import com.gatdsen.ui.menu.*;
 
@@ -19,6 +19,7 @@ public class GADS extends Game {
     GADSAssetManager assetManager;
     private RunConfiguration runConfig;
     private ConfigScreen[] screens;
+    private ScreenStack screenStack;
     private Screen currentScreen;
 
     /**
@@ -26,12 +27,17 @@ public class GADS extends Game {
      */
     public enum ScreenState {
         MAINSCREEN,
+        MULTIPLAYERBASESCREEN,
+        MULTIPLAYERJOINSCREEN,
+        MULTIPLAYERHOSTSCREEN,
         NORMALMODESCREEN,
+        EXAMMENUSCREEN,
         CHRISTMASTASKSCREEN,
         INGAMESCREEN,
         LOADSCREEN,
         VICTORYSCREEN,
         LOSSSCREEN,
+        CAMPAIGNSCREEN,
         DRAWSCREEN
     }
 
@@ -43,6 +49,7 @@ public class GADS extends Game {
     public GADS(RunConfiguration runConfig) {
         this.runConfig = runConfig;
         screens = new ConfigScreen[ScreenState.values().length];
+        screenStack = new ScreenStack();
     }
 
     /**
@@ -78,6 +85,10 @@ public class GADS extends Game {
                 return new InGameScreen(this);
             case NORMALMODESCREEN:
                 return new GamemodeNormalScreen(this);
+            case EXAMMENUSCREEN:
+                return new ExamMenuScreen(this);
+            case CAMPAIGNSCREEN:
+                return new CampaignMenuScreen(this);
             case CHRISTMASTASKSCREEN:
                 return new ChristmasTaskScreen(this);
             case VICTORYSCREEN:
@@ -86,6 +97,12 @@ public class GADS extends Game {
                 return new DrawScreen(this);
             case LOSSSCREEN:
                 return new LossScreen(this);
+            case MULTIPLAYERBASESCREEN:
+                return new MultiplayerBaseMenuScreen(this);
+            case MULTIPLAYERJOINSCREEN:
+                return new MultiplayerJoinScreen(this);
+            case MULTIPLAYERHOSTSCREEN:
+                return new MultiplayerHostScreen(this);
             default:
                 return null;
         }
@@ -101,6 +118,7 @@ public class GADS extends Game {
             initScreens();
         }
         setScreen(screens[screenState.ordinal()], runConfiguration);
+        screenStack.pushScreen(screens[screenState.ordinal()]);
     }
 
     /**
@@ -109,7 +127,7 @@ public class GADS extends Game {
      * @param screen may be {@code null}
      */
     public void setScreen(ConfigScreen screen, RunConfiguration runConfiguration) {
-        if (runConfiguration != null){
+        if (runConfiguration != null) {
             screen.setRunConfiguration(runConfiguration);
         }
         currentScreen = screen;
@@ -131,7 +149,9 @@ public class GADS extends Game {
      */
     @Override
     public void dispose() {
-        if (screen != null) this.screen.dispose();
+        if (screen != null) {
+            screenStack.popScreen();
+        }
         assetManager.unloadAtlas();
         System.exit(0);
     }
