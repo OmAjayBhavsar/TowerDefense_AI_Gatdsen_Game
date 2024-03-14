@@ -228,7 +228,7 @@ public class PlayerState implements Serializable {
     }
 
     /**
-     * Gibt die aktuelle SpawnCoins des Spielers zurück
+     * Gibt die aktuellen SpawnCoins des Spielers zurück
      * @return SpawnCoins
      */
     public int getSpawnCoins() {
