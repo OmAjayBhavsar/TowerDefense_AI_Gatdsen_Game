@@ -77,7 +77,9 @@ public class Game extends Executable {
         for (Future<Long> future : longFutures) {
             try {
                 seed += future.get();
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException e) {
+                return;
+            } catch (ExecutionException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -91,7 +93,10 @@ public class Game extends Executable {
             }
             futures[playerIndex] = playerHandlers[playerIndex].init(state, seed);
         }
-        awaitFutures(futures);
+        try {
+            awaitFutures(futures);
+        } catch (InterruptedException ignored) {
+        }
         gameResults.setPlayerInformation(
                 Arrays.stream(playerHandlers).map(PlayerHandler::getPlayerInformation).toArray(PlayerInformation[]::new)
         );
@@ -187,7 +192,11 @@ public class Game extends Executable {
                     animationLogProcessor.animate(log);
                 }
             }
-            awaitFutures(futures);
+            try {
+                awaitFutures(futures);
+            } catch (InterruptedException e) {
+                return;
+            }
             if (inputGenerator != null) {
                 inputGenerator.endTurn();
             }
@@ -229,14 +238,14 @@ public class Game extends Executable {
         }
     }
 
-    private void awaitFutures(Future<?>[] futures) {
+    private void awaitFutures(Future<?>[] futures) throws InterruptedException {
         for (Future<?> future : futures) {
             if (future == null) {
                 continue;
             }
             try {
                 future.get();
-            } catch (InterruptedException|ExecutionException e) {
+            } catch (ExecutionException e) {
                 throw new RuntimeException(e);
             }
         }

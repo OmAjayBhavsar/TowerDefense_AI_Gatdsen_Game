@@ -19,6 +19,7 @@ public class GADS extends Game {
     GADSAssetManager assetManager;
     private RunConfiguration runConfig;
     private ConfigScreen[] screens;
+    private ScreenStack screenStack;
     private Screen currentScreen;
 
     /**
@@ -48,6 +49,7 @@ public class GADS extends Game {
     public GADS(RunConfiguration runConfig) {
         this.runConfig = runConfig;
         screens = new ConfigScreen[ScreenState.values().length];
+        screenStack = new ScreenStack();
     }
 
     /**
@@ -116,6 +118,7 @@ public class GADS extends Game {
             initScreens();
         }
         setScreen(screens[screenState.ordinal()], runConfiguration);
+        screenStack.pushScreen(screens[screenState.ordinal()]);
     }
 
     /**
@@ -124,7 +127,7 @@ public class GADS extends Game {
      * @param screen may be {@code null}
      */
     public void setScreen(ConfigScreen screen, RunConfiguration runConfiguration) {
-        if (runConfiguration != null){
+        if (runConfiguration != null) {
             screen.setRunConfiguration(runConfiguration);
         }
         currentScreen = screen;
@@ -146,7 +149,9 @@ public class GADS extends Game {
      */
     @Override
     public void dispose() {
-        if (screen != null) this.screen.dispose();
+        if (screen != null) {
+            screenStack.popScreen();
+        }
         assetManager.unloadAtlas();
         System.exit(0);
     }
