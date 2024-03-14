@@ -267,14 +267,19 @@ public final class PlayerExecutor {
      */
     private long waitForFutureWhileHandlingCommands(long untilTime, CompletableFuture<?> future, BlockingQueue<Command> commands, Command.CommandHandler commandHandler) {
         AtomicLong completionTime = new AtomicLong(-1);
-        future.thenRun(() -> completionTime.set(System.currentTimeMillis()));
+        future.thenRun(() -> {
+            completionTime.set(System.currentTimeMillis());
+        });
+        // TODO: Callback bei Beendigung des Future, könnte controller.endTurn() aufrufen, sodass die static time nicht
+        //       überprüft werden müsste
+        boolean useStaticTime = isDebug || PlayerType.fromPlayer(player) == PlayerType.HUMAN;
         long currentTime = System.currentTimeMillis();
         // Ausführen der Schleife, solange der Future noch nicht fertig ist und entweder Debug-Modus aktiv ist oder die
         // aktuelle Zeit kleiner oder gleich der maximalen Zeit ist.
         while (completionTime.get() == -1 && (isDebug || (currentTime = System.currentTimeMillis()) <= untilTime)) {
             Command command = null;
             try {
-                if (isDebug) {
+                if (useStaticTime) {
                     // Im Debug-Modus führen wir solange Befehle aus, bis der Future fertig ist, weshalb wir hier
                     // immer nur 100ms warten, um periodisch durch den Schleifenkopf unseren Future zu prüfen.
                     command = commands.poll(100, TimeUnit.MILLISECONDS);
