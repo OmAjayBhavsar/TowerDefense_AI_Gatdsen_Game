@@ -41,11 +41,13 @@ public final class LocalPlayerHandler extends PlayerHandler {
 
     @Override
     protected Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler) {
-        return playerExecutor.executeTurn(gameState, commandHandler);
+        return playerExecutor.executeTurn(gameState, commandHandler).thenAccept(this::penalize);
     }
 
     @Override
-    public void dispose() {
-        playerExecutor.dispose();
+    public void dispose(boolean gameCompleted) {
+        // Die Threads vom PlayerExecutor können nur wiederverwendet werden, wenn der Spieler nicht disqualifiziert
+        // wurde und das Spiel nicht abgebrochen wurde.
+        playerExecutor.dispose(gameCompleted && !isDisqualified());
     }
 }

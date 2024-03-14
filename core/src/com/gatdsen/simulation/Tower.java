@@ -5,6 +5,7 @@ import com.gatdsen.simulation.action.ProjectileAction;
 import com.gatdsen.simulation.action.TowerAttackAction;
 import com.gatdsen.simulation.tower.BasicTower;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 /**
  * Speichert einen Tower. Beinhalet Methoden zum ausführen von Tower-Aktionen.
  */
-public abstract class Tower {
+public abstract class Tower implements Serializable {
 
     // ToDo: lookup table for upgraded values
 
@@ -159,14 +160,7 @@ public abstract class Tower {
         return id;
     }
 
-    /**
-     * Gibt den Preis für ein Upgrade des Towers zurück
-     *
-     * @return Preis für ein Upgrade des Towers
-     */
-    public int getUpgradePrice() {
-        return getPrice();
-    }
+
 
     /**
      * Gibt den Level des Towers zurück
@@ -200,12 +194,25 @@ public abstract class Tower {
 
     public abstract void incrementRechargeTime();
 
+
+    public static int getTowerPrice(TowerType type) {
+        switch (type) {
+            case BASIC_TOWER:
+                return 80;
+            case AOE_TOWER:
+                return 100;
+            case SNIPER_TOWER:
+               return 100;
+            default:
+                return 0;
+        }
+    }
+
     /**
      * Gibt den Preis des Towers zurück
-     *
      * @return Preis des Towers
      */
-    public abstract int getPrice();
+    public abstract int getUpgradePrice();
 
     /**
      * Upgraded den Tower

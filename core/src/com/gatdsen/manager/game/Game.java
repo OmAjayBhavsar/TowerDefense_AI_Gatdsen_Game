@@ -77,12 +77,13 @@ public class Game extends Executable {
         for (Future<Long> future : longFutures) {
             try {
                 seed += future.get();
-            } catch (InterruptedException e) {
-                return;
             } catch (ExecutionException e) {
                 throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                return;
             }
         }
+
         Future<?>[] futures = new Future[config.playerCount];
         PlayerState[] playerStates = state.getPlayerStates();
         for (int playerIndex = 0; playerIndex < config.playerCount; playerIndex++) {
@@ -95,7 +96,11 @@ public class Game extends Executable {
         }
         try {
             awaitFutures(futures);
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
+            if (pendingShutdown) {
+                return;
+            }
+            throw new RuntimeException(e);
         }
         gameResults.setPlayerInformation(
                 Arrays.stream(playerHandlers).map(PlayerHandler::getPlayerInformation).toArray(PlayerInformation[]::new)
@@ -195,7 +200,10 @@ public class Game extends Executable {
             try {
                 awaitFutures(futures);
             } catch (InterruptedException e) {
-                return;
+                if (pendingShutdown) {
+                    break;
+                }
+                throw new RuntimeException(e);
             }
             if (inputGenerator != null) {
                 inputGenerator.endTurn();
@@ -210,10 +218,15 @@ public class Game extends Executable {
                 animationLogProcessor.awaitNotification();
             }
         }
-        gameResults.setScores(state.getHealth());
-        setStatus(Status.COMPLETED);
-        for (CompletionHandler<Executable> completionListener : completionListeners) {
-            completionListener.onComplete(this);
+        if (inputGenerator != null) {
+            inputGenerator.endTurn();
+        }
+        if (!pendingShutdown) {
+            gameResults.setScores(state.getHealth());
+            setStatus(Status.COMPLETED);
+            for (CompletionHandler<Executable> completionListener : completionListeners) {
+                completionListener.onComplete(this);
+            }
         }
     }
 
@@ -224,30 +237,48 @@ public class Game extends Executable {
         if (simulationThread != null) {
             simulationThread.interrupt();
         }
+        if (state != null) {
+            gameResults.setScores(state.getHealth());
+            state = null;
+        }
         simulation = null;
-        state = null;
         simulationThread = null;
-        gameResults = null;
         synchronized (schedulingLock) {
             if (playerHandlers != null) {
+                boolean gameCompleted = getStatus() == Status.COMPLETED;
                 for (PlayerHandler playerHandler : playerHandlers) {
-                    playerHandler.dispose();
+                    playerHandler.dispose(gameCompleted);
                 }
                 playerHandlers = null;
             }
         }
     }
 
-    private void awaitFutures(Future<?>[] futures) throws InterruptedException {
-        for (Future<?> future : futures) {
-            if (future == null) {
-                continue;
+    /**
+     * Hilfsmethode, die auf das Beenden aller übergebenen {@link Future} Objekte wartet.
+     * @param futures Die {@link Future} Objekte, auf die gewartet werden soll
+     * @throws InterruptedException Wenn das Warten auf das Beenden der {@link Future} Objekte unterbrochen wird. 
+     *                              In diesem Fall werden alle Objekte mit {@link Future#cancel(boolean)} abgebrochen.
+     */
+    private static void awaitFutures(Future<?>[] futures) throws InterruptedException {
+        try {
+            for (Future<?> future : futures) {
+                if (future == null) {
+                    continue;
+                }
+                try {
+                    future.get();
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            try {
-                future.get();
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            for (Future<?> future : futures) {
+                if (future != null) {
+                    future.cancel(true);
+                }
             }
+            throw e;
         }
     }
 

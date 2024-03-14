@@ -22,7 +22,8 @@ public interface Message extends Serializable {
         PlayerInitResponse,
 
         PlayerExecuteTurnRequest,
-        PlayerCommandResponse
+        PlayerCommandResponse,
+        PlayerExecuteTurnResponse
     }
 
     /**

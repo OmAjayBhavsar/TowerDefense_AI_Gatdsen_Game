@@ -93,19 +93,6 @@ public final class Controller {
     }
 
     /**
-     * Markiert das Ende des aktuellen Zuges für diesen Controller und deaktiviert diesen, sodass keine weiteren
-     * {@link Command}s mehr ausgeführt werden können, ähnlich wie {@link Controller#endTurn()}.
-     * Zusätzlich wird der Spieler aber mit der übergebenen {@link Penalty} bestraft.
-     * @param penalty Die Strafe, die der Spieler erhält
-     */
-    void endTurn(Penalty penalty) {
-        if (isActive()) {
-            commands.add(new EndTurnCommand(penalty));
-            deactivate();
-        }
-    }
-
-    /**
      * Gibt an, ob dieser Controller noch aktiv ist.
      * @return true, wenn dieser Controller aktiv ist, sonst false
      */
