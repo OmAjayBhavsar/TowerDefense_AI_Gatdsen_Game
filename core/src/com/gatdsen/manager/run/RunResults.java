@@ -4,8 +4,19 @@ import com.gatdsen.manager.player.data.PlayerInformation;
 
 public final class RunResults {
 
+    private final transient RunConfiguration config;
     private PlayerInformation[] playerInformation;
     private float[] scores;
+
+    public RunResults(RunConfiguration config) {
+        this.config = config;
+        this.playerInformation = new PlayerInformation[config.playerFactories.size()];
+        this.scores = new float[config.playerFactories.size()];
+    }
+
+    public RunConfiguration getConfig() {
+        return config;
+    }
 
     public PlayerInformation[] getPlayerInformation() {
         return playerInformation;

@@ -60,6 +60,20 @@ public final class RunConfiguration {
                     isValid = false;
                 }
                 break;
+            case Replay:
+                if (mapName == null) {
+                    System.err.println("RunConfiguration: A replay file name has to be provided for the replay mode.");
+                    isValid = false;
+                }
+                if (replay) {
+                    System.err.println("RunConfiguration: A replay of the replay mode can't be created. Why would you do that anyway??");
+                    isValid = false;
+                }
+                if (!playerFactories.isEmpty()) {
+                    System.err.println("RunConfiguration: Players can't be provided for the replay mode.");
+                    isValid = false;
+                }
+                break;
             default:
                 throw new RuntimeException("RunConfiguration: Gamemode " + gameMode + " is not unlocked yet.");
         }
@@ -75,6 +89,8 @@ public final class RunConfiguration {
             case Christmas_Task:
                 config.mapName = "map2";
                 config.playerFactories.add(LocalPlayerHandlerFactory.IDLE_BOT);
+                break;
+            case Replay:
                 break;
             default:
                 throw new RuntimeException("RunConfiguration: Gamemode " + gameMode + " is not unlocked yet.");
