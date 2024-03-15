@@ -3,7 +3,7 @@ package com.gatdsen.ui.menu.attributes;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 
 public class IpAdressWriteAttribute extends Attribute{
     @Override
@@ -21,12 +21,12 @@ public class IpAdressWriteAttribute extends Attribute{
     }
 
     @Override
-    public RunConfiguration getConfig(RunConfiguration runConfiguration) {
+    public RunConfig getConfig(RunConfig runConfig) {
         return null;
     }
 
     @Override
-    public void setConfig(RunConfiguration runConfiguration) {
+    public void setConfig(RunConfig runConfig) {
 
     }
 }

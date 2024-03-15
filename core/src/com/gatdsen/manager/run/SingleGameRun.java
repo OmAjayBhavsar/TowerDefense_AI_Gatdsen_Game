@@ -6,7 +6,7 @@ import com.gatdsen.simulation.GameState;
 
 public class SingleGameRun extends Run {
 
-    public SingleGameRun(Manager manager, RunConfiguration runConfig) {
+    public SingleGameRun(Manager manager, RunConfig runConfig) {
         super(manager, runConfig);
         GameConfig gameConfig = runConfig.asGameConfig();
         Executable game = runConfig.gameMode == GameState.GameMode.Replay ? new ReplayGame(gameConfig) : new Game(gameConfig);

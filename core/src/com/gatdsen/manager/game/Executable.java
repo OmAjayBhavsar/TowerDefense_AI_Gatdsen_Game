@@ -46,7 +46,7 @@ public abstract class Executable {
     }
 
 
-    public abstract void start();
+    public abstract void start() throws Exception;
 
     protected void setStatus(Status newStatus) {
         status = newStatus;

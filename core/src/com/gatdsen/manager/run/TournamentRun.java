@@ -30,11 +30,11 @@ public class TournamentRun extends Run {
         protected int p2 = -1;
 
         int winner = 0;
-        private final RunConfiguration config;
+        private final RunConfig config;
 
         private int completed = 0;
 
-        private BracketNode(RunConfiguration config) {
+        private BracketNode(RunConfig config) {
             this.config = config;
         }
 
@@ -131,7 +131,7 @@ public class TournamentRun extends Run {
     }
 
     private class LooserBracket extends BracketNode{
-        private LooserBracket(RunConfiguration config) {
+        private LooserBracket(RunConfig config) {
             super(config);
         }
 
@@ -158,7 +158,7 @@ public class TournamentRun extends Run {
     private BracketNode winnerFinal;
     private BracketNode looserFinal;
 
-    protected TournamentRun(Manager manager, RunConfiguration runConfig) {
+    protected TournamentRun(Manager manager, RunConfig runConfig) {
         super(manager, runConfig);
         playerFactories = runConfig.playerFactories;
 
@@ -254,7 +254,7 @@ public class TournamentRun extends Run {
 
     }
 
-    private BracketNode makeTournament(List<BracketNode> leafs, RunConfiguration runConfig){
+    private BracketNode makeTournament(List<BracketNode> leafs, RunConfig runConfig){
         assert  ((leafs.size() & leafs.size() - 1) == 0);
         List<BracketNode> newNodes;
         while (leafs.size() > 1){

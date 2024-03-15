@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.manager.map.MapRetriever;
 
 import java.util.Arrays;
@@ -38,24 +38,24 @@ public class MapAttribute extends Attribute {
     }
 
     /**
-     * Konfiguriert die RunConfiguration unter Berücksichtigung dieses Attributs und gibt die aktualisierte Konfiguration zurück.
+     * Konfiguriert die RunConfig unter Berücksichtigung dieses Attributs und gibt die aktualisierte Konfiguration zurück.
      *
-     * @param runConfiguration Die aktuelle RunConfiguration.
-     * @return Die aktualisierte RunConfiguration nach der Konfiguration des Attributs.
+     * @param runConfig Die aktuelle RunConfig.
+     * @return Die aktualisierte RunConfig nach der Konfiguration des Attributs.
      */
     @Override
-    public RunConfiguration getConfig(RunConfiguration runConfiguration) {
-        runConfiguration.mapName = mapSelectBox.getSelected();
-        return runConfiguration;
+    public RunConfig getConfig(RunConfig runConfig) {
+        runConfig.mapName = mapSelectBox.getSelected();
+        return runConfig;
     }
 
     /**
-     * Setzt die RunConfiguration basierend auf den Attributinformationen.
+     * Setzt die RunConfig basierend auf den Attributinformationen.
      *
-     * @param runConfiguration Die RunConfiguration, die konfiguriert wird.
+     * @param runConfig Die RunConfig, die konfiguriert wird.
      */
     @Override
-    public void setConfig(RunConfiguration runConfiguration) {
-        mapSelectBox.setSelected(runConfiguration.mapName);
+    public void setConfig(RunConfig runConfig) {
+        mapSelectBox.setSelected(runConfig.mapName);
     }
 }
