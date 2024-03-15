@@ -59,7 +59,11 @@ public class GADS extends Game {
     public void create() {
         assetManager = new GADSAssetManager();
         initScreens();
-        setScreen(ScreenState.MAINSCREEN, runConfig);
+        if (runConfig.validate()) {
+            setScreen(ScreenState.INGAMESCREEN, runConfig);
+        } else {
+            setScreen(ScreenState.MAINSCREEN, runConfig);
+        }
     }
 
     /**
