@@ -19,13 +19,6 @@ public class ReplayGame extends Executable {
 
     public ReplayGame(GameConfig config) {
         super(config);
-        if (!config.gui) {
-            System.err.println("Replays require a gui");
-            abort();
-        }
-        if (config.gameMode != GameState.GameMode.Replay) {
-            throw new RuntimeException("Invalid state detected");
-        }
         loadGameResults(config.mapName);
     }
 
@@ -46,11 +39,13 @@ public class ReplayGame extends Executable {
             if (getStatus() == Status.ABORTED) return;
             setStatus(Status.ACTIVE);
             //Init the Log Processor
-            animationLogProcessor.init(
-                    replay.getInitialState().copy(),
-                    Arrays.stream(replay.getPlayerInformation()).map(PlayerInformation::getName).toArray(String[]::new),
-                    getSkins()
-            );
+            if (config.gui) {
+                animationLogProcessor.init(
+                        replay.getInitialState().copy(),
+                        Arrays.stream(replay.getPlayerInformation()).map(PlayerInformation::getName).toArray(String[]::new),
+                        getSkins()
+                );
+            }
             //Run the Game
             executionThread = new Thread(this::run);
             executionThread.setName("Replay_Execution_Thread");
@@ -60,20 +55,21 @@ public class ReplayGame extends Executable {
     }
 
     private void run() {
-        Iterator<ActionLog> actionLogs = replay.getActionLogs().iterator();
-        while (!pendingShutdown && actionLogs.hasNext()) {
-            synchronized (schedulingLock) {
-                if (getStatus() == Status.PAUSED)
-                    try {
-                        schedulingLock.wait();
-
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+        if (config.gui) {
+            Iterator<ActionLog> actionLogs = replay.getActionLogs().iterator();
+            while (!pendingShutdown && actionLogs.hasNext()) {
+                synchronized (schedulingLock) {
+                    if (getStatus() == Status.PAUSED) {
+                        try {
+                            schedulingLock.wait();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
+                }
+                animationLogProcessor.animate(actionLogs.next());
+                animationLogProcessor.awaitNotification();
             }
-            animationLogProcessor.animate(actionLogs.next());
-            animationLogProcessor.awaitNotification();
-
         }
         setStatus(Status.COMPLETED);
         for (CompletionHandler<Executable> completionListener : completionListeners) {
@@ -91,7 +87,6 @@ public class ReplayGame extends Executable {
         if (executionThread != null) {
             executionThread.interrupt();
         }
-        replay = null;
         executionThread = null;
     }
 
@@ -101,6 +96,6 @@ public class ReplayGame extends Executable {
 
     @Override
     public GameResults getGameResults() {
-        throw new RuntimeException("Replays dont produce GameResults!");
+        return replay;
     }
 }
