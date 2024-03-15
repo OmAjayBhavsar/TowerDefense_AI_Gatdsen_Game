@@ -4,7 +4,7 @@ import com.gatdsen.manager.concurrent.ResourcePool;
 import com.gatdsen.manager.game.Executable;
 import com.gatdsen.manager.game.GameResults;
 import com.gatdsen.manager.run.Run;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -41,9 +41,9 @@ public class Manager {
         return singleton;
     }
 
-    public Run startRun(RunConfiguration runConfiguration) {
-        if (runConfiguration.validate()) {
-            return Run.getRun(this, runConfiguration);
+    public Run startRun(RunConfig runConfig) {
+        if (runConfig.validate()) {
+            return Run.getRun(this, runConfig);
         }
         return null;
     }

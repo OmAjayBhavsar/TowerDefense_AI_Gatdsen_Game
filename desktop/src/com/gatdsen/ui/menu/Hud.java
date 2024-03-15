@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gatdsen.animation.entity.TileMap;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Tower;
@@ -437,11 +437,11 @@ public class Hud implements Disposable {
 
         //determine sprite
         if (isDraw) {
-            gameInstance.setScreen(GADS.ScreenState.DRAWSCREEN, new RunConfiguration());
+            gameInstance.setScreen(GADS.ScreenState.DRAWSCREEN, new RunConfig());
         } else if (won && team == 0) {
-            gameInstance.setScreen(GADS.ScreenState.VICTORYSCREEN, new RunConfiguration());
+            gameInstance.setScreen(GADS.ScreenState.VICTORYSCREEN, new RunConfig());
         } else {
-            gameInstance.setScreen(GADS.ScreenState.LOSSSCREEN, new RunConfiguration());
+            gameInstance.setScreen(GADS.ScreenState.LOSSSCREEN, new RunConfig());
         }
     }
 

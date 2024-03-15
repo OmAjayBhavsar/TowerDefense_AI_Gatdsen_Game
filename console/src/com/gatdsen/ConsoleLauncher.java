@@ -2,7 +2,7 @@ package com.gatdsen;
 
 import com.gatdsen.manager.Manager;
 import com.gatdsen.manager.run.Run;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 import org.apache.commons.cli.CommandLine;
 
 public final class ConsoleLauncher extends Launcher {
@@ -13,7 +13,7 @@ public final class ConsoleLauncher extends Launcher {
         if (params == null) {
             return;
         }
-        RunConfiguration runConfig = parseRunConfiguration(params);
+        RunConfig runConfig = parseRunConfig(params);
         if (runConfig == null) {
             return;
         }

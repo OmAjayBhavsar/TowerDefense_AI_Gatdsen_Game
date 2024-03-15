@@ -4,7 +4,7 @@ package com.gatdsen.ui;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.ui.assets.GADSAssetManager;
 import com.gatdsen.ui.menu.*;
 
@@ -17,7 +17,7 @@ import com.gatdsen.ui.menu.*;
  */
 public class GADS extends Game {
     GADSAssetManager assetManager;
-    private RunConfiguration runConfig;
+    private RunConfig runConfig;
     private ConfigScreen[] screens;
     private ScreenStack screenStack;
     private Screen currentScreen;
@@ -46,7 +46,7 @@ public class GADS extends Game {
      *
      * @param runConfig kommt von DesktopLauncher.java
      */
-    public GADS(RunConfiguration runConfig) {
+    public GADS(RunConfig runConfig) {
         this.runConfig = runConfig;
         screens = new ConfigScreen[ScreenState.values().length];
         screenStack = new ScreenStack();
@@ -117,11 +117,11 @@ public class GADS extends Game {
      *
      * @param screenState Zustand des Bildschirms
      */
-    public void setScreen(ScreenState screenState, RunConfiguration runConfiguration) {
+    public void setScreen(ScreenState screenState, RunConfig runConfig) {
         if (screens[screenState.ordinal()] == null) {
             initScreens();
         }
-        setScreen(screens[screenState.ordinal()], runConfiguration);
+        setScreen(screens[screenState.ordinal()], runConfig);
         screenStack.pushScreen(screens[screenState.ordinal()]);
     }
 
@@ -130,9 +130,9 @@ public class GADS extends Game {
      *
      * @param screen may be {@code null}
      */
-    public void setScreen(ConfigScreen screen, RunConfiguration runConfiguration) {
-        if (runConfiguration != null) {
-            screen.setRunConfiguration(runConfiguration);
+    public void setScreen(ConfigScreen screen, RunConfig runConfig) {
+        if (runConfig != null) {
+            screen.setRunConfig(runConfig);
         }
         currentScreen = screen;
         super.setScreen(screen);

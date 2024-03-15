@@ -10,16 +10,16 @@ import com.gatdsen.simulation.GameState.GameMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class RunConfiguration {
+public final class RunConfig {
 
-    public RunConfiguration() {
+    public RunConfig() {
     }
 
     /**
-     * Privater Konstruktor, der eine tiefe Kopie einer vorhandenen RunConfiguration erstellt.
-     * @param original Die ursprüngliche RunConfiguration, von der eine Kopie erstellt wird.
+     * Privater Konstruktor, der eine tiefe Kopie einer vorhandenen RunConfig erstellt.
+     * @param original Die ursprüngliche RunConfig, von der eine Kopie erstellt wird.
      */
-    private RunConfiguration(RunConfiguration original) {
+    private RunConfig(RunConfig original) {
         gameMode = original.gameMode;
         gui = original.gui;
         animationLogProcessor = original.animationLogProcessor;
@@ -42,46 +42,46 @@ public final class RunConfiguration {
         switch (gameMode) {
             case Normal:
                 if (mapName == null) {
-                    System.err.println("RunConfiguration: No map name was provided.");
+                    System.err.println("RunConfig: No map name was provided.");
                     isValid = false;
                 }
                 if (playerFactories.size() != 2) {
-                    System.err.println("RunConfiguration: Only two players are allowed in normal game mode.");
+                    System.err.println("RunConfig: Only two players are allowed in normal game mode.");
                     isValid = false;
                 }
                 break;
             case Christmas_Task:
                 if (mapName != null) {
-                    System.err.println("RunConfiguration: A map can't be provided for the christmas task.");
+                    System.err.println("RunConfig: A map can't be provided for the christmas task.");
                     isValid = false;
                 }
                 if (playerFactories.size() != 1) {
-                    System.err.println("RunConfiguration: Only one player is allowed for the christmas task.");
+                    System.err.println("RunConfig: Only one player is allowed for the christmas task.");
                     isValid = false;
                 }
                 break;
             case Replay:
                 if (mapName == null) {
-                    System.err.println("RunConfiguration: A replay file name has to be provided for the replay mode.");
+                    System.err.println("RunConfig: A replay file name has to be provided for the replay mode.");
                     isValid = false;
                 }
                 if (replay) {
-                    System.err.println("RunConfiguration: A replay of the replay mode can't be created. Why would you do that anyway??");
+                    System.err.println("RunConfig: A replay of the replay mode can't be created. Why would you do that anyway??");
                     isValid = false;
                 }
                 if (!playerFactories.isEmpty()) {
-                    System.err.println("RunConfiguration: Players can't be provided for the replay mode.");
+                    System.err.println("RunConfig: Players can't be provided for the replay mode.");
                     isValid = false;
                 }
                 break;
             default:
-                throw new RuntimeException("RunConfiguration: Gamemode " + gameMode + " is not unlocked yet.");
+                throw new RuntimeException("RunConfig: Gamemode " + gameMode + " is not unlocked yet.");
         }
         return isValid;
     }
 
     public GameConfig asGameConfig() {
-        RunConfiguration config = copy();
+        RunConfig config = copy();
         switch (gameMode) {
             case Normal:
                 config.playerFactories = playerFactories;
@@ -93,21 +93,21 @@ public final class RunConfiguration {
             case Replay:
                 break;
             default:
-                throw new RuntimeException("RunConfiguration: Gamemode " + gameMode + " is not unlocked yet.");
+                throw new RuntimeException("RunConfig: Gamemode " + gameMode + " is not unlocked yet.");
         }
         return new GameConfig(config);
     }
 
     /**
-     * Erstellt und gibt eine Kopie des aktuellen RunConfiguration-Objekts zurück.
-     * @return Eine Kopie des aktuellen RunConfiguration-Objekts.
+     * Erstellt und gibt eine Kopie des aktuellen RunConfig-Objekts zurück.
+     * @return Eine Kopie des aktuellen RunConfig-Objekts.
      */
-    public RunConfiguration copy(){
-        return new RunConfiguration(this);
+    public RunConfig copy(){
+        return new RunConfig(this);
     }
 
     public String toString() {
-        return "RunConfiguration{" +
+        return "RunConfig{" +
                 "gameMode=" + gameMode +
                 ", gui=" + gui +
                 ", animationLogProcessor=" + animationLogProcessor +

@@ -32,8 +32,8 @@ public class MainScreen extends BaseMenuScreen {
         normalGameModeButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                runConfiguration.gameMode = GameState.GameMode.Normal;
-                gameInstance.setScreen(GADS.ScreenState.NORMALMODESCREEN,runConfiguration);
+                runConfig.gameMode = GameState.GameMode.Normal;
+                gameInstance.setScreen(GADS.ScreenState.NORMALMODESCREEN, runConfig);
             }
         });
         mainMenuTable.add(normalGameModeButton).colspan(4).pad(10).width(200).row();
@@ -41,9 +41,9 @@ public class MainScreen extends BaseMenuScreen {
         christmasTaskButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                //setRunConfiguration(RunConfiguration.fromGameMode(GameState.GameMode.Christmas_Task), runConfiguration));
-                runConfiguration.gameMode = GameState.GameMode.Christmas_Task;
-                gameInstance.setScreen(GADS.ScreenState.CHRISTMASTASKSCREEN, runConfiguration);
+                //setRunConfig(RunConfig.fromGameMode(GameState.GameMode.Christmas_Task), runConfig));
+                runConfig.gameMode = GameState.GameMode.Christmas_Task;
+                gameInstance.setScreen(GADS.ScreenState.CHRISTMASTASKSCREEN, runConfig);
             }
         });
         mainMenuTable.add(christmasTaskButton).colspan(4).pad(10).width(200).row();
@@ -51,8 +51,8 @@ public class MainScreen extends BaseMenuScreen {
         examButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                runConfiguration.gameMode = GameState.GameMode.Exam_Admission;
-                gameInstance.setScreen(GADS.ScreenState.EXAMMENUSCREEN,runConfiguration);
+                runConfig.gameMode = GameState.GameMode.Exam_Admission;
+                gameInstance.setScreen(GADS.ScreenState.EXAMMENUSCREEN, runConfig);
             }
         });
         mainMenuTable.add(examButton).colspan(4).pad(10).width(200).row();
@@ -60,8 +60,8 @@ public class MainScreen extends BaseMenuScreen {
         campaignButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                runConfiguration.gameMode = GameState.GameMode.Campaign;
-                gameInstance.setScreen(GADS.ScreenState.CAMPAIGNSCREEN,runConfiguration);
+                runConfig.gameMode = GameState.GameMode.Campaign;
+                gameInstance.setScreen(GADS.ScreenState.CAMPAIGNSCREEN, runConfig);
             }
         });
         mainMenuTable.add(campaignButton).colspan(4).pad(10).width(200).row();
@@ -69,7 +69,7 @@ public class MainScreen extends BaseMenuScreen {
         multiplayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                gameInstance.setScreen(GADS.ScreenState.MULTIPLAYERBASESCREEN,runConfiguration);
+                gameInstance.setScreen(GADS.ScreenState.MULTIPLAYERBASESCREEN, runConfig);
             }
         });
         mainMenuTable.add(multiplayerButton).colspan(4).pad(10).width(200).row();

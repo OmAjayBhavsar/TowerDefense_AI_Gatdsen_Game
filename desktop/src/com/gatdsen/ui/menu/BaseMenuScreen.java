@@ -116,7 +116,7 @@ public abstract class BaseMenuScreen extends ConfigScreen {
             startGameButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    gameInstance.setScreen(GADS.ScreenState.INGAMESCREEN, getRunConfiguration());
+                    gameInstance.setScreen(GADS.ScreenState.INGAMESCREEN, getRunConfig());
                 }
             });
             navigationTable.add(startGameButton).colspan(4).pad(10).width(200);
@@ -125,7 +125,7 @@ public abstract class BaseMenuScreen extends ConfigScreen {
             nextGameButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    gameInstance.setScreen(GADS.ScreenState.INGAMESCREEN, getRunConfiguration());
+                    gameInstance.setScreen(GADS.ScreenState.INGAMESCREEN, getRunConfig());
                 }
             });
             navigationTable.add(nextGameButton).colspan(4).pad(10).width(200);

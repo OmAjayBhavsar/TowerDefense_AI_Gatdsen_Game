@@ -3,7 +3,7 @@ package com.gatdsen.ui.menu;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.ui.GADS;
 import com.gatdsen.ui.menu.attributes.Attribute;
 
@@ -39,29 +39,29 @@ public abstract class AttributeScreen extends BaseMenuScreen {
     }
 
     /**
-     * Gibt die RunConfiguration unter Berücksichtigung der Attribute zurück
+     * Gibt die RunConfig unter Berücksichtigung der Attribute zurück
      *
-     * @return Eine RunConfiguration mit den konfigurierten Attributen
+     * @return Eine RunConfig mit den konfigurierten Attributen
      */
     @Override
-    protected RunConfiguration getRunConfiguration() {
-        RunConfiguration runConfiguration = super.getRunConfiguration();
+    protected RunConfig getRunConfig() {
+        RunConfig runConfig = super.getRunConfig();
         for (Attribute attribute : attributes) {
-            attribute.getConfig(runConfiguration);
+            attribute.getConfig(runConfig);
         }
-        return runConfiguration;
+        return runConfig;
     }
 
     /**
-     * Setzt die RunConfiguration unter Berücksichtigung der Attribute
+     * Setzt die RunConfig unter Berücksichtigung der Attribute
      *
-     * @param runConfiguration Die RunConfiguration, die als Basis für die Kopie verwendet wird
+     * @param runConfig Die RunConfig, die als Basis für die Kopie verwendet wird
      */
     @Override
-    protected void setRunConfiguration(RunConfiguration runConfiguration) {
-        super.setRunConfiguration(runConfiguration);
+    protected void setRunConfig(RunConfig runConfig) {
+        super.setRunConfig(runConfig);
         for (Attribute attribute : attributes) {
-            attribute.setConfig(runConfiguration);
+            attribute.setConfig(runConfig);
         }
     }
 

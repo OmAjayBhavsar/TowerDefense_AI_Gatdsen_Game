@@ -1,8 +1,6 @@
 package com.gatdsen.manager.run;
 
 import com.gatdsen.manager.Manager;
-import com.gatdsen.manager.run.Run;
-import com.gatdsen.manager.run.RunConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +11,7 @@ import java.util.Collection;
 
 @RunWith(Parameterized.class)
 public class TestGroupMatchmaking {
-    private final RunConfiguration runConfig;
+    private final RunConfig runConfig;
     private final Run run;
     private final Manager manager;
 
@@ -21,9 +19,9 @@ public class TestGroupMatchmaking {
     private final Object lock = new Object();
 
     static class TestExample{
-    private RunConfiguration config;
+    private RunConfig config;
 
-    public TestExample(RunConfiguration config) {
+    public TestExample(RunConfig config) {
         this.config = config;
     }
 

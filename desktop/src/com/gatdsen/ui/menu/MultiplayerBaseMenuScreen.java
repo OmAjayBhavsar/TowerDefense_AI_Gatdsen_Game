@@ -32,7 +32,7 @@ public class MultiplayerBaseMenuScreen extends BaseMenuScreen{
         hostMultiplayerGameButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                gameInstance.setScreen(GADS.ScreenState.MULTIPLAYERHOSTSCREEN,runConfiguration);
+                gameInstance.setScreen(GADS.ScreenState.MULTIPLAYERHOSTSCREEN, runConfig);
             }
         });
         mainMenuTable.add(hostMultiplayerGameButton).colspan(4).pad(10).width(200).row();
@@ -40,7 +40,7 @@ public class MultiplayerBaseMenuScreen extends BaseMenuScreen{
         joinMultiplayerGameButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                gameInstance.setScreen(GADS.ScreenState.MULTIPLAYERJOINSCREEN, runConfiguration);
+                gameInstance.setScreen(GADS.ScreenState.MULTIPLAYERJOINSCREEN, runConfig);
             }
         });
         mainMenuTable.add(joinMultiplayerGameButton).colspan(4).pad(10).width(200).row();

@@ -21,11 +21,11 @@ public class ParallelMultiGameRun extends Run {
 
     private final Map<Game, Integer[]> playerIndices = new HashMap<>();
 
-    protected ParallelMultiGameRun(Manager manager, RunConfiguration runConfig) {
+    protected ParallelMultiGameRun(Manager manager, RunConfig runConfig) {
         super(manager, runConfig);
         if (runConfig.gameMode == GameState.GameMode.Exam_Admission) {
 
-            //ToDo this is the configuration for the exam admission
+            //ToDo this is the config for the exam admission
 
             if (runConfig.playerFactories.size() != 1) {
                 System.err.println("Exam Admission only accepts exactly 1 player");
@@ -56,7 +56,7 @@ public class ParallelMultiGameRun extends Run {
         Game firstGame = null;
         for (List<Integer> matchUp : permListOfMatchUps
         ) {
-            RunConfiguration curConfig = runConfig.copy();
+            RunConfig curConfig = runConfig.copy();
             List<PlayerHandlerFactory> playerFactories = new ArrayList<>();
             for (Integer index : matchUp) {
                 playerFactories.add(runConfig.playerFactories.get(index));
