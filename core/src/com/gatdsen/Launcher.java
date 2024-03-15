@@ -134,6 +134,10 @@ public abstract class Launcher {
                     builder.append("failed");
                 }
                 break;
+            case Replay:
+                if (!results.getConfig().gui) {
+                    builder.append("\nStarted a replay without GUI, so only the results will be printed: \n");
+                }
             case Normal:
             case Tournament_Phase_1:
             default:
