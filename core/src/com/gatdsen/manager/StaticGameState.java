@@ -15,8 +15,9 @@ public final class StaticGameState {
     private final GameState state;
     private final int playerIndex;
     private final StaticPlayerState[] staticPlayerStates;
+    private final Timer timer;
 
-    StaticGameState(GameState state, int playerIndex) {
+    StaticGameState(GameState state, int playerIndex, Timer timer) {
         this.state = state;
         this.playerIndex = playerIndex;
         staticPlayerStates = new StaticPlayerState[state.getPlayerCount()];
@@ -24,6 +25,7 @@ public final class StaticGameState {
         for (int i = 0; i < state.getPlayerCount(); i++) {
             staticPlayerStates[i] = new StaticPlayerState(playerStates[i]);
         }
+        this.timer = timer;
     }
 
     /**
@@ -76,5 +78,13 @@ public final class StaticGameState {
      */
     public int getBoardSizeY() {
         return state.getBoardSizeY();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Timer getTimer() {
+        return timer;
     }
 }
