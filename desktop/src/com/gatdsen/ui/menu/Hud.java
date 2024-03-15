@@ -104,8 +104,8 @@ public class Hud implements Disposable {
 
     }
 
-    public void setHudViewport (int worldWidth, int worldHeight){
-        stage.getViewport().setWorldSize((float) worldWidth /10, (float) worldHeight /10);
+    public void setHudViewport(int worldWidth, int worldHeight) {
+        stage.getViewport().setWorldSize((float) worldWidth / 10, (float) worldHeight / 10);
     }
 
     /**
@@ -141,30 +141,13 @@ public class Hud implements Disposable {
         // Erstellen der Elemente
 
         player0BalanceLabel = new Label("$" + player0Balance, skin);
-        player0BalanceLabel.setAlignment(Align.center);
         player1BalanceLabel = new Label("$" + player1Balance, skin);
-        player1BalanceLabel.setAlignment(Align.center);
-        Label currentPlayer0Label = new Label("Spieler 1", skin);
-        currentPlayer0Label.setAlignment(Align.center);
-        Label currentPlayer1Label = new Label("Spieler 2", skin);
-        currentPlayer1Label.setAlignment(Align.center);
         currentRoundLabel = new Label("Runde: " + roundCounter, skin);
-        currentRoundLabel.setAlignment(Align.center);
         healthPlayer0Label = new Label("" + healthPlayer0, skin);
-        healthPlayer0Label.setAlignment(Align.center);
         healthPlayer1Label = new Label("" + healthPlayer1, skin);
-        healthPlayer1Label.setAlignment(Align.center);
-        Label shopLabel1 = new Label("Shop zum Spawnen", skin);
-        shopLabel1.setAlignment(Align.center);
-        Label shopLabel2 = new Label("von Gegnern", skin);
-        shopLabel2.setAlignment(Align.center);
         nextRoundButton = new TextButton("Zug beenden", skin);
         backToMainMenuButton = new TextButton("Hauptmenü", skin);
         restartGameButton = new TextButton("Neustart", skin);
-        Label shopPlayer0Label = new Label("Spieler 1", skin);
-        shopPlayer0Label.setAlignment(Align.center);
-        Label shopPlayer1Label = new Label("Spieler 2", skin);
-        shopPlayer1Label.setAlignment(Align.center);
         nextRoundButton.addListener(new ChangeListener() {
             /**
              * Wird aufgerufen, wenn der Button geklickt wird
@@ -192,6 +175,9 @@ public class Hud implements Disposable {
         });
 
         HorizontalGroup playerGroup = new HorizontalGroup();
+        playerGroup.space(50);
+
+        playerGroup.pad(padding);
 
         playerGroup.addActor(new Label("Spieler 1", skin));
         playerGroup.addActor(player0BalanceLabel);
@@ -202,7 +188,7 @@ public class Hud implements Disposable {
         playerGroup.addActor(new Label("Spieler 2", skin));
 
         VerticalGroup mainGroup = new VerticalGroup();
-
+        mainGroup.pad(padding);
         mainGroup.space(padding);
         mainGroup.padTop(padding);
         mainGroup.addActor(playerGroup);
@@ -441,10 +427,10 @@ public class Hud implements Disposable {
      */
     @Override
     public void dispose() {
-       stage.dispose();
+        stage.dispose();
     }
 
-    public void clear(){
+    public void clear() {
         stage.clear();
         tileMapButton(0, tileMap).clear();
     }
