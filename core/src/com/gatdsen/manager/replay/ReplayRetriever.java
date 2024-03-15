@@ -5,6 +5,7 @@ import com.gatdsen.manager.game.GameResults;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
@@ -20,23 +21,32 @@ public final class ReplayRetriever {
     private static final ReplayRetriever instance = new ReplayRetriever();
 
     private final File externalReplayDirectory = new File(EXTERNAL_REPLAY_DIRECTORY);
-    private final Replay[] internalReplays;
+    private Replay[] internalReplays = null;
     private int writtenFiles = 0;
 
     public static ReplayRetriever getInstance() {
         return instance;
     }
 
-    private ReplayRetriever() {
-        internalReplays = getInternalReplays();
+    /**
+     * Gibt alle verfügbaren Replays zurück. Dies sind sowohl die internen als auch die externen Replays.
+     * @return Ein Array mit allen verfügbaren Replays
+     */
+    public Replay[] getAvailableReplays() {
+        List<Replay> replays = new ArrayList<>(Arrays.asList(getInternalReplays()));
+        replays.addAll(getExternalReplays());
+        return replays.toArray(new Replay[0]);
     }
 
     /**
-     * Hilfsmethode, um die internen Replays zu laden.
+     * Hilfsmethode, um die internen Replays zu laden. Nachdem die Replays einmal geladen wurden, werden sie gecached.
      * @return Ein Array aller vorhandenen internen Replays
      * @throws RuntimeException Wenn ein Fehler beim Laden eines Replays aufgetreten ist
      */
     private Replay[] getInternalReplays() throws RuntimeException {
+        if (internalReplays != null) {
+            return internalReplays;
+        }
         URI uri;
         try {
             uri = Objects.requireNonNull(getClass().getResource(INTERNAL_REPLAY_DIRECTORY)).toURI();
@@ -62,7 +72,7 @@ public final class ReplayRetriever {
             directory = fileSystem.getPath(INTERNAL_REPLAY_DIRECTORY);
         }
         try (Stream<Path> mapStream = Files.list(directory)) {
-            return mapStream
+            internalReplays = mapStream
                     .filter(path -> path.getFileName().toString().endsWith(Replay.FILE_EXTENSION))
                     .map(path -> {
                                 try {
@@ -76,6 +86,7 @@ public final class ReplayRetriever {
                             }
                     )
                     .toArray(Replay[]::new);
+            return internalReplays;
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -114,16 +125,6 @@ public final class ReplayRetriever {
     }
 
     /**
-     * Gibt alle verfügbaren Replays zurück. Dies sind sowohl die internen als auch die externen Replays.
-     * @return Ein Array mit allen verfügbaren Replays
-     */
-    public Replay[] getAvailableReplays() {
-        List<Replay> replays = new ArrayList<>(Arrays.asList(internalReplays));
-        replays.addAll(getExternalReplays());
-        return replays.toArray(new Replay[0]);
-    }
-
-    /**
      * Speichert die übergebenen GameResults als Replay ab.
      * @param results Die GameResults, die als Replay abgespeichert werden sollen
      * @throws ReplayException Wenn das Replay nicht gespeichert werden konnte
@@ -157,25 +158,41 @@ public final class ReplayRetriever {
     }
 
     /**
-     * Lädt das Replay mit dem übergebenen Dateinamen. Es kann sich dabei um ein internes oder externes Replay handeln.
-     * @param fileName Der Dateiname des Replays
+     * Lädt das Replay auf Basis des übergebenen Parameters. Zunächst wird überprüft, ob der übergebene Parameter dem
+     * Dateinamen eines internen Replays entspricht und falls ja, dieses zurückgegeben. Andernfalls wird versucht, das
+     * Replay anhand des übergebenen Parameters zu laden. <br>
+     * Der Parameter kann entweder der Dateiname (ohne Pfad und ohne Dateiendung) eines Replays im
+     * /replays-Verzeichnisses des Spiels sein oder der direkte Dateipfad zu einem Replay.
+     * @param fileNameOrFilePath Der Dateiname oder der direkte Dateipfad des Replays
      * @return Das geladene Replay
      * @throws ReplayException Wenn das Replay nicht geladen werden konnte
      */
-    public Replay loadReplay(String fileName) throws ReplayException {
-        for (Replay internalReplay : internalReplays) {
-            if (internalReplay.getFileName().equals(fileName)) {
+    public Replay loadReplay(String fileNameOrFilePath) throws ReplayException {
+        for (Replay internalReplay : getInternalReplays()) {
+            if (internalReplay.getFileName().equals(fileNameOrFilePath)) {
                 return internalReplay;
             }
         }
-        String path = Replay.getFilePath(EXTERNAL_REPLAY_DIRECTORY, fileName);
+        String path = EXTERNAL_REPLAY_DIRECTORY;
+        String fileName = fileNameOrFilePath;
+        if (fileNameOrFilePath.endsWith(Replay.FILE_EXTENSION)) {
+            File file = new File(fileNameOrFilePath);
+            String parent = file.getParent();
+            if (parent != null) {
+                path = parent + "/";
+            } else {
+                path = "";
+            }
+            fileName = file.getName().replace(Replay.FILE_EXTENSION, "");
+        }
+        String filePath = Replay.getFilePath(path, fileName);
         Replay replay;
-        try (FileInputStream fs = new FileInputStream(path)) {
-            replay = loadReplay(fileName, EXTERNAL_REPLAY_DIRECTORY, fs);
+        try (FileInputStream fs = new FileInputStream(filePath)) {
+            replay = loadReplay(fileName, path, fs);
         } catch (FileNotFoundException e) {
-            throw new ReplayLoadException("There is no replay at " + path, e);
+            throw new ReplayLoadException("There is no replay at " + filePath, e);
         } catch (IOException e) {
-            throw new ReplayLoadException("Unable to read replay at " + path, e);
+            throw new ReplayLoadException("Unable to read replay at " + filePath, e);
         }
         return replay;
     }
