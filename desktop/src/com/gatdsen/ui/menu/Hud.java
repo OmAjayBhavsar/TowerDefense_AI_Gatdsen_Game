@@ -38,7 +38,7 @@ public class Hud implements Disposable {
 
     private Stage stage;
     private final InputHandler inputHandler;
-    private InputMultiplexer inputMultiplexer;
+    private final InputMultiplexer inputMultiplexer;
     private final TurnTimer turnTimer;
     public HorizontalGroup playerGroup;
     public VerticalGroup mainGroup;
@@ -106,7 +106,6 @@ public class Hud implements Disposable {
 
     public void setHudViewport (int worldWidth, int worldHeight){
         stage.getViewport().setWorldSize((float) worldWidth /10, (float) worldHeight /10);
-
     }
 
     /**
@@ -442,7 +441,12 @@ public class Hud implements Disposable {
      */
     @Override
     public void dispose() {
-        stage.dispose();
+       stage.dispose();
+    }
+
+    public void clear(){
+        stage.clear();
+        tileMapButton(0, tileMap).clear();
     }
 
     /**

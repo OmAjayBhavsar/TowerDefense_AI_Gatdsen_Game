@@ -153,6 +153,7 @@ public class GADS extends Game {
             screenStack.popScreen();
         }
         assetManager.unloadAtlas();
+        ((InGameScreen)screens[ScreenState.INGAMESCREEN.ordinal()]).shutdown();
         System.exit(0);
     }
 }

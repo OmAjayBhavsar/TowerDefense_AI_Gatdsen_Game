@@ -21,7 +21,7 @@ public class ScreenStack {
 
     public void popScreen() {
         if (!screenStack.isEmpty()) {
-            screenStack.pop().dispose();
+            screenStack.pop().hide();
         }
 
         if (!screenStack.isEmpty()) {
@@ -36,7 +36,7 @@ public class ScreenStack {
 
     private void popAllScreens() {
         while (!screenStack.isEmpty()) {
-            screenStack.pop().dispose();
+            screenStack.pop().hide();
         }
     }
 }
