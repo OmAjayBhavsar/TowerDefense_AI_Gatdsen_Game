@@ -10,6 +10,9 @@ import com.gatdsen.simulation.GameState.GameMode;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Diese Klasse repräsentiert die Konfiguration eines {@link Run}s.
+ */
 public final class RunConfig {
 
     public RunConfig() {
@@ -37,47 +40,85 @@ public final class RunConfig {
     public boolean replay = false;
     public List<PlayerHandlerFactory> playerFactories = new ArrayList<>();
 
+    /**
+     * Überprüft, ob die RunConfig gültig ist. Wenn nicht, werden Fehlermeldungen auf der Standardfehlerausgabe
+     * ausgegeben und false zurückgegeben.
+     * @return true, wenn die RunConfig gültig ist, ansonsten false
+     */
     public boolean validate() {
+        StringBuilder errorMessages = new StringBuilder();
+        boolean isValid = validate(errorMessages);
+        System.err.print(errorMessages);
+        return isValid;
+    }
+
+    /**
+     * Überprüft, ob die RunConfig gültig ist. <br>
+     * Anders als {@link #validate()} werden keine Fehlermeldungen ausgegeben.
+     * @return true, wenn die RunConfig gültig ist, ansonsten false
+     */
+    public boolean validateSilent() {
+        return validate(null);
+    }
+
+    /**
+     * Überprüft, ob die RunConfig gültig ist. Wenn nicht, werden die Fehlermeldungen an den übergebenen StringBuilder
+     * angehängt und false zurückgegeben.
+     * @param errorMessages Der StringBuilder, an den die Fehlermeldungen angehängt werden sollen
+     * @return true, wenn die RunConfig gültig ist, ansonsten false
+     */
+    private boolean validate(StringBuilder errorMessages) {
         boolean isValid = true;
         switch (gameMode) {
             case Normal:
                 if (mapName == null) {
-                    System.err.println("RunConfig: No map name was provided.");
+                    appendStringToStringBuilder(errorMessages, "RunConfig: No map name was provided.\n");
                     isValid = false;
                 }
                 if (playerFactories.size() != 2) {
-                    System.err.println("RunConfig: Only two players are allowed in normal game mode.");
+                    appendStringToStringBuilder(errorMessages, "RunConfig: Only two players are allowed in normal game mode.\n");
                     isValid = false;
                 }
                 break;
             case Christmas_Task:
                 if (mapName != null) {
-                    System.err.println("RunConfig: A map can't be provided for the christmas task.");
+                    appendStringToStringBuilder(errorMessages, "RunConfig: A map can't be provided for the christmas task.\n");
                     isValid = false;
                 }
                 if (playerFactories.size() != 1) {
-                    System.err.println("RunConfig: Only one player is allowed for the christmas task.");
+                    appendStringToStringBuilder(errorMessages, "RunConfig: Only one player is allowed for the christmas task.\n");
                     isValid = false;
                 }
                 break;
             case Replay:
                 if (mapName == null) {
-                    System.err.println("RunConfig: A replay file name has to be provided for the replay mode.");
+                    appendStringToStringBuilder(errorMessages, "RunConfig: A replay file name has to be provided for the replay mode.\n");
                     isValid = false;
                 }
                 if (replay) {
-                    System.err.println("RunConfig: A replay of the replay mode can't be created. Why would you do that anyway??");
+                    appendStringToStringBuilder(errorMessages, "RunConfig: A replay of the replay mode can't be created. Why would you do that anyway??\n");
                     isValid = false;
                 }
                 if (!playerFactories.isEmpty()) {
-                    System.err.println("RunConfig: Players can't be provided for the replay mode.");
+                    appendStringToStringBuilder(errorMessages, "RunConfig: Players can't be provided for the replay mode.\n");
                     isValid = false;
                 }
                 break;
             default:
-                throw new RuntimeException("RunConfig: Gamemode " + gameMode + " is not unlocked yet.");
+                throw new RuntimeException("RunConfig: Gamemode " + gameMode + " is not unlocked yet.\n");
         }
         return isValid;
+    }
+
+    /**
+     * Hilfsmethode, um einen String an einen StringBuilder anzuhängen, falls der StringBuilder nicht null ist.
+     * @param builder Der StringBuilder, an den der String angehängt werden soll
+     * @param string Der String, der an den StringBuilder angehängt werden soll
+     */
+    private static void appendStringToStringBuilder(StringBuilder builder, String string) {
+        if (builder != null) {
+            builder.append(string);
+        }
     }
 
     public GameConfig asGameConfig() {
