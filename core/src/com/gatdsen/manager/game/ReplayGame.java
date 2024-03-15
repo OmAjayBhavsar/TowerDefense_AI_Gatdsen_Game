@@ -65,6 +65,9 @@ public class ReplayGame extends Executable {
                 animationLogProcessor.awaitNotification();
             }
         }
+        if (pendingShutdown) {
+            return;
+        }
         setStatus(Status.COMPLETED);
         for (CompletionHandler<Executable> completionListener : completionListeners) {
             completionListener.onComplete(this);
