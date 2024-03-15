@@ -174,10 +174,8 @@ public abstract class BaseMenuScreen extends ConfigScreen {
     @Override
     public void resize(int width, int height) {
         menuViewport.update(width, height, true);
-
         menuViewport.apply();
         backgroundViewport.update(width, height, true);
-
         backgroundViewport.apply();
         camera.update();
     }

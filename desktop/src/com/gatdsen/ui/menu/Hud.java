@@ -36,11 +36,12 @@ import java.util.ArrayList;
  */
 public class Hud implements Disposable {
 
-    private static Stage stage;
+    private Stage stage;
     private final InputHandler inputHandler;
-    private final InputMultiplexer inputMultiplexer;
+    private InputMultiplexer inputMultiplexer;
     private final TurnTimer turnTimer;
-    public final Table layoutTable;
+    public HorizontalGroup playerGroup;
+    public VerticalGroup mainGroup;
     private final Container<ImagePopup> turnPopupContainer;
     private final InGameScreen inGameScreen;
     private final TextureRegion turnChangeSprite;
@@ -83,26 +84,52 @@ public class Hud implements Disposable {
      * @param gameInstance Die gameInstance für das Spiel
      */
     public Hud(InGameScreen ingameScreen, GADS gameInstance) {
-
         this.gameInstance = gameInstance;
         this.inGameScreen = ingameScreen;
-        hudViewport = new FitViewport(600, 400);
         this.uiMessenger = new UiMessenger(this);
         turnChangeDuration = 2;
         turnChangeSprite = AssetContainer.IngameAssets.turnChange;
-        stage = new Stage(hudViewport);
-        layoutTable = setupLayoutTable();
         inputHandler = setupInputHandler(ingameScreen, this);
         inputHandler.setUiMessenger(uiMessenger);
         turnTimer = new TurnTimer();
         turnPopupContainer = new Container<ImagePopup>();
-        layoutHudElements();
+        hudViewport = new FitViewport(200, 200);
+        stage = new Stage(hudViewport);
         // Kombination von Eingaben von beiden Prozessoren (Spiel und UI)
         inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(inputHandler); // für die Simulation benötigt
-        inputMultiplexer.addProcessor(stage); // für die UI-Buttons benötigt
-        stage.addActor(layoutTable);
+        inputMultiplexer.addProcessor(inputHandler);
+        inputHandler.setUiMessenger(uiMessenger);// für die Simulation benötigt
+        inputMultiplexer.addProcessor(stage);
         scoreView = new ScoreView(null);
+
+    }
+
+    public void setHudViewport (int worldWidth, int worldHeight){
+        stage.getViewport().setWorldSize((float) worldWidth /10, (float) worldHeight /10);
+
+    }
+
+    /**
+     * Startet ein neues Spiel mit den gegebenen Parametern
+     *
+     * @param gameState             Der Zustand des neuen Spiels
+     * @param arrayPositionTileMaps Die Positionen der TileMaps im Array
+     * @param tileSize              Die Größe der Tiles
+     * @param tileMap               Die TileMap des Spiels
+     */
+
+    public void init(GameState gameState, Vector2[] arrayPositionTileMaps, int tileSize, TileMap tileMap) {
+
+        renderingSpeed = 1;
+        player0Balance = 100;
+        player1Balance = 100;
+        health = 300;
+        buttonWidth = 150;
+        roundCounter = 0;
+        float padding = 10;
+        TextButton restartGameButton;
+        TextButton nextRoundButton;
+        TextButton backToMainMenuButton;
 
         healthBarPlayer0.setValue(health);
         healthBarPlayer0.setAnimateDuration(0.25f);
@@ -111,91 +138,6 @@ public class Hud implements Disposable {
         if (gameState != null) {
             roundCounter = gameState.getTurn();
         } else roundCounter = 0;
-    }
-
-    /**
-     * Erstellt einen InputHandler und gibt ihn zurück
-     *
-     * @param ingameScreen Die Instanz der InGameScreen-Klasse
-     * @param h            Das Hud-Objekt
-     * @return Ein neues InputHandler-Objekt
-     */
-    private InputHandler setupInputHandler(InGameScreen ingameScreen, Hud h) {
-        return new InputHandler(ingameScreen, h);
-    }
-
-    /**
-     * Konfiguriert und gibt eine Tabelle für das Layout zurück
-     *
-     * @return Eine neu konfigurierte Table-Instanz
-     */
-    private Table setupLayoutTable() {
-        Table table = new Table(AssetContainer.MainMenuAssets.skin);
-
-        table.setFillParent(true);
-        table.columnDefaults(0).width(100);
-        table.columnDefaults(1).width(100);
-        table.columnDefaults(2).width(100);
-        table.columnDefaults(3).width(100);
-        table.columnDefaults(4).width(100);
-        table.columnDefaults(5).width(100);
-        table.columnDefaults(6).width(100);
-        table.center().top();
-        return table;
-    }
-
-    /**
-     * Setzt das Scoreboard für das Spiel auf
-     *
-     * @param game Die GameState-Instanz für das Spiel
-     */
-    public void setupScoreboard(GameState game) {
-
-        //ToDo read player count and assign individual colors
-        ScoreBoard scores = new ScoreBoard(new Color[]{Color.WHITE, Color.WHITE}, names, game);
-
-        this.scores = game.getHealth();
-
-        scoreView.addScoreboard(scores);
-
-    }
-
-    /**
-     * Setzt die Namen der Spieler
-     *
-     * @param names Ein Array mit den Namen der Spieler
-     */
-    public void setPlayerNames(String[] names) {
-        this.names = names;
-    }
-
-
-    /**
-     * Aktualisiert die UI-Elemente des HUD mit den aktuellen Daten.
-     */
-    private void updateUIElements() {
-        if (player0BalanceLabel != null) {
-            player0BalanceLabel.setText("$" + player0Balance);
-        }
-
-        if (player1BalanceLabel != null) {
-            player1BalanceLabel.setText("$" + player1Balance);
-        }
-
-        healthPlayer0Label.setText("" + healthPlayer0);
-        healthPlayer1Label.setText("" + healthPlayer0);
-
-        // ToDo weitere UI-Elemente aktualisieren...
-    }
-
-    /**
-     * Konfiguriert die HUD-Elemente und deren Anordnung
-     */
-    public void layoutHudElements() {
-        float padding = 10;
-        TextButton restartGameButton;
-        TextButton nextRoundButton;
-        TextButton backToMainMenuButton;
 
         // Erstellen der Elemente
 
@@ -213,7 +155,6 @@ public class Hud implements Disposable {
         healthPlayer0Label.setAlignment(Align.center);
         healthPlayer1Label = new Label("" + healthPlayer1, skin);
         healthPlayer1Label.setAlignment(Align.center);
-        Label invisibleLabel = new Label("", skin);
         Label shopLabel1 = new Label("Shop zum Spawnen", skin);
         shopLabel1.setAlignment(Align.center);
         Label shopLabel2 = new Label("von Gegnern", skin);
@@ -251,33 +192,114 @@ public class Hud implements Disposable {
             }
         });
 
-        layoutTable.add(currentPlayer0Label).expandX();
-        layoutTable.add(player0BalanceLabel).pad(padding).expandX();
-        layoutTable.add(healthBarPlayer0).pad(padding).expandX();
-        layoutTable.add(currentRoundLabel).align(Align.center).pad(padding).expandX();
-        layoutTable.add(healthBarPlayer1).pad(padding).expandX();
-        layoutTable.add(player1BalanceLabel).pad(padding).expandX();
-        layoutTable.add(currentPlayer1Label).pad(padding).expandX().row();
-        layoutTable.add(invisibleLabel).pad(padding).expandX();
-        layoutTable.add(invisibleLabel).pad(padding).expandX();
-        layoutTable.add(healthPlayer0Label).pad(padding).expandX();
-        layoutTable.add(invisibleLabel).pad(padding).expandX();
-        layoutTable.add(healthPlayer1Label).pad(padding).expandX().row();
-        layoutTable.add(invisibleLabel);
-        layoutTable.add(invisibleLabel);
-        layoutTable.add(invisibleLabel);
-        layoutTable.add(turnTimer).row();
-        layoutTable.add(invisibleLabel);
-        layoutTable.add(invisibleLabel);
-        layoutTable.add(invisibleLabel);
-        layoutTable.add(nextRoundButton).pad(padding).expandX().width(buttonWidth).row();
-        layoutTable.add(invisibleLabel).expandY().top().row();
-        layoutTable.add(invisibleLabel);
-        layoutTable.add(invisibleLabel);
-        layoutTable.add(invisibleLabel);
-        layoutTable.add(backToMainMenuButton).expandX().width(buttonWidth).row();
-        layoutTable.add(invisibleLabel).row();
-        layoutTable.add(invisibleLabel).row();
+        HorizontalGroup playerGroup = new HorizontalGroup();
+
+        playerGroup.addActor(new Label("Spieler 1", skin));
+        playerGroup.addActor(player0BalanceLabel);
+        playerGroup.addActor(healthBarPlayer0);
+        playerGroup.addActor(currentRoundLabel);
+        playerGroup.addActor(healthBarPlayer1);
+        playerGroup.addActor(player1BalanceLabel);
+        playerGroup.addActor(new Label("Spieler 2", skin));
+
+        VerticalGroup mainGroup = new VerticalGroup();
+
+        mainGroup.space(padding);
+        mainGroup.padTop(padding);
+        mainGroup.addActor(playerGroup);
+        mainGroup.addActor(new Label("", skin)); // Invisible label for spacing
+        mainGroup.addActor(turnTimer);
+        mainGroup.addActor(new Label("", skin)); // Invisible label for spacing
+        mainGroup.addActor(new Label("Shop zum Spawnen", skin));
+        mainGroup.addActor(new Label("von Gegnern", skin));
+        mainGroup.addActor(nextRoundButton);
+        mainGroup.addActor(new Label("", skin)); // Invisible label for spacing
+        mainGroup.addActor(backToMainMenuButton);
+
+        stage.addActor(mainGroup);
+
+        this.gameState = gameState;
+        stage.addActor(hudGroup);
+
+        int numberOfTeams = gameState.getPlayerCount();
+        TextButton[] teamButtons;
+        teamButtons = new TextButton[numberOfTeams];
+
+        for (int i = 0; i < numberOfTeams; i++) {
+            int[][] towerMap = new int[gameState.getBoardSizeX()][gameState.getBoardSizeY()];
+            towerMaps.add(towerMap);
+            teamButtons[i] = tileMapButton(i, tileMap);
+            teamButtons[i].setSize((gameState.getBoardSizeX() * tileSize) / 10.0f, (gameState.getBoardSizeY() * tileSize) / 10.0f);
+            hudGroup.addActor(teamButtons[i]);
+            teamButtons[i].setPosition((arrayPositionTileMaps[i].x) / 10.0f, (arrayPositionTileMaps[i].y) / 10.0f);
+            teamButtons[i].setColor(Color.CLEAR);
+            initPlayerHealth(i);
+            initBankBalance(i);
+        }
+        if (turnPopupContainer.hasChildren()) {
+            turnPopupContainer.removeActorAt(0, false);
+        }
+        setupScoreboard(gameState);
+
+        float mainGroupX = (hudViewport.getWorldWidth() - mainGroup.getWidth()) / 2;
+        float mainGroupY = hudViewport.getWorldHeight() - mainGroup.getHeight();
+
+        mainGroup.setPosition(mainGroupX, mainGroupY);
+        stage.addActor(mainGroup);
+    }
+
+    /**
+     * Erstellt einen InputHandler und gibt ihn zurück
+     *
+     * @param ingameScreen Die Instanz der InGameScreen-Klasse
+     * @param h            Das Hud-Objekt
+     * @return Ein neues InputHandler-Objekt
+     */
+    private InputHandler setupInputHandler(InGameScreen ingameScreen, Hud h) {
+        return new InputHandler(ingameScreen, h);
+    }
+
+    /**
+     * Setzt das Scoreboard für das Spiel auf
+     *
+     * @param game Die GameState-Instanz für das Spiel
+     */
+    public void setupScoreboard(GameState game) {
+
+        //ToDo read player count and assign individual colors
+        ScoreBoard scores = new ScoreBoard(new Color[]{Color.WHITE, Color.WHITE}, names, game);
+
+        this.scores = game.getHealth();
+
+        scoreView.addScoreboard(scores);
+    }
+
+    /**
+     * Setzt die Namen der Spieler
+     *
+     * @param names Ein Array mit den Namen der Spieler
+     */
+    public void setPlayerNames(String[] names) {
+        this.names = names;
+    }
+
+
+    /**
+     * Aktualisiert die UI-Elemente des HUD mit den aktuellen Daten.
+     */
+    private void updateUIElements() {
+        if (player0BalanceLabel != null) {
+            player0BalanceLabel.setText("$" + player0Balance);
+        }
+
+        if (player1BalanceLabel != null) {
+            player1BalanceLabel.setText("$" + player1Balance);
+        }
+
+        healthPlayer0Label.setText("" + healthPlayer0);
+        healthPlayer1Label.setText("" + healthPlayer0);
+
+        // ToDo weitere UI-Elemente aktualisieren...
     }
 
     /**
@@ -309,7 +331,6 @@ public class Hud implements Disposable {
      * Zeichnet das HUD und die ScoreView
      */
     public void draw() {
-
         stage.getViewport().apply(true);
         stage.draw();
         if (scoreView != null) {
@@ -430,7 +451,7 @@ public class Hud implements Disposable {
     public void toggleDebugOutlines() {
         this.debugVisible = !debugVisible;
 
-        this.layoutTable.setDebug(debugVisible);
+        this.mainGroup.setDebug(debugVisible);
     }
 
     /**
@@ -470,8 +491,6 @@ public class Hud implements Disposable {
         //set the color to black
         pixmap.setColor(0, 0, 0, 0.5f);
         pixmap.fill();
-        layoutTable.clear();
-        layoutTable.setBackground(new TextureRegionDrawable(new Texture(pixmap)));
         pixmap.dispose();
 
         //determine sprite
@@ -490,51 +509,6 @@ public class Hud implements Disposable {
     public void skipTurnStart() {
         if (turnPopupContainer.getActor() != null)
             turnPopupContainer.getActor().remove();
-    }
-
-    /**
-     * Startet ein neues Spiel mit den gegebenen Parametern
-     *
-     * @param gameState             Der Zustand des neuen Spiels
-     * @param arrayPositionTileMaps Die Positionen der TileMaps im Array
-     * @param tileSize              Die Größe der Tiles
-     * @param tileMap               Die TileMap des Spiels
-     */
-    public void init(GameState gameState, Vector2[] arrayPositionTileMaps, int tileSize, TileMap tileMap) {
-
-        renderingSpeed = 1;
-        player0Balance = 100;
-        player1Balance = 100;
-        health = 300;
-        buttonWidth = 150;
-        roundCounter = 0;
-
-        this.gameState = gameState;
-        stage.addActor(hudGroup);
-
-        hudViewport.setWorldWidth((float) ((gameState.getBoardSizeX() * 2 + 10) * 200) / 10);
-        hudViewport.setWorldHeight((float) ((gameState.getBoardSizeY() + 5) * 200) / 10);
-
-        int numberOfTeams = gameState.getPlayerCount();
-        TextButton[] teamButtons;
-        teamButtons = new TextButton[numberOfTeams];
-
-        for (int i = 0; i < numberOfTeams; i++) {
-            int[][] towerMap = new int[gameState.getBoardSizeX()][gameState.getBoardSizeY()];
-            towerMaps.add(towerMap);
-            teamButtons[i] = tileMapButton(i, tileMap);
-            teamButtons[i].setSize((gameState.getBoardSizeX() * tileSize) / 10.0f, (gameState.getBoardSizeY() * tileSize) / 10.0f);
-            hudGroup.addActor(teamButtons[i]);
-            teamButtons[i].setPosition((arrayPositionTileMaps[i].x) / 10.0f, (arrayPositionTileMaps[i].y) / 10.0f);
-            teamButtons[i].setColor(Color.CLEAR);
-            initPlayerHealth(i);
-            initBankBalance(i);
-        }
-        layoutTable.setBackground((Drawable) null);
-        if (turnPopupContainer.hasChildren()) {
-            turnPopupContainer.removeActorAt(0, false);
-        }
-        setupScoreboard(gameState);
     }
 
     /**

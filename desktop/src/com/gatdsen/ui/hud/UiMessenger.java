@@ -51,8 +51,6 @@ public class UiMessenger {
      * @param
      */
     public void startTurnTimer(int turnTime, boolean currPlayerIsHuman) {
-        hud.layoutTable.clear();
-        hud.layoutHudElements();
         if (currPlayerIsHuman) {
             hud.startTurnTimer(turnTime);
         } else {
