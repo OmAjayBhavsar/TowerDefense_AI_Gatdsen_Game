@@ -151,7 +151,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         animator.dispose();
         manager.stop(run);
         hud.dispose();
-        gameManager.setScreen(GADS.ScreenState.MAINSCREEN, null);
+        gameManager.setScreen(GADS.ScreenState.MAINSCREEN, new RunConfig());
     }
 
     public void setupInput() {
