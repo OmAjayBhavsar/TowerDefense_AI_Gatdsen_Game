@@ -2,7 +2,7 @@ package com.gatdsen.ui.menu.attributes;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 
 public abstract class Attribute {
     /**
@@ -14,17 +14,17 @@ public abstract class Attribute {
     public abstract Actor getContent(Skin skin);
 
     /**
-     * Konfiguriert die RunConfiguration unter Berücksichtigung dieses Attributs und gibt die aktualisierte Konfiguration zurück
+     * Konfiguriert die RunConfig unter Berücksichtigung dieses Attributs und gibt die aktualisierte Konfiguration zurück
      *
-     * @param runConfiguration Die aktuelle RunConfiguration
-     * @return Die aktualisierte RunConfiguration nach der Konfiguration des Attributs
+     * @param runConfig Die aktuelle RunConfig
+     * @return Die aktualisierte RunConfig nach der Konfiguration des Attributs
      */
-    public abstract RunConfiguration getConfig(RunConfiguration runConfiguration);
+    public abstract RunConfig getConfig(RunConfig runConfig);
 
     /**
-     * Setzt die RunConfiguration basierend auf den Attributinformationen
+     * Setzt die RunConfig basierend auf den Attributinformationen
      *
-     * @param runConfiguration Die RunConfiguration, die konfiguriert wird
+     * @param runConfig Die RunConfig, die konfiguriert wird
      */
-    public abstract void setConfig(RunConfiguration runConfiguration);
+    public abstract void setConfig(RunConfig runConfig);
 }
