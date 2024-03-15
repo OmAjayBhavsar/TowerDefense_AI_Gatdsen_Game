@@ -83,7 +83,7 @@ public final class PlayerExecutor {
             if (isDebug) {
                 future.get();
             } else {
-                future.get(2 * HUMAN_EXECUTE_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
+                future.get(HUMAN_EXECUTE_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
             }
         } catch(CancellationException e) {
             System.out.println("HumanPlayer turn execution was cancelled");
