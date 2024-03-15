@@ -3,6 +3,8 @@ package com.gatdsen.manager;
 import com.gatdsen.manager.concurrent.ResourcePool;
 import com.gatdsen.manager.game.Executable;
 import com.gatdsen.manager.game.GameResults;
+import com.gatdsen.manager.replay.ReplayException;
+import com.gatdsen.manager.replay.ReplayRetriever;
 import com.gatdsen.manager.run.Run;
 import com.gatdsen.manager.run.RunConfig;
 
@@ -13,12 +15,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Manager {
 
-    private static final String RESULT_DIR_NAME = "results";
-    private static final File RESULT_DIR = new File(RESULT_DIR_NAME);
     private static int systemReservedProcessorCount = 2;
     private static final Manager singleton = new Manager();
     private boolean pendingShutdown = false;
-    private int writtenFiles = 0;
 
     private final Thread executionManager;
 
@@ -101,13 +100,12 @@ public class Manager {
             }
             while (!pendingSaves.isEmpty()) {
                 GameResults results = pendingSaves.poll();
-                if (RESULT_DIR.exists() || RESULT_DIR.mkdirs()) {
-                    try (FileOutputStream fs = new FileOutputStream(String.format("%s/%s_%d_%d.replay", RESULT_DIR, results.getConfig().gameMode, System.currentTimeMillis(), writtenFiles++))) {
-                        new ObjectOutputStream(fs).writeObject(results);
-                    } catch (IOException e) {
-                        System.err.printf("Unable to save replay at %s/%s_%d_%d.replay %n", RESULT_DIR, results.getConfig().gameMode, System.currentTimeMillis(), writtenFiles);
-                    }
-                } else System.err.printf("Unable to create results directory at %s %n", RESULT_DIR);
+                try {
+                    ReplayRetriever.getInstance().saveAsReplay(results);
+                } catch (ReplayException e) {
+                    System.err.println("Unable to save replay: " + e.getMessage());
+                    e.printStackTrace(System.err);
+                }
             }
         }
     }

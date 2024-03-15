@@ -2,6 +2,9 @@ package com.gatdsen.manager.game;
 
 import com.gatdsen.manager.CompletionHandler;
 import com.gatdsen.manager.player.data.PlayerInformation;
+import com.gatdsen.manager.replay.Replay;
+import com.gatdsen.manager.replay.ReplayException;
+import com.gatdsen.manager.replay.ReplayRetriever;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.action.ActionLog;
 
@@ -14,35 +17,26 @@ import java.util.Iterator;
  */
 public class ReplayGame extends Executable {
 
-    private GameResults replay = null;
+    private Replay replay;
     private Thread executionThread;
 
     public ReplayGame(GameConfig config) {
         super(config);
-        loadGameResults(config.mapName);
-    }
-
-    private void loadGameResults(String path) {
-        try (FileInputStream fs = new FileInputStream(path)) {
-            this.replay = (GameResults) new ObjectInputStream(fs).readObject();
-        } catch (IOException e) {
-            System.err.printf("Unable to read replay at %s %n", path);
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
-    public void start() {
+    public void start() throws ReplayException {
         synchronized (schedulingLock) {
-            if (getStatus() == Status.ABORTED) return;
+            if (getStatus() == Status.ABORTED) {
+                return;
+            }
             setStatus(Status.ACTIVE);
+            replay = ReplayRetriever.getInstance().loadReplay(config.mapName);
             //Init the Log Processor
             if (config.gui) {
                 animationLogProcessor.init(
-                        replay.getInitialState().copy(),
-                        Arrays.stream(replay.getPlayerInformation()).map(PlayerInformation::getName).toArray(String[]::new),
+                        replay.getGameResults().getInitialState().copy(),
+                        Arrays.stream(replay.getGameResults().getPlayerInformation()).map(PlayerInformation::getName).toArray(String[]::new),
                         getSkins()
                 );
             }
@@ -56,7 +50,7 @@ public class ReplayGame extends Executable {
 
     private void run() {
         if (config.gui) {
-            Iterator<ActionLog> actionLogs = replay.getActionLogs().iterator();
+            Iterator<ActionLog> actionLogs = replay.getGameResults().getActionLogs().iterator();
             while (!pendingShutdown && actionLogs.hasNext()) {
                 synchronized (schedulingLock) {
                     if (getStatus() == Status.PAUSED) {
@@ -78,7 +72,7 @@ public class ReplayGame extends Executable {
     }
 
     private String[][] getSkins() {
-        return replay.getSkins();
+        return replay.getGameResults().getSkins();
     }
 
     @Override
@@ -96,6 +90,6 @@ public class ReplayGame extends Executable {
 
     @Override
     public GameResults getGameResults() {
-        return replay;
+        return replay.getGameResults();
     }
 }
