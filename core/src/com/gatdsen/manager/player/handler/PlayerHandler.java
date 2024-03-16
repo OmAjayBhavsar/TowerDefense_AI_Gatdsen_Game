@@ -62,5 +62,11 @@ public abstract class PlayerHandler {
 
     protected abstract Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler);
 
-    public abstract void dispose();
+    /**
+     * Beendet diesen PlayerHandler und wird genutzt, um bspw. die Ressourcen freizugeben, die zur Ausführung des
+     * Spielers genutzt wurden.
+     * @param gameCompleted Gibt an, ob das Spiel korrekt abgeschlossen wurde. Wenn das Spiel abgebrochen wurde, ist
+     *                      dieser Wert false.
+     */
+    public abstract void dispose(boolean gameCompleted);
 }

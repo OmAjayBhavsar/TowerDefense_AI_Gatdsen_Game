@@ -4,7 +4,7 @@ import com.gatdsen.manager.player.data.BotInformation;
 import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.manager.run.Run;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.manager.player.handler.ProcessPlayerHandler;
 import com.gatdsen.manager.run.RunResults;
 import com.gatdsen.simulation.GameState.GameMode;
@@ -13,7 +13,6 @@ import org.apache.commons.cli.*;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public abstract class Launcher {
@@ -73,8 +72,8 @@ public abstract class Launcher {
         return params;
     }
 
-    protected static RunConfiguration parseRunConfiguration(CommandLine params) {
-        RunConfiguration runConfig = new RunConfiguration();
+    protected static RunConfig parseRunConfig(CommandLine params) {
+        RunConfig runConfig = new RunConfig();
         runConfig.gui = !params.hasOption("n");
         runConfig.mapName = params.getOptionValue("m", null);
         if (params.hasOption("p")) {
@@ -134,6 +133,10 @@ public abstract class Launcher {
                     builder.append("failed");
                 }
                 break;
+            case Replay:
+                if (!results.getConfig().gui) {
+                    builder.append("\nStarted a replay without GUI, so only the results will be printed: \n");
+                }
             case Normal:
             case Tournament_Phase_1:
             default:

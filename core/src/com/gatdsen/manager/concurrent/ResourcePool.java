@@ -165,7 +165,6 @@ public final class ResourcePool {
             if (resource.isDisposed()) {
                 continue;
             }
-            System.err.println("ResourcePool.stop(): Disposing of a Resource that is still in use.");
             try {
                 resource.waitForDispose();
             } catch (InterruptedException ignored) {

@@ -7,7 +7,8 @@ import java.util.List;
 /**
  * Diese Nachricht wird von einem Spielerprozess an den Spielprozess gesendet, um diesen über einen vom Spieler
  * ausgeführten Befehl zu informieren.
- * Mehrere dieser Nachrichten werden als Antwort auf eine {@link PlayerExecuteTurnRequest} gesendet.
+ * Mehrere dieser Nachrichten werden als Antwort auf eine {@link PlayerExecuteTurnRequest} gesendet, sowie anschließend
+ * eine finale {@link PlayerExecuteTurnResponse}, nachdem alle Befehle dieses Spielzugs übermittelt wurden.
  */
 public final class PlayerCommandResponse implements Message {
 

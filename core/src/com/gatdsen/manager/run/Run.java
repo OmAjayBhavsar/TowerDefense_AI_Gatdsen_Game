@@ -25,15 +25,16 @@ public abstract class Run {
     private boolean disposed = false;
     private final List<PlayerHandlerFactory> playerFactories;
 
-    protected final RunResults results = new RunResults();
+    protected final RunResults results;
 
-    public Run(Manager manager, RunConfiguration runConfig) {
+    public Run(Manager manager, RunConfig runConfig) {
         this.playerFactories = new ArrayList<>(runConfig.playerFactories);
         gameMode = runConfig.gameMode;
         this.manager = manager;
+        results = new RunResults(runConfig);
     }
 
-    public static Run getRun(Manager manager, RunConfiguration runConfig) {
+    public static Run getRun(Manager manager, RunConfig runConfig) {
         switch (runConfig.gameMode) {
             case Campaign:
             case Replay:

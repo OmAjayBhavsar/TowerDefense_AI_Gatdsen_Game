@@ -3,6 +3,7 @@ package com.gatdsen.manager.player.handler;
 import com.gatdsen.manager.command.Command;
 import com.gatdsen.manager.concurrent.RMICommunicator;
 import com.gatdsen.manager.player.Player;
+import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.networking.rmi.message.*;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerController;
@@ -58,6 +59,7 @@ public class RemotePlayerHandler extends PlayerHandler {
             if (message.getType() != Message.Type.PlayerInitResponse) {
                 throw new UnexpectedMessageException(message, Message.Type.PlayerInitResponse);
             }
+            penalize(((PlayerInitResponse) message).penalty);
             initFuture.complete(null);
             communicator.setMessageHandler(null);
         });
@@ -71,25 +73,23 @@ public class RemotePlayerHandler extends PlayerHandler {
         assert executeTurnFuture == null || executeTurnFuture.isDone() : "PlayerHandler.executeTurn() should only be called once the previously returned Future is done";
         executeTurnFuture = new CompletableFuture<>();
         communicator.setMessageHandler(message -> {
-            if (message.getType() != Message.Type.PlayerCommandResponse) {
-                throw new UnexpectedMessageException(message, Message.Type.PlayerCommandResponse);
+            if (message.getType() == Message.Type.PlayerCommandResponse) {
+                commandHandler.handle(((PlayerCommandResponse) message).commands);
+                return;
+            } else if (message.getType() == Message.Type.PlayerExecuteTurnResponse) {
+                penalize(((PlayerExecuteTurnResponse) message).penalty);
+                executeTurnFuture.complete(null);
+                communicator.setMessageHandler(null);
+                return;
             }
-            List<Command> commands = ((PlayerCommandResponse) message).commands;
-            commandHandler.handle(commands);
-            for (Command command : commands) {
-                if (command.endsTurn()) {
-                    executeTurnFuture.complete(null);
-                    communicator.setMessageHandler(null);
-                    return;
-                }
-            }
+            throw new UnexpectedMessageException(message, Message.Type.PlayerCommandResponse, Message.Type.PlayerExecuteTurnResponse);
         });
         communicator.communicate(new PlayerExecuteTurnRequest(gameState));
         return executeTurnFuture;
     }
 
     @Override
-    public void dispose() {
+    public void dispose(boolean gameCompleted) {
         // TODO: release RMICommunicator back to the ResourcePool
     }
 }

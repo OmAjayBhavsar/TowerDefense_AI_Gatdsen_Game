@@ -18,7 +18,8 @@ public final class MapRetriever {
     static {
         File externalMapDirectory = new File(EXTERNAL_MAP_DIRECTORY);
         if (!externalMapDirectory.isDirectory()) {
-            System.err.println("Warning: No map directory found at " + externalMapDirectory.getAbsolutePath());
+            // TODO: Should this be logged?
+            // System.err.println("Warning: No map directory found at " + externalMapDirectory.getAbsolutePath());
         }
     }
 

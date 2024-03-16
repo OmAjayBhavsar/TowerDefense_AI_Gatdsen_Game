@@ -11,6 +11,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Diese Klasse repräsentiert einen RMI-Kommunikator, der für die Kommunikation mit einem anderen Prozess verwendet
@@ -54,24 +55,48 @@ public final class RMICommunicator extends Resource {
     }
 
     /**
-     * Setzt den Callback, der aufgerufen wird, wenn eine Nachricht empfangen wird.
+     * Setzt den Callback, der aufgerufen wird, wenn eine Nachricht empfangen wird. Falls der Kommunikator noch nicht
+     * eingerichtet wurde, blockiert diese Methode so lange, bis der Kommunikator fertig eingerichtet ist und der
+     * Callback gesetzt werden kann.
      * Siehe auch {@link SimpleProcessCommunicator#setMessageHandler(Message.Handler)}
      * @param messageHandler Der Callback
      */
     public void setMessageHandler(Message.Handler messageHandler) {
+        try {
+            blockUntilSetup();
+        } catch (InterruptedException e) {
+            return;
+        }
         localCommunicatorObject.setMessageHandler(messageHandler);
     }
 
     /**
-     * Sendet eine Nachricht an den Kommunikationspartner. Falls der Kommunikator noch nicht eingerichtet wurde, wird
-     * die Nachricht in einer Warteschlange gehalten, bis der Kommunikator eingerichtet wurde.
+     * Sendet eine Nachricht an den Kommunikationspartner. Falls der Kommunikator noch nicht eingerichtet wurde,
+     * blockiert diese Methode so lange, bis der Kommunikator fertig eingerichtet ist und die Nachricht gesendet werden
+     * kann.
      * @param message Die zu sendende Nachricht
      */
     public void communicate(Message message) {
-        if (setupFuture.isDone()) {
-            communicate(remoteCommunicatorStub, message);
-        } else {
-            setupFuture.thenRun(() -> communicate(remoteCommunicatorStub, message));
+        try {
+            blockUntilSetup();
+        } catch (InterruptedException e) {
+            return;
+        }
+        communicate(remoteCommunicatorStub, message);
+    }
+
+    /**
+     * Falls der Kommunikator noch nicht eingerichtet wurde, blockiert diese Methode den aktuellen Thread so lange, bis
+     * der Kommunikator fertig eingerichtet ist.
+     * @throws InterruptedException Falls der Thread unterbrochen wird, während er wartet / blockiert
+     */
+    private void blockUntilSetup() throws InterruptedException {
+        if (!setupFuture.isDone()) {
+            try {
+                setupFuture.get();
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

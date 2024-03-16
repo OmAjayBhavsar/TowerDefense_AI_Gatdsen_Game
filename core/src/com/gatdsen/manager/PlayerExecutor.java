@@ -15,7 +15,6 @@ import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.simulation.GameState;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -38,7 +37,7 @@ public final class PlayerExecutor {
     private final Player player;
     private final InputProcessor inputGenerator;
 
-    private boolean isDisqualified = false;
+    private boolean hasReusableExecutor = true;
 
     public PlayerExecutor(boolean isDebug, int playerIndex, Class<? extends Player> playerClass) {
         this(isDebug, playerIndex, playerClass, null);
@@ -75,7 +74,7 @@ public final class PlayerExecutor {
     }
 
     private void initHumanPlayer(GameState state) {
-        StaticGameState staticState = new StaticGameState(state, playerIndex);
+        StaticGameState staticState = new StaticGameState(state, playerIndex, new Timer(HUMAN_EXECUTE_INIT_TIMEOUT));
         Future<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Init_Thread_Player_" + player.getName());
             player.init(staticState);
@@ -84,7 +83,7 @@ public final class PlayerExecutor {
             if (isDebug) {
                 future.get();
             } else {
-                future.get(2 * HUMAN_EXECUTE_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
+                future.get(HUMAN_EXECUTE_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
             }
         } catch(CancellationException e) {
             System.out.println("HumanPlayer turn execution was cancelled");
@@ -98,6 +97,7 @@ public final class PlayerExecutor {
             e.printStackTrace(System.err);
         } catch (TimeoutException e) {
             future.cancel(true);
+            hasReusableExecutor = false;
             System.out.println("HumanPlayer computation surpassed timeout");
         }
     }
@@ -109,10 +109,10 @@ public final class PlayerExecutor {
             System.err.println(reason);
             return new DisqualificationPenalty(reason);
         }
-        StaticGameState staticState = new StaticGameState(state, playerIndex);
+        ((Bot) player).setRandomSeed(seed);
+        StaticGameState staticState = new StaticGameState(state, playerIndex, new Timer(BOT_EXECUTE_INIT_TIMEOUT));
         Future<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Init_Thread_Player_" + player.getName());
-            ((Bot) player).setRandomSeed(seed);
             player.init(staticState);
         });
         long startTime = System.currentTimeMillis();
@@ -136,7 +136,7 @@ public final class PlayerExecutor {
             return new MissTurnsPenalty(reason);
         } catch (TimeoutException e) {
             future.cancel(true);
-            isDisqualified = true;
+            hasReusableExecutor = false;
             String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for surpassing computation timeout by taking more than " + (2 * BOT_EXECUTE_INIT_TIMEOUT) + "ms!";
             System.err.println(reason);
             return new DisqualificationPenalty(reason);
@@ -149,7 +149,7 @@ public final class PlayerExecutor {
         return null;
     }
 
-    public Future<?> executeTurn(GameState state, Command.CommandHandler commandHandler) {
+    public CompletableFuture<Penalty> executeTurn(GameState state, Command.CommandHandler commandHandler) {
         if (PlayerType.fromPlayer(player) == PlayerType.HUMAN) {
             return executeHumanPlayerTurn(state, commandHandler);
         } else {
@@ -157,19 +157,21 @@ public final class PlayerExecutor {
         }
     }
 
-    private Future<?> executeHumanPlayerTurn(GameState state, Command.CommandHandler commandHandler) {
-        StaticGameState staticState = new StaticGameState(state, playerIndex);
+    private CompletableFuture<Penalty> executeHumanPlayerTurn(GameState state, Command.CommandHandler commandHandler) {
+        StaticGameState staticState = new StaticGameState(state, playerIndex, new Timer(HUMAN_EXECUTE_TURN_TIMEOUT));
         Controller controller = new Controller(HUMAN_CONTROLLER_USES);
-        CompletableFuture<?> future = executor.executeCompletable(() -> {
+        CompletableFuture<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
             player.executeTurn(staticState, controller);
         });
         return executor.execute(() -> {
             inputGenerator.activateTurn((HumanPlayer) player, playerIndex);
             Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
-            long endTime = waitForFutureWhileHandlingCommands(System.currentTimeMillis() + HUMAN_EXECUTE_TURN_TIMEOUT, future, controller.commands, commandHandler);
+            long endTime = waitForFutureWhileHandlingCommands(System.currentTimeMillis() + HUMAN_EXECUTE_TURN_TIMEOUT, future, controller, commandHandler);
             if (endTime == -1) {
+                controller.endTurn();
                 future.cancel(true);
+                hasReusableExecutor = false;
                 System.out.println("HumanPlayer computation surpassed timeout");
             } else {
                 assert future.isDone() : "Future should be done when waitForFutureWhileHandlingCommands() returns a valid end time!";
@@ -187,7 +189,6 @@ public final class PlayerExecutor {
                     e.printStackTrace(System.err);
                 }
             }
-            controller.endTurn();
             // Falls in der waitWhileHandlingCommands()-Methode nicht alle Befehle abgearbeitet wurden, holen wir das
             // hier nach und verarbeiten die in der Controller-Warteschlange verbliebenen Befehle.
             List<Command> commands = new LinkedList<>();
@@ -195,24 +196,26 @@ public final class PlayerExecutor {
             if (count > 0) {
                 commandHandler.handle(commands);
             }
+            return null;
         });
     }
 
-    private Future<?> executeBotTurn(GameState state, Command.CommandHandler commandHandler) {
-        StaticGameState staticState = new StaticGameState(state, playerIndex);
+    private CompletableFuture<Penalty> executeBotTurn(GameState state, Command.CommandHandler commandHandler) {
+        StaticGameState staticState = new StaticGameState(state, playerIndex, new Timer(BOT_EXECUTE_TURN_TIMEOUT));
         Controller controller = new Controller(BOT_CONTROLLER_USES);
-        CompletableFuture<?> future = executor.executeCompletable(() -> {
+        CompletableFuture<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
             player.executeTurn(staticState, controller);
         });
         return executor.execute(() -> {
             Thread.currentThread().setName("Future_Executor_Player_" + player.getName());
             long startTime = System.currentTimeMillis();
-            long endTime = waitForFutureWhileHandlingCommands(startTime + 2 * BOT_EXECUTE_TURN_TIMEOUT, future, controller.commands, commandHandler);
+            long endTime = waitForFutureWhileHandlingCommands(startTime + 2 * BOT_EXECUTE_TURN_TIMEOUT, future, controller, commandHandler);
             Penalty penalty = null;
             if (endTime == -1) {
+                controller.endTurn();
                 future.cancel(true);
-                isDisqualified = true;
+                hasReusableExecutor = false;
                 String reason = "Bot \"" + player.getName() + "\" has to miss the next turn for surpassing computation timeout by taking more than " + (2 * BOT_EXECUTE_TURN_TIMEOUT) + "ms!";
                 System.err.println(reason);
                 penalty = new DisqualificationPenalty(reason);
@@ -238,11 +241,6 @@ public final class PlayerExecutor {
                     penalty = new MissTurnsPenalty(reason);
                 }
             }
-            if (penalty == null) {
-                controller.endTurn();
-            } else {
-                controller.endTurn(penalty);
-            }
             // Falls in der waitWhileHandlingCommands()-Methode nicht alle Befehle abgearbeitet wurden, holen wir das
             // hier nach und verarbeiten die in der Controller-Warteschlange verbliebenen Befehle.
             List<Command> commands = new LinkedList<>();
@@ -250,57 +248,67 @@ public final class PlayerExecutor {
             if (count > 0) {
                 commandHandler.handle(commands);
             }
+            return penalty;
         });
     }
 
     /**
-     * Hilfsmethode, die wartet bis entweder der Future erfüllt ist oder {@link System#currentTimeMillis()} größer als
-     * die übergebene Maximalzeit {@code untilTime} ist, falls diese Instanz sich nicht im Debug-Modus befindet.
-     * Währenddessen werden alle Befehle, die in der Warteschlange {@code commands} liegen, mit dem übergebenen
-     * {@link Command.CommandHandler} abgearbeitet.
+     * Hilfsmethode, die wartet bis entweder der übergebene {@link CompletableFuture} erfüllt ist oder
+     * {@link System#currentTimeMillis()} größer als die übergebene Maximalzeit {@code untilTime} ist, falls diese
+     * Instanz sich nicht im Debug-Modus befindet. <br>
+     * Währenddessen werden alle Befehle, die in der Warteschlange des {@link Controller}s liegen, mit dem übergebenen
+     * {@link Command.CommandHandler} abgearbeitet. <br>
+     * Falls der Future erfüllt wurde, wird die Methode {@link Controller#endTurn()} aufgerufen, um den aktuellen Zug zu
+     * beenden.
      * @param untilTime Die maximale Wartezeit
      * @param future Der Future, der auf Erfüllung wartet
-     * @param commands Die Warteschlange, die abgearbeitet werden soll
+     * @param controller Der Controller, der den aktuellen Zug steuert
      * @param commandHandler Der Handler, der die Befehle abarbeiten soll
      * @return Die Zeit, zu der der Future erfüllt wurde oder -1, falls der Future über die maximale Wartezeit hinaus
      * noch nicht erfüllt wurde
      */
-    private long waitForFutureWhileHandlingCommands(long untilTime, CompletableFuture<?> future, BlockingQueue<Command> commands, Command.CommandHandler commandHandler) {
+    private long waitForFutureWhileHandlingCommands(long untilTime, CompletableFuture<?> future, Controller controller, Command.CommandHandler commandHandler) throws InterruptedException {
         AtomicLong completionTime = new AtomicLong(-1);
-        future.thenRun(() -> {
+        future.whenComplete((result, exception) -> {
             completionTime.set(System.currentTimeMillis());
+            // Dieses Beenden des Controllers ist sehr wichtig, da es einen finalen Befehl in die Warteschlange des
+            // Controllers einfügt, der das Ende des aktuellen Zuges markiert.
+            // So kann es nicht vorkommen, dass wir unten in der Schleife im poll() bis zum Timeout warten, obwohl der
+            // Future schon erfüllt wurde, da dieser finale Befehl noch in die Warteschlange eingefügt wird.
+            controller.endTurn();
         });
-        // TODO: Callback bei Beendigung des Future, könnte controller.endTurn() aufrufen, sodass die static time nicht
-        //       überprüft werden müsste
-        boolean useStaticTime = isDebug || PlayerType.fromPlayer(player) == PlayerType.HUMAN;
+        BlockingQueue<Command> commands = controller.commands;
         long currentTime = System.currentTimeMillis();
         // Ausführen der Schleife, solange der Future noch nicht fertig ist und entweder Debug-Modus aktiv ist oder die
         // aktuelle Zeit kleiner oder gleich der maximalen Zeit ist.
         while (completionTime.get() == -1 && (isDebug || (currentTime = System.currentTimeMillis()) <= untilTime)) {
-            Command command = null;
-            try {
-                if (useStaticTime) {
-                    // Im Debug-Modus führen wir solange Befehle aus, bis der Future fertig ist, weshalb wir hier
-                    // immer nur 100ms warten, um periodisch durch den Schleifenkopf unseren Future zu prüfen.
-                    command = commands.poll(100, TimeUnit.MILLISECONDS);
-                } else {
-                    // Im normalen Modus warten wir auf Befehle, bis der Future fertig ist oder die maximale Zeit
-                    // erreicht ist. Als maximale Wartezeit auf einen Befehl aus der Warteschlange verwenden wir die
-                    // verbleibende Zeit in der Schleife.
-                    command = commands.poll(untilTime - currentTime, TimeUnit.MILLISECONDS);
+            if (commands.size() > 1) {
+                // Abhängig von der Ausführungsdauer des CommandHandlers kann es sein, dass sich in der Warteschlange
+                // mehrere Befehle stauen. In diesem Fall holen wir alle Befehle aus der Warteschlange und verarbeiten
+                // diese mit einem Mal statt einzeln.
+                List<Command> commandsToHandle = new LinkedList<>();
+                commands.drainTo(commandsToHandle);
+                commandHandler.handle(commandsToHandle);
+            } else {
+                // Falls nur ein oder kein Befehl in der Warteschlange liegt, warten wir auf den nächsten Befehl.
+                // Als maximale Wartezeit auf einen Befehl aus der Warteschlange verwenden wir die verbleibende Zeit
+                // in der Schleife.
+                Command command = commands.poll(untilTime - currentTime, TimeUnit.MILLISECONDS);
+                if (command == null) {
+                    continue;
                 }
-            } catch (InterruptedException ignored) {
-                // Wir ignorieren die Unterbrechung
+                commandHandler.handle(command);
             }
-            if (command == null) {
-                continue;
-            }
-            commandHandler.handle(command);
         }
         return completionTime.get();
     }
 
-    public void dispose() {
-        ResourcePool.getInstance().releaseThreadExecutor(executor, !isDisqualified);
+    /**
+     * Beendet diesen PlayerExecutor und wird genutzt, um die Ressourcen freizugeben, die zur Ausführung des Spielers
+     * genutzt wurden.
+     * @param reusable Gibt an, ob die Ressourcen wiederverwendet werden können
+     */
+    public void dispose(boolean reusable) {
+        ResourcePool.getInstance().releaseThreadExecutor(executor, reusable && hasReusableExecutor);
     }
 }

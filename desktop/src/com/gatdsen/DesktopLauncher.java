@@ -5,7 +5,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.gatdsen.manager.*;
 import com.gatdsen.manager.run.Run;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.ui.GADS;
 import org.apache.commons.cli.CommandLine;
 
@@ -18,7 +18,7 @@ public final class DesktopLauncher extends Launcher {
         if (params == null) {
             return;
         }
-        RunConfiguration runConfig = parseRunConfiguration(params);
+        RunConfig runConfig = parseRunConfig(params);
         if (runConfig == null) {
             return;
         }

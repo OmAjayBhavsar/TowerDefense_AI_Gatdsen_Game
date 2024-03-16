@@ -9,7 +9,7 @@ import com.gatdsen.animation.Animator;
 import com.gatdsen.animation.AnimatorCamera;
 import com.gatdsen.manager.*;
 import com.gatdsen.manager.run.Run;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.action.Action;
 import com.gatdsen.simulation.action.ActionLog;
@@ -54,16 +54,16 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
     }
 
     @Override
-    protected void setRunConfiguration(RunConfiguration runConfiguration) {
+    protected void setRunConfig(RunConfig runConfig) {
         //update runconfig
-        super.setRunConfiguration(runConfiguration);
-        this.runConfiguration.gui = true;
-        this.runConfiguration.animationLogProcessor = this;
-        this.runConfiguration.inputProcessor = hud.getInputHandler();
+        super.setRunConfig(runConfig);
+        this.runConfig.gui = true;
+        this.runConfig.animationLogProcessor = this;
+        this.runConfig.inputProcessor = hud.getInputHandler();
 
-        run = manager.startRun(this.runConfiguration);
+        run = manager.startRun(this.runConfig);
         if (run == null) {
-            throw new RuntimeException("Can't start game with an invalid RunConfiguration!");
+            throw new RuntimeException("Can't start game with an invalid RunConfig!");
         }
     }
 
@@ -151,7 +151,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         animator.dispose();
         manager.stop(run);
         hud.dispose();
-        gameManager.setScreen(GADS.ScreenState.MAINSCREEN, null);
+        gameManager.setScreen(GADS.ScreenState.MAINSCREEN, new RunConfig());
     }
 
     public void setupInput() {
