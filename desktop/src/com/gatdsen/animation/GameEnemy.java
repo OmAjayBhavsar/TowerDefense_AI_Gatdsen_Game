@@ -12,12 +12,14 @@ import static com.gatdsen.ui.assets.AssetContainer.IngameAssets.gameEnemyAnimati
 
 public class GameEnemy extends AnimatedEntity {
     private Integer level;
-    static private BitmapFont fonte = new BitmapFont();
+    private BitmapFont fonte;
     public Healthbar healthbar;
 
-    public GameEnemy(int level, int maxHealth) {
+    public GameEnemy(int level, int maxHealth, BitmapFont fonts) {
         super(gameEnemyAnimations[GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
         this.level = level;
+        fonte = fonts;
+
         healthbar = new Healthbar(maxHealth);
         this.add(healthbar);
 
