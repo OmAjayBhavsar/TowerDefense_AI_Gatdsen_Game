@@ -74,7 +74,7 @@ public final class PlayerExecutor {
     }
 
     private void initHumanPlayer(GameState state) {
-        StaticGameState staticState = new StaticGameState(state, playerIndex);
+        StaticGameState staticState = new StaticGameState(state, playerIndex, new Timer(HUMAN_EXECUTE_INIT_TIMEOUT));
         Future<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Init_Thread_Player_" + player.getName());
             player.init(staticState);
@@ -83,7 +83,7 @@ public final class PlayerExecutor {
             if (isDebug) {
                 future.get();
             } else {
-                future.get(2 * HUMAN_EXECUTE_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
+                future.get(HUMAN_EXECUTE_INIT_TIMEOUT, TimeUnit.MILLISECONDS);
             }
         } catch(CancellationException e) {
             System.out.println("HumanPlayer turn execution was cancelled");
@@ -110,7 +110,7 @@ public final class PlayerExecutor {
             return new DisqualificationPenalty(reason);
         }
         ((Bot) player).setRandomSeed(seed);
-        StaticGameState staticState = new StaticGameState(state, playerIndex);
+        StaticGameState staticState = new StaticGameState(state, playerIndex, new Timer(BOT_EXECUTE_INIT_TIMEOUT));
         Future<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Init_Thread_Player_" + player.getName());
             player.init(staticState);
@@ -158,7 +158,7 @@ public final class PlayerExecutor {
     }
 
     private CompletableFuture<Penalty> executeHumanPlayerTurn(GameState state, Command.CommandHandler commandHandler) {
-        StaticGameState staticState = new StaticGameState(state, playerIndex);
+        StaticGameState staticState = new StaticGameState(state, playerIndex, new Timer(HUMAN_EXECUTE_TURN_TIMEOUT));
         Controller controller = new Controller(HUMAN_CONTROLLER_USES);
         CompletableFuture<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
@@ -201,7 +201,7 @@ public final class PlayerExecutor {
     }
 
     private CompletableFuture<Penalty> executeBotTurn(GameState state, Command.CommandHandler commandHandler) {
-        StaticGameState staticState = new StaticGameState(state, playerIndex);
+        StaticGameState staticState = new StaticGameState(state, playerIndex, new Timer(BOT_EXECUTE_TURN_TIMEOUT));
         Controller controller = new Controller(BOT_CONTROLLER_USES);
         CompletableFuture<?> future = executor.execute(() -> {
             Thread.currentThread().setName("Run_Thread_Player_" + player.getName());
@@ -269,7 +269,7 @@ public final class PlayerExecutor {
      */
     private long waitForFutureWhileHandlingCommands(long untilTime, CompletableFuture<?> future, Controller controller, Command.CommandHandler commandHandler) throws InterruptedException {
         AtomicLong completionTime = new AtomicLong(-1);
-        future.thenRun(() -> {
+        future.whenComplete((result, exception) -> {
             completionTime.set(System.currentTimeMillis());
             // Dieses Beenden des Controllers ist sehr wichtig, da es einen finalen Befehl in die Warteschlange des
             // Controllers einfügt, der das Ende des aktuellen Zuges markiert.

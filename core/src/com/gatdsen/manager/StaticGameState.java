@@ -15,8 +15,9 @@ public final class StaticGameState {
     private final GameState state;
     private final int playerIndex;
     private final StaticPlayerState[] staticPlayerStates;
+    private final Timer timer;
 
-    StaticGameState(GameState state, int playerIndex) {
+    StaticGameState(GameState state, int playerIndex, Timer timer) {
         this.state = state;
         this.playerIndex = playerIndex;
         staticPlayerStates = new StaticPlayerState[state.getPlayerCount()];
@@ -24,6 +25,7 @@ public final class StaticGameState {
         for (int i = 0; i < state.getPlayerCount(); i++) {
             staticPlayerStates[i] = new StaticPlayerState(playerStates[i]);
         }
+        this.timer = timer;
     }
 
     /**
@@ -41,40 +43,49 @@ public final class StaticGameState {
     }
 
     /**
-     * @return Gibt die aktuelle Runde zurück.
-     * <p>
+     * Gibt die aktuelle Runde zurück. <br>
      * Dieser Wert ist nicht nur nützlich, um zu überprüfen, wie viele Runden das Spiel bereits andauert, sondern
      * ebenfalls um zu überprüfen, ob man eine Runde aussetzen musste, da in diesem Fall die {@code executeTurn()} Methode des
      * Spielers nicht aufgerufen wird.
+     * @return Die aktuelle Runde
      */
     public int getTurn() {
         return state.getTurn();
     }
 
     /**
-     * @return Gibt die Anzahl der Spieler zurück, die am Spiel teilnehmen.
-     * <p>
-     * Im Normalfall sind dies zwei Spieler.
+     * Gibt die Anzahl der Spieler zurück, die am Spiel teilnehmen. <br>
+     * Im Normalfall sind dies 2 Spieler.
+     * @return Die Anzahl der Spieler
      */
     public int getPlayerCount() {
         return state.getPlayerCount();
     }
 
     /**
-     * @return Gibt die Breite des Spielfeldes zurück.
-     * <p>
+     * Gibt die Breite des Spielfeldes zurück. <br>
      * Diese Methode kann bspw. in Verbindung mit {@link StaticPlayerState#getBoard()} verwendet werden.
+     * @return Die Breite des Spielfeldes
      */
     public int getBoardSizeX() {
         return state.getBoardSizeX();
     }
 
     /**
-     * @return Gibt die Höhe des Spielfeldes zurück.
-     * <p>
+     * Gibt die Höhe des Spielfeldes zurück. <br>
      * Diese Methode kann bspw. in Verbindung mit {@link StaticPlayerState#getBoard()} verwendet werden.
+     * @return Die Höhe des Spielfeldes
      */
     public int getBoardSizeY() {
         return state.getBoardSizeY();
+    }
+
+    /**
+     * Gibt ein {@link Timer} Objekt zurück, welches verwendet werden kann, um die vergangene Zeit seit Rundenbeginn
+     * und die verbleibende Zeit bis zum Rundenende zu erhalten.
+     * @return Das {@link Timer} Objekt der aktuellen Runde
+     */
+    public Timer getTimer() {
+        return timer;
     }
 }
