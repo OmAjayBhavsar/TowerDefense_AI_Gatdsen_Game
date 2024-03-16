@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input;
 import com.gatdsen.manager.Controller;
 import com.gatdsen.manager.PlayerExecutor;
 import com.gatdsen.manager.StaticGameState;
+import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.IntVector2;
 import com.gatdsen.simulation.Tower;
 
@@ -138,6 +139,15 @@ public class HumanPlayer extends Player {
      */
     public void sellTower(int x, int y) {
         controller.sellTower(x, y);
+    }
+
+    /**
+     * Ruft den {@link Controller} des {@link HumanPlayer} auf, um einen Gegner zu einem gegnerischen Spieler auf das
+     * Spielfeld zu senden.
+     * @param type Der Typ des Gegners, der gesendet werden soll
+     */
+    public void sendEnemyToPlayer(Enemy.Type type) {
+        controller.sendEnemyToPlayer(type);
     }
 
     /**
