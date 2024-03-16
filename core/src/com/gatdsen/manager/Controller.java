@@ -2,6 +2,7 @@ package com.gatdsen.manager;
 
 import com.gatdsen.manager.command.*;
 import com.gatdsen.manager.player.data.penalty.Penalty;
+import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.Tower;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -31,7 +32,7 @@ public final class Controller {
     }
 
     /**
-     * Platziert einen neuen Turm auf dem Spielfeld
+     * Platziert einen neuen Turm auf dem Spielfeld.
      * @param x x-Koordinate, an der der Turm platziert werden soll
      * @param y y-Koordinate, an der der Turm platziert werden soll
      * @param type Typ des Turms, der platziert werden soll
@@ -41,7 +42,7 @@ public final class Controller {
     }
 
     /**
-     * Verbessert einen Turm auf dem Spielfeld
+     * Verbessert einen Turm auf dem Spielfeld.
      * @param x x-Koordinate, an der sich der Turm befindet
      * @param y y-Koordinate, an der sich der Turm befindet
      */
@@ -50,7 +51,7 @@ public final class Controller {
     }
 
     /**
-     * Verkauft einen Turm auf dem Spielfeld
+     * Verkauft einen Turm auf dem Spielfeld.
      * @param x x-Koordinate, an der sich der Turm befindet
      * @param y y-Koordinate, an der sich der Turm befindet
      */
@@ -70,18 +71,28 @@ public final class Controller {
     }
 
     /**
-     * Internal utility method.
-     * Controls the remaining uses and submits cmd to the game.
-     *
-     * @param command the command to be queued
+     * Sendet einen Gegner zu einem gegnerischen Spieler auf das Spielfeld.
+     * @param enemyType Der Typ des Gegners, der gesendet werden soll
+     */
+    public void sendEnemyToPlayer(Enemy.Type enemyType) {
+        queue(new SendEnemyToPlayerCommand(enemyType));
+    }
+
+    /**
+     * Interne Methode: <br>
+     * Kontrolliert die verbleibenden Nutzungen und fügt die {@link Command}s der Warteschlange zur Weiterverarbeitung
+     * hinzu
+     * @param command Der Befehl, der zur Warteschlange hinzugefügt werden soll
      */
     private void queue(Command command) {
         if (isActive()) {
             commands.add(command);
+            uses--;
         }
     }
 
     /**
+     * Interne Methode: <br>
      * Markiert das Ende des aktuellen Zuges für diesen Controller und deaktiviert diesen, sodass keine weiteren
      * {@link Command}s mehr ausgeführt werden können.
      */
@@ -93,6 +104,7 @@ public final class Controller {
     }
 
     /**
+     * Interne Methode: <br>
      * Gibt an, ob dieser Controller noch aktiv ist.
      * @return true, wenn dieser Controller aktiv ist, sonst false
      */
@@ -101,6 +113,7 @@ public final class Controller {
     }
 
     /**
+     * Interne Methode: <br>
      * Deaktiviert diesen Controller, sodass keine weiteren {@link Command}s mehr ausgeführt werden können.
      */
     private void deactivate() {
