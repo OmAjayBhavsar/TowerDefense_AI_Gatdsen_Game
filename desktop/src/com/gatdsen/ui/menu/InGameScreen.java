@@ -129,7 +129,6 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         hud.resizeViewport(width, height);
         gameViewport.update(width, height);
         debugView.getViewport().update(width, height);
-
     }
 
     @Override

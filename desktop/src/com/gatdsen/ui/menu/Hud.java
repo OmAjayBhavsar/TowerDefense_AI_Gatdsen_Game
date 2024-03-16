@@ -11,8 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
@@ -20,6 +18,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gatdsen.animation.entity.TileMap;
 import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Tower;
@@ -27,7 +26,10 @@ import com.gatdsen.ui.GADS;
 import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.hud.*;
 
+import javax.swing.*;
+import java.net.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Class for taking care of the User Interface.
@@ -40,8 +42,6 @@ public class Hud implements Disposable {
     private final InputHandler inputHandler;
     private final InputMultiplexer inputMultiplexer;
     private final TurnTimer turnTimer;
-    public HorizontalGroup playerGroup;
-    public VerticalGroup mainGroup;
     private final Container<ImagePopup> turnPopupContainer;
     private final InGameScreen inGameScreen;
     private final TextureRegion turnChangeSprite;
@@ -76,6 +76,7 @@ public class Hud implements Disposable {
     private Label currentRoundLabel;
     private Label healthPlayer0Label;
     private Label healthPlayer1Label;
+    private VerticalGroup mainVerticalGroup;
 
     /**
      * Initialisiert das HUD-Objekt
@@ -101,6 +102,9 @@ public class Hud implements Disposable {
         inputHandler.setUiMessenger(uiMessenger);// für die Simulation benötigt
         inputMultiplexer.addProcessor(stage);
         scoreView = new ScoreView(null);
+        mainVerticalGroup = new VerticalGroup();
+        mainVerticalGroup.setFillParent(true);
+        stage.addActor(mainVerticalGroup);
 
     }
 
@@ -118,17 +122,18 @@ public class Hud implements Disposable {
      */
 
     public void init(GameState gameState, Vector2[] arrayPositionTileMaps, int tileSize, TileMap tileMap) {
-
+        int playerTableWidth = 80;
         renderingSpeed = 1;
         player0Balance = 100;
         player1Balance = 100;
         health = 300;
         buttonWidth = 150;
         roundCounter = 0;
-        float padding = 10;
         TextButton restartGameButton;
         TextButton nextRoundButton;
         TextButton backToMainMenuButton;
+
+        this.gameState = gameState;
 
         healthBarPlayer0.setValue(health);
         healthBarPlayer0.setAnimateDuration(0.25f);
@@ -138,8 +143,7 @@ public class Hud implements Disposable {
             roundCounter = gameState.getTurn();
         } else roundCounter = 0;
 
-        // Erstellen der Elemente
-
+// Erstellen der Elemente
         player0BalanceLabel = new Label("$" + player0Balance, skin);
         player1BalanceLabel = new Label("$" + player1Balance, skin);
         currentRoundLabel = new Label("Runde: " + roundCounter, skin);
@@ -148,6 +152,15 @@ public class Hud implements Disposable {
         nextRoundButton = new TextButton("Zug beenden", skin);
         backToMainMenuButton = new TextButton("Hauptmenü", skin);
         restartGameButton = new TextButton("Neustart", skin);
+        SelectBox<String> playerSelectBox = new SelectBox<>(skin);
+        playerSelectBox.setItems("Spieler 1", "Spieler 2");
+        playerSelectBox.setSize(140, 20);
+
+        SelectBox<String> enemySelectBox = new SelectBox<>(skin);
+        enemySelectBox.setItems("Schild-Maus", "EMP-Maus", "Rüstungs-Maus"); // Beispielwerte, bitte anpassen
+        enemySelectBox.setSize(140, 20);
+
+        TextButton buyButton = new TextButton("Kaufen", skin);
         nextRoundButton.addListener(new ChangeListener() {
             /**
              * Wird aufgerufen, wenn der Button geklickt wird
@@ -173,37 +186,59 @@ public class Hud implements Disposable {
                 inGameScreen.dispose();
             }
         });
+        buyButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                String selectedPlayer = playerSelectBox.getSelected();
+                String selectedEnemy = enemySelectBox.getSelected();
+                int selectedPlayerInt;
+                Enemy.Type enemyType;
 
-        HorizontalGroup playerGroup = new HorizontalGroup();
-        playerGroup.space(50);
+                selectedPlayerInt = switch (selectedPlayer) {
+                    case "Spieler 1" -> 0;
+                    case "Spieler 2" -> 1;
+                    default -> 0;
+                };
 
-        playerGroup.pad(padding);
+                enemyType = switch (selectedEnemy) {
+                    case "Schild-Maus" -> Enemy.Type.SHIELD_ENEMY;
+                    case "EMP-Maus" -> Enemy.Type.EMP_ENEMY;
+                    case "Rüstungs-Maus" -> Enemy.Type.ARMOR_ENEMY;
+                    default -> Enemy.Type.SHIELD_ENEMY;
+                };
+                inputHandler.playerBuyedEnemy(selectedPlayerInt, enemyType);
+            }
+        });
 
-        playerGroup.addActor(new Label("Spieler 1", skin));
-        playerGroup.addActor(player0BalanceLabel);
-        playerGroup.addActor(healthBarPlayer0);
-        playerGroup.addActor(currentRoundLabel);
-        playerGroup.addActor(healthBarPlayer1);
-        playerGroup.addActor(player1BalanceLabel);
-        playerGroup.addActor(new Label("Spieler 2", skin));
+        Table playerTable = new Table();
+        playerTable.defaults().pad(10);
+        playerTable.add(new Label("Spieler 1", skin)).width(playerTableWidth);
+        playerTable.add(player0BalanceLabel).width(playerTableWidth);
+        playerTable.add(healthBarPlayer0).width(playerTableWidth);
+        playerTable.add(currentRoundLabel).width(playerTableWidth);
+        playerTable.add(healthBarPlayer1).width(playerTableWidth);
+        playerTable.add(player1BalanceLabel).width(playerTableWidth);
+        playerTable.add(new Label("Spieler 2", skin)).width(playerTableWidth);
 
-        VerticalGroup mainGroup = new VerticalGroup();
-        mainGroup.pad(padding);
-        mainGroup.space(padding);
-        mainGroup.padTop(padding);
-        mainGroup.addActor(playerGroup);
-        mainGroup.addActor(new Label("", skin)); // Invisible label for spacing
-        mainGroup.addActor(turnTimer);
-        mainGroup.addActor(new Label("", skin)); // Invisible label for spacing
-        mainGroup.addActor(new Label("Shop zum Spawnen", skin));
-        mainGroup.addActor(new Label("von Gegnern", skin));
-        mainGroup.addActor(nextRoundButton);
-        mainGroup.addActor(new Label("", skin)); // Invisible label for spacing
-        mainGroup.addActor(backToMainMenuButton);
+        Table mainTable = new Table();
+        mainTable.defaults().pad(10);
+        mainTable.add(new Label("", skin)).width(buttonWidth).row(); // Invisible label for spacing
+        mainTable.add(turnTimer).width(buttonWidth).row();
+        mainTable.add(new Label("", skin)).width(buttonWidth).row(); // Invisible label for spacing
+        mainTable.add(nextRoundButton).colspan(3).width(buttonWidth).row();
+        mainTable.add(new Label("Shop zum Spawnen", skin)).colspan(3).row();
+        mainTable.add(new Label("von Gegnern", skin)).colspan(3).row();
+        mainTable.add(playerSelectBox).colspan(3).width(buttonWidth).row();
+        mainTable.add(enemySelectBox).colspan(3).width(buttonWidth).row();
+        mainTable.add(buyButton).colspan(3).width(buttonWidth).row();
+        mainTable.add(new Label("", skin)).colspan(3).width(buttonWidth).row(); // Invisible label for spacing
+        mainTable.add(backToMainMenuButton).colspan(3).width(buttonWidth).row();
 
-        stage.addActor(mainGroup);
+        // Hinzufügen der Tabellen zur VerticalGroup
+        mainVerticalGroup.addActor(playerTable);
+        mainVerticalGroup.addActor(mainTable);
 
-        this.gameState = gameState;
+        stage.addActor(mainVerticalGroup);
         stage.addActor(hudGroup);
 
         int numberOfTeams = gameState.getPlayerCount();
@@ -226,11 +261,11 @@ public class Hud implements Disposable {
         }
         setupScoreboard(gameState);
 
-        float mainGroupX = (hudViewport.getWorldWidth() - mainGroup.getWidth()) / 2;
-        float mainGroupY = hudViewport.getWorldHeight() - mainGroup.getHeight();
+        // float mainGroupX = (hudViewport.getWorldWidth() - mainVerticalGroup.getWidth()) / 2;
+        //  float mainGroupY = hudViewport.getWorldHeight() - mainVerticalGroup.getHeight();
 
-        mainGroup.setPosition(mainGroupX, mainGroupY);
-        stage.addActor(mainGroup);
+        //    mainVerticalGroup.setPosition(mainGroupX, mainGroupY);
+        stage.addActor(mainVerticalGroup);
     }
 
     /**
@@ -432,7 +467,13 @@ public class Hud implements Disposable {
 
     public void clear() {
         stage.clear();
-        tileMapButton(0, tileMap).clear();
+        mainVerticalGroup.clear();
+        hudGroup.clear(); // Entferne alle Elemente aus der Hud-Gruppe
+        for (Actor actor : hudGroup.getChildren()) {
+            if (actor instanceof TextButton) {
+                actor.remove(); // Entferne jeden TextButton aus der Hud-Gruppe
+            }
+        }
     }
 
     /**
@@ -441,7 +482,7 @@ public class Hud implements Disposable {
     public void toggleDebugOutlines() {
         this.debugVisible = !debugVisible;
 
-        this.mainGroup.setDebug(debugVisible);
+        this.mainVerticalGroup.setDebug(debugVisible);
     }
 
     /**
