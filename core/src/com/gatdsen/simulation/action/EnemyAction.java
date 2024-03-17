@@ -48,10 +48,22 @@ public class EnemyAction extends TeamAction {
         return level;
     }
 
+    /**
+     * Gibt die ID des Gegners zurück, der die Action ausführt.
+     *
+     * @return Der Typ des Gegners, der die Action ausführt.
+     */
+    public Enemy.Type getType() {
+        return type;
+    }
+
+    /**
+     * Gibt die ID des Gegners zurück, der die Action ausführt.
+     * @return Die ID des Gegners, der die Action ausführt.
+     */
     public int getId() {
         return id;
     }
-
 
     @Override
     public String toString() {
