@@ -90,18 +90,18 @@ public abstract class BaseMenuScreen extends ConfigScreen {
         menuTable.add(getContent(skin)).expandY().top().row();
         Table navigationTable = new Table(skin);
 
-        if (getPrev() != null) {
+        GADS.ScreenState previousScreenState = getPrev();
+        GADS.ScreenState nextScreenState = getNext();
+        if (previousScreenState != null) {
             TextButton backButton = new TextButton("Zurück", skin);
             backButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    GADS.ScreenState prevScreenState  = getPrev();
-                    gameInstance.setScreen(prevScreenState , null);
+                    gameInstance.setScreen(previousScreenState , null);
                 }
             });
             navigationTable.add(backButton).colspan(4).pad(10).width(200);
-        }
-        else {
+        } else {
             TextButton exitButton = new TextButton("Beenden", skin);
             exitButton.addListener(new ChangeListener() {
                 @Override
@@ -111,21 +111,21 @@ public abstract class BaseMenuScreen extends ConfigScreen {
             });
             navigationTable.add(exitButton).colspan(4).pad(10).width(200);
         }
-        if (getNext() == GADS.ScreenState.INGAMESCREEN) {
+        if (nextScreenState == GADS.ScreenState.INGAMESCREEN) {
             TextButton startGameButton = new TextButton("Start", skin);
             startGameButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    gameInstance.setScreen(GADS.ScreenState.INGAMESCREEN, getRunConfiguration());
+                    gameInstance.setScreen(GADS.ScreenState.INGAMESCREEN, getRunConfig());
                 }
             });
             navigationTable.add(startGameButton).colspan(4).pad(10).width(200);
-        } else if (getNext()!= null) {
+        } else if (nextScreenState != null) {
             TextButton nextGameButton = new TextButton("Weiter", skin);
             nextGameButton.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    gameInstance.setScreen(GADS.ScreenState.INGAMESCREEN, getRunConfiguration());
+                    gameInstance.setScreen(nextScreenState, getRunConfig());
                 }
             });
             navigationTable.add(nextGameButton).colspan(4).pad(10).width(200);

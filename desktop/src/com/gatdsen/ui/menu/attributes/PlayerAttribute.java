@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 
 import java.util.ArrayList;
 
@@ -50,34 +50,34 @@ public class PlayerAttribute extends Attribute {
     }
 
     /**
-     * Konfiguriert die RunConfiguration unter Berücksichtigung dieses Attributs und gibt die aktualisierte Konfiguration zurück.
+     * Konfiguriert die RunConfig unter Berücksichtigung dieses Attributs und gibt die aktualisierte Konfiguration zurück.
      *
-     * @param runConfiguration Die aktuelle RunConfiguration.
-     * @return Die aktualisierte RunConfiguration nach der Konfiguration des Attributs.
+     * @param runConfig Die aktuelle RunConfig.
+     * @return Die aktualisierte RunConfig nach der Konfiguration des Attributs.
      */
     @Override
-    public RunConfiguration getConfig(RunConfiguration runConfiguration) {
-        if (runConfiguration.playerFactories == null) {
-            runConfiguration.playerFactories = new ArrayList<>();
+    public RunConfig getConfig(RunConfig runConfig) {
+        if (runConfig.playerFactories == null) {
+            runConfig.playerFactories = new ArrayList<>();
         }
-        while (runConfiguration.playerFactories.size() <= playerIndex) {
-            runConfiguration.playerFactories.add(null);
+        while (runConfig.playerFactories.size() <= playerIndex) {
+            runConfig.playerFactories.add(null);
         }
-        runConfiguration.playerFactories.set(playerIndex, playerSelectBox.getSelected());
-        return runConfiguration;
+        runConfig.playerFactories.set(playerIndex, playerSelectBox.getSelected());
+        return runConfig;
     }
 
     /**
-     * Setzt die RunConfiguration basierend auf den Attributinformationen.
+     * Setzt die RunConfig basierend auf den Attributinformationen.
      *
-     * @param runConfiguration Die RunConfiguration, die konfiguriert wird.
+     * @param runConfig Die RunConfig, die konfiguriert wird.
      */
     @Override
-    public void setConfig(RunConfiguration runConfiguration) {
-        if (runConfiguration.playerFactories == null || runConfiguration.playerFactories.size() <= playerIndex) {
+    public void setConfig(RunConfig runConfig) {
+        if (runConfig.playerFactories == null || runConfig.playerFactories.size() <= playerIndex) {
             playerSelectBox.setSelected(null);
             return;
         }
-        playerSelectBox.setSelected(runConfiguration.playerFactories.get(playerIndex));
+        playerSelectBox.setSelected(runConfig.playerFactories.get(playerIndex));
     }
 }

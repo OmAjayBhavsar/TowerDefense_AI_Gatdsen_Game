@@ -19,7 +19,8 @@ public final class ProcessPlayerHandler extends RemotePlayerHandler {
     }
 
     @Override
-    public void dispose(boolean test) {
-        ResourcePool.getInstance().releaseProcessExecutor(process, test);
+    public void dispose(boolean gameCompleted) {
+        // Der Prozess kann nur wiederverwendet werden, wenn der Spieler nicht disqualifiziert wurde
+        ResourcePool.getInstance().releaseProcessExecutor(process, !isDisqualified());
     }
 }

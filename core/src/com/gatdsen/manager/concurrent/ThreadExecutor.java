@@ -35,31 +35,27 @@ public final class ThreadExecutor extends Resource {
      * @param callable Der {@link Callable}, der die Aufgabe repräsentiert und ausgeführt werden soll.
      * @return Ein {@link Future} Objekt, das die Fertigstellung und das Ergebnis des Callables repräsentiert.
      */
-    public <T> Future<T> execute(Callable<T> callable) {
-        return executor.submit(callable);
+    public <T> CompletableFuture<T> execute(Callable<T> callable) {
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        return callable.call();
+                    } catch (Error | RuntimeException e) {
+                        throw e;
+                    } catch (Throwable t) {
+                        throw new CompletionException(t);
+                    }
+                },
+                executor
+        );
     }
 
     /**
      * Startet eine neue Aufgabe in einem der Threads dieses ThreadExecutors.
      * @param runnable Der {@link Runnable}, der die Aufgabe repräsentiert und ausgeführt werden soll.
-     * @return Ein {@link Future} Objekt, das die Fertigstellung der Aufgabe repräsentiert.
-     */
-    public Future<?> execute(Runnable runnable) {
-        return executor.submit(runnable);
-    }
-
-    /**
-     * Startet eine neue Aufgabe in einem der Threads dieses ThreadExecutors. <br>
-     * Anders als {@link #execute(Runnable)} gibt diese Methode ein CompletableFuture zurück, welche mehr
-     * Funktionalität bieten, wie bspw. die Angabe von Callbacks, die bei Fertigstellung der Aufgabe ausgeführt werden
-     * sollen. <br>
-     * Da der Ansatz mit CompletableFutures zwar mächtiger ist, aber minimal höheren Overhead hat, wurde diese Methode
-     * zusätzlich zu {@link #execute(Runnable)} hinzugefügt, um die Wahl zwischen beiden Ansätzen zu ermöglichen und
-     * keinen vorzuschreiben.
-     * @param runnable Der {@link Runnable}, der die Aufgabe repräsentiert und ausgeführt werden soll.
      * @return Ein {@link CompletableFuture} Objekt, das die Fertigstellung der Aufgabe repräsentiert.
      */
-    public CompletableFuture<?> executeCompletable(Runnable runnable) {
+    public CompletableFuture<?> execute(Runnable runnable) {
         return CompletableFuture.runAsync(runnable, executor);
     }
 

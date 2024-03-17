@@ -11,12 +11,15 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gatdsen.animation.entity.TileMap;
+import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.manager.run.RunConfiguration;
 import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.GameState;
@@ -26,10 +29,7 @@ import com.gatdsen.ui.GADS;
 import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.hud.*;
 
-import javax.swing.*;
-import java.net.Proxy;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Class for taking care of the User Interface.
@@ -42,6 +42,7 @@ public class Hud implements Disposable {
     private final InputHandler inputHandler;
     private final InputMultiplexer inputMultiplexer;
     private final TurnTimer turnTimer;
+    public final Table layoutTable;
     private final Container<ImagePopup> turnPopupContainer;
     private final InGameScreen inGameScreen;
     private final TextureRegion turnChangeSprite;
@@ -85,6 +86,7 @@ public class Hud implements Disposable {
      * @param gameInstance Die gameInstance für das Spiel
      */
     public Hud(InGameScreen ingameScreen, GADS gameInstance) {
+
         this.gameInstance = gameInstance;
         this.inGameScreen = ingameScreen;
         this.uiMessenger = new UiMessenger(this);
@@ -526,11 +528,11 @@ public class Hud implements Disposable {
 
         //determine sprite
         if (isDraw) {
-            gameInstance.setScreen(GADS.ScreenState.DRAWSCREEN, new RunConfiguration());
+            gameInstance.setScreen(GADS.ScreenState.DRAWSCREEN, new RunConfig());
         } else if (won && team == 0) {
-            gameInstance.setScreen(GADS.ScreenState.VICTORYSCREEN, new RunConfiguration());
+            gameInstance.setScreen(GADS.ScreenState.VICTORYSCREEN, new RunConfig());
         } else {
-            gameInstance.setScreen(GADS.ScreenState.LOSSSCREEN, new RunConfiguration());
+            gameInstance.setScreen(GADS.ScreenState.LOSSSCREEN, new RunConfig());
         }
     }
 
@@ -701,7 +703,6 @@ public class Hud implements Disposable {
 
     /**
      * Initialisiert Leben des Spielers und aktualisiert die entsprechende Lebensleiste sowie visuelle Elemente
-     *
      * @param playerID Die ID des Spielers, dessen Leben initialisiert werden soll
      */
     public void initPlayerHealth(int playerID) {
@@ -722,7 +723,6 @@ public class Hud implements Disposable {
 
     /**
      * Aktualisiert den Gesundheitswert eines Spielers.
-     *
      * @param playerID Die ID des Spielers.
      * @param health   Der neue Gesundheitswert.
      */

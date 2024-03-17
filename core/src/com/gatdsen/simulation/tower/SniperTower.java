@@ -78,7 +78,7 @@ public class SniperTower extends Tower {
      * @return Den Preis des SniperTower
      */
     @Override
-    public int getPrice() {
+    public int getUpgradePrice() {
         switch (level) {
             case 1: return 100;
             case 2: return 150;

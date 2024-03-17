@@ -201,10 +201,7 @@ public class Game extends Executable {
                 awaitFutures(futures);
             } catch (InterruptedException e) {
                 if (pendingShutdown) {
-                    if (inputGenerator != null) {
-                        inputGenerator.endTurn();
-                    }
-                    return;
+                    break;
                 }
                 throw new RuntimeException(e);
             }
@@ -220,6 +217,9 @@ public class Game extends Executable {
                 animationLogProcessor.animate(finalLog);
                 animationLogProcessor.awaitNotification();
             }
+        }
+        if (inputGenerator != null) {
+            inputGenerator.endTurn();
         }
         if (!pendingShutdown) {
             gameResults.setScores(state.getHealth());
@@ -239,20 +239,27 @@ public class Game extends Executable {
         }
         if (state != null) {
             gameResults.setScores(state.getHealth());
+            state = null;
         }
         simulation = null;
         simulationThread = null;
         synchronized (schedulingLock) {
             if (playerHandlers != null) {
-                boolean reusable = getStatus() == Status.COMPLETED;
+                boolean gameCompleted = getStatus() == Status.COMPLETED;
                 for (PlayerHandler playerHandler : playerHandlers) {
-                    playerHandler.dispose(reusable);
+                    playerHandler.dispose(gameCompleted);
                 }
                 playerHandlers = null;
             }
         }
     }
 
+    /**
+     * Hilfsmethode, die auf das Beenden aller übergebenen {@link Future} Objekte wartet.
+     * @param futures Die {@link Future} Objekte, auf die gewartet werden soll
+     * @throws InterruptedException Wenn das Warten auf das Beenden der {@link Future} Objekte unterbrochen wird. 
+     *                              In diesem Fall werden alle Objekte mit {@link Future#cancel(boolean)} abgebrochen.
+     */
     private static void awaitFutures(Future<?>[] futures) throws InterruptedException {
         try {
             for (Future<?> future : futures) {

@@ -188,13 +188,18 @@ public class PlayerState implements Serializable {
 
     /**
      * Gibt das Spielfeld des Spielers zurück
-     *
      * @return Spielfeld
      */
     public Tile[][] getBoard() {
         return board;
     }
-
+    /**
+     * Gibt das Ende des Pfades zurück
+     * @return Ende des Pfades
+     */
+    public PathTile getCheese(){
+        return endTile;
+    }
     /**
      * Gibt den Index des Spielers zurück
      *
@@ -223,6 +228,14 @@ public class PlayerState implements Serializable {
     }
 
     /**
+     * Gibt die aktuellen SpawnCoins des Spielers zurück
+     * @return SpawnCoins
+     */
+    public int getSpawnCoins() {
+        return spawnCoins;
+    }
+
+    /**
      * Platziert einen Tower auf dem Spielfeld
      *
      * @param x    x-Koordinate des Towers
@@ -239,7 +252,7 @@ public class PlayerState implements Serializable {
 
         TowerTile towerTile = new TowerTile(this, x, y, type);
 
-        if (money < towerTile.getTower().getPrice()) {
+        if (money < Tower.getTowerPrice(type)) {
             // ToDo: append error action
             Tower.idCounter--;
             return head;
@@ -251,7 +264,7 @@ public class PlayerState implements Serializable {
             return head;
         }
 
-        money -= towerTile.getTower().getPrice();
+        money -= Tower.getTowerPrice(type);
         Action updateAction = new UpdateCurrencyAction(0, money, spawnCoins, index);
         head.addChild(updateAction);
 
@@ -309,7 +322,7 @@ public class PlayerState implements Serializable {
         if (board[x][y] instanceof TowerTile) {
             TowerTile towerTile = (TowerTile) board[x][y];
             Tower tower = towerTile.getTower();
-            money += tower.getPrice() / 2;
+            money += Tower.getTowerPrice(tower.type) / 2;
             head.addChild(new UpdateCurrencyAction(0, money, spawnCoins, index));
             head.addChild(new TowerDestroyAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));
             board[x][y] = null;
@@ -369,9 +382,6 @@ public class PlayerState implements Serializable {
      */
     void spawnEnemy(Enemy.Type type) {
         switch (type) {
-            case BASIC_ENEMY:
-                spawnEnemies.push(new BasicEnemy(this, 1, spawnTile));
-                break;
             case EMP_ENEMY:
                 spawnEnemies.push(new EmpEnemy(this, 1, spawnTile));
                 break;
@@ -415,7 +425,9 @@ public class PlayerState implements Serializable {
      * @return der neue Action Head
      */
     Action moveEnemies(Action head) {
-        /*System.out.println("MoveEnemies");
+        /*
+        TODO: All enemies should be moved at the same time
+        System.out.println("MoveEnemies");
         PathTile actual = endTile;
         while (actual.getPrev() != null) {
             if (!actual.getEnemies().isEmpty()) {

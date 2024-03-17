@@ -1,6 +1,6 @@
 package com.gatdsen.simulation;
 
-public class ObstacleTile extends Tile{
+public class ObstacleTile extends Tile {
     /**
      * Erstellt ein Hindernis (Obstacle) an der angegebenen Position.
      * @param x x-Koordinate
@@ -32,6 +32,13 @@ public class ObstacleTile extends Tile{
      */
     @Override
     public boolean isBuildable() {
+        return false;
+    }
+    /**
+     * @return False, da Hindernisse keine Pfade sind
+     */
+    @Override
+    public boolean isPath() {
         return false;
     }
 }

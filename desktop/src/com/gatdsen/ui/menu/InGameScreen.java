@@ -1,5 +1,6 @@
 package com.gatdsen.ui.menu;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -8,7 +9,7 @@ import com.gatdsen.animation.Animator;
 import com.gatdsen.animation.AnimatorCamera;
 import com.gatdsen.manager.*;
 import com.gatdsen.manager.run.Run;
-import com.gatdsen.manager.run.RunConfiguration;
+import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.action.Action;
 import com.gatdsen.simulation.action.ActionLog;
@@ -53,16 +54,16 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
     }
 
     @Override
-    protected void setRunConfiguration(RunConfiguration runConfiguration) {
-        //aktualisiere die Run-Konfiguration
-        super.setRunConfiguration(runConfiguration);
-        this.runConfiguration.gui = true;
-        this.runConfiguration.animationLogProcessor = this;
-        this.runConfiguration.inputProcessor = hud.getInputHandler();
+    protected void setRunConfig(RunConfig runConfig) {
+        //update runconfig
+        super.setRunConfig(runConfig);
+        this.runConfig.gui = true;
+        this.runConfig.animationLogProcessor = this;
+        this.runConfig.inputProcessor = hud.getInputHandler();
 
-        run = manager.startRun(this.runConfiguration);
+        run = manager.startRun(this.runConfig);
         if (run == null) {
-            throw new RuntimeException("Das Spiel kann nicht mit einer ungültigen Run-Konfiguration gestartet werden!");
+            throw new RuntimeException("Can't start game with an invalid RunConfig!");
         }
     }
 
@@ -129,6 +130,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         hud.resizeViewport(width, height);
         gameViewport.update(width, height);
         debugView.getViewport().update(width, height);
+
     }
 
     @Override
@@ -147,7 +149,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
     }
 
     /**
-     * Wird aufgerufen, wenn die Anwendung beendet wird oder derzeit, wenn Escape gedrückt wird, um zum Menü zurückzukehren. Nicht die beste, aber derzeit schnellste Methode.
+     * Gets called when the application is destroyed or currently when escape is pressed to return to menu. Not the best but the fastest way rn.
      */
     @Override
     public void dispose() {
@@ -159,10 +161,8 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
     public void shutdown() {
         hud.dispose();
         manager.stop(run);
-        gameManager.setScreen(GADS.ScreenState.MAINSCREEN, null);
+        gameManager.setScreen(GADS.ScreenState.MAINSCREEN, new RunConfig());
     }
-
-
 
     public void setupInput() {
 

@@ -45,7 +45,7 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
             case GameCreateRequest:
                 GameCreateRequest gameCreateRequest = (GameCreateRequest) message;
                 if (playerExecutor != null) {
-                    playerExecutor.dispose(false);
+                    playerExecutor.dispose(true);
                 }
                 playerExecutor = new PlayerExecutor(
                         gameCreateRequest.isDebug,
@@ -62,14 +62,18 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
                 break;
             case PlayerInitRequest:
                 PlayerInitRequest playerInitRequest = (PlayerInitRequest) message;
-                Penalty penalty = playerExecutor.init(playerInitRequest.state, playerInitRequest.seed);
-                RMICommunicator.communicate(remoteCommunicatorStub, new PlayerInitResponse(penalty));
+                RMICommunicator.communicate(
+                        remoteCommunicatorStub,
+                        new PlayerInitResponse(playerExecutor.init(playerInitRequest.state, playerInitRequest.seed))
+                );
                 break;
             case PlayerExecuteTurnRequest:
                 PlayerExecuteTurnRequest playerExecuteTurnRequest = (PlayerExecuteTurnRequest) message;
                 playerExecutor.executeTurn(
                         playerExecuteTurnRequest.state,
                         commands -> RMICommunicator.communicate(remoteCommunicatorStub, new PlayerCommandResponse(commands))
+                ).thenAccept(
+                        penalty -> RMICommunicator.communicate(remoteCommunicatorStub, new PlayerExecuteTurnResponse(penalty))
                 );
                 break;
             case ProcessCommunicatorShutdownRequest:
