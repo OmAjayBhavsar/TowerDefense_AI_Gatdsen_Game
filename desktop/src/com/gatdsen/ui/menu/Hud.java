@@ -264,12 +264,6 @@ public class Hud implements Disposable {
         if (turnPopupContainer.hasChildren()) {
             turnPopupContainer.removeActorAt(0, false);
         }
-        setupScoreboard(gameState);
-
-        // float mainGroupX = (hudViewport.getWorldWidth() - mainVerticalGroup.getWidth()) / 2;
-        //  float mainGroupY = hudViewport.getWorldHeight() - mainVerticalGroup.getHeight();
-
-        //    mainVerticalGroup.setPosition(mainGroupX, mainGroupY);
         stage.addActor(mainVerticalGroup);
     }
 
@@ -282,21 +276,6 @@ public class Hud implements Disposable {
      */
     private InputHandler setupInputHandler(InGameScreen ingameScreen, Hud h) {
         return new InputHandler(ingameScreen, h);
-    }
-
-    /**
-     * Setzt das Scoreboard für das Spiel auf
-     *
-     * @param game Die GameState-Instanz für das Spiel
-     */
-    public void setupScoreboard(GameState game) {
-
-        //ToDo read player count and assign individual colors
-        ScoreBoard scores = new ScoreBoard(new Color[]{Color.WHITE, Color.WHITE}, names, game);
-
-        this.scores = game.getHealth();
-
-        scoreView.addScoreboard(scores);
     }
 
     /**
@@ -330,8 +309,6 @@ public class Hud implements Disposable {
 
         healthPlayer0Label.setText("" + healthPlayer0);
         healthPlayer1Label.setText("" + healthPlayer0);
-
-        // ToDo weitere UI-Elemente aktualisieren...
     }
 
     /**
