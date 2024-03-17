@@ -172,8 +172,8 @@ public class GADSAssetManager {
         IngameAssets.gameTowerAnimations[1][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1 / 5f, atlas.findRegions("katanaCat_idle_down/katanaCat_idle_down"), Animation.PlayMode.LOOP);
         IngameAssets.gameTowerAnimations[1][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("katanaCat_attack_down/katanaCat_attack_down"), Animation.PlayMode.LOOP);
         // Basic Tower
-        IngameAssets.gameTowerAnimations[0][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1 / 5f, atlas.findRegions("minnigunCat_idle_down/minnigunCat_idle_down"), Animation.PlayMode.LOOP);
-        IngameAssets.gameTowerAnimations[0][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("minnigunCat_attack_down/minnigunCat_attack_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameTowerAnimations[0][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1 / 5f, atlas.findRegions("minigunCat_idle_down/minigunCat_idle_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameTowerAnimations[0][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("minigunCat_attack_down/minigunCat_attack_down"), Animation.PlayMode.LOOP);
 
         // Gegner Animationen
         IngameAssets.gameEnemyAnimations = new AtlasAnimation[GameEnemyAnimationType.values().length];
