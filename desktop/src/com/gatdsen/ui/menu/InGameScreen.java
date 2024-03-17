@@ -24,26 +24,26 @@ import com.gatdsen.ui.debugView.DebugView;
 public class InGameScreen extends ConfigScreen implements AnimationLogProcessor {
 
     private final Manager manager;
-    private Viewport gameViewport;
-    private float worldWidth = 50 * 200;
-    private float worldHeight = 30 * 200;
+    private final Viewport gameViewport;
 
     private float renderingSpeed = 1;
 
     //sollte das HUD von GADS verwaltet werden?
-    private Hud hud;
-    private Animator animator;
+    private final Hud hud;
+    private final Animator animator;
     private final GADS gameManager;
     private Run run;
 
-    private DebugView debugView;
+    private final DebugView debugView;
 
     public InGameScreen(GADS instance) {
 
         gameManager = instance;
+        float worldHeight = 30 * 200;
+        float worldWidth = 50 * 200;
         gameViewport = new FitViewport(worldWidth, worldHeight + 700);
 
-        hud = new Hud(this, gameManager);
+        hud = new Hud(this, gameManager, (int) worldWidth, (int) worldHeight);
 
         debugView = new DebugView(AssetContainer.MainMenuAssets.skin);
 
@@ -55,7 +55,6 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
 
     @Override
     protected void setRunConfig(RunConfig runConfig) {
-        //update runconfig
         super.setRunConfig(runConfig);
         this.runConfig.gui = true;
         this.runConfig.animationLogProcessor = this;
@@ -104,7 +103,6 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         Vector2[] positionTileMaps = new Vector2[]{animator.playerMaps[0].getPos(), animator.playerMaps[1].getPos()};
 
         hud.setPlayerNames(playerNames);
-        hud.setHudViewport(worldWidth, worldHeight);
         hud.init(state, positionTileMaps, tileSize, animator.playerMaps[0]);
     }
 

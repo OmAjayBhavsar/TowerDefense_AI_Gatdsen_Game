@@ -20,7 +20,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gatdsen.animation.entity.TileMap;
 import com.gatdsen.manager.run.RunConfig;
-import com.gatdsen.manager.run.RunConfiguration;
 import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerState;
@@ -30,6 +29,7 @@ import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.hud.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Class for taking care of the User Interface.
@@ -42,7 +42,6 @@ public class Hud implements Disposable {
     private final InputHandler inputHandler;
     private final InputMultiplexer inputMultiplexer;
     private final TurnTimer turnTimer;
-    public final Table layoutTable;
     private final Container<ImagePopup> turnPopupContainer;
     private final InGameScreen inGameScreen;
     private final TextureRegion turnChangeSprite;
@@ -57,6 +56,8 @@ public class Hud implements Disposable {
     Viewport hudViewport;
     private int player0Balance;
     private int player1Balance;
+    private int player0SpawnCoins;
+    private int player1SpawnCoins;
     protected GADS gameInstance;
     private GameState gameState;
     private int health;
@@ -74,6 +75,8 @@ public class Hud implements Disposable {
     private ArrayList<int[][]> towerMaps = new ArrayList<>();
     private Label player0BalanceLabel;
     private Label player1BalanceLabel;
+    private Label player0SpawnCoinsLabel;
+    private Label player1SpawnCoinsLabel;
     private Label currentRoundLabel;
     private Label healthPlayer0Label;
     private Label healthPlayer1Label;
@@ -85,7 +88,7 @@ public class Hud implements Disposable {
      * @param ingameScreen Die Instanz der InGameScreen-Klasse
      * @param gameInstance Die gameInstance für das Spiel
      */
-    public Hud(InGameScreen ingameScreen, GADS gameInstance) {
+    public Hud(InGameScreen ingameScreen, GADS gameInstance, int screenWidth, int screenHeight) {
 
         this.gameInstance = gameInstance;
         this.inGameScreen = ingameScreen;
@@ -96,7 +99,7 @@ public class Hud implements Disposable {
         inputHandler.setUiMessenger(uiMessenger);
         turnTimer = new TurnTimer();
         turnPopupContainer = new Container<ImagePopup>();
-        hudViewport = new FitViewport(200, 200);
+        hudViewport = new FitViewport(screenWidth / 10f, screenHeight / 10f);
         stage = new Stage(hudViewport);
         // Kombination von Eingaben von beiden Prozessoren (Spiel und UI)
         inputMultiplexer = new InputMultiplexer();
@@ -107,11 +110,6 @@ public class Hud implements Disposable {
         mainVerticalGroup = new VerticalGroup();
         mainVerticalGroup.setFillParent(true);
         stage.addActor(mainVerticalGroup);
-
-    }
-
-    public void setHudViewport(int worldWidth, int worldHeight) {
-        stage.getViewport().setWorldSize((float) worldWidth / 10, (float) worldHeight / 10);
     }
 
     /**
@@ -148,6 +146,8 @@ public class Hud implements Disposable {
 // Erstellen der Elemente
         player0BalanceLabel = new Label("$" + player0Balance, skin);
         player1BalanceLabel = new Label("$" + player1Balance, skin);
+        player0SpawnCoinsLabel = new Label("SpawnCoins: " + player0SpawnCoins, skin);
+        player1SpawnCoinsLabel = new Label("SpawnCoins: " + player1SpawnCoins, skin);
         currentRoundLabel = new Label("Runde: " + roundCounter, skin);
         healthPlayer0Label = new Label("" + healthPlayer0, skin);
         healthPlayer1Label = new Label("" + healthPlayer1, skin);
@@ -215,11 +215,13 @@ public class Hud implements Disposable {
         Table playerTable = new Table();
         playerTable.defaults().pad(10);
         playerTable.add(new Label("Spieler 1", skin)).width(playerTableWidth);
+        playerTable.add(player0SpawnCoinsLabel).center();
         playerTable.add(player0BalanceLabel).width(playerTableWidth);
         playerTable.add(healthBarPlayer0).width(playerTableWidth);
         playerTable.add(currentRoundLabel).width(playerTableWidth);
         playerTable.add(healthBarPlayer1).width(playerTableWidth);
         playerTable.add(player1BalanceLabel).width(playerTableWidth);
+        playerTable.add(player1SpawnCoinsLabel);
         playerTable.add(new Label("Spieler 2", skin)).width(playerTableWidth);
 
         Table mainTable = new Table();
@@ -254,9 +256,10 @@ public class Hud implements Disposable {
             teamButtons[i].setSize((gameState.getBoardSizeX() * tileSize) / 10.0f, (gameState.getBoardSizeY() * tileSize) / 10.0f);
             hudGroup.addActor(teamButtons[i]);
             teamButtons[i].setPosition((arrayPositionTileMaps[i].x) / 10.0f, (arrayPositionTileMaps[i].y) / 10.0f);
-            teamButtons[i].setColor(Color.CLEAR);
+            //teamButtons[i].setColor(Color.CLEAR);
             initPlayerHealth(i);
             initBankBalance(i);
+            initSpawnCoins(i);
         }
         if (turnPopupContainer.hasChildren()) {
             turnPopupContainer.removeActorAt(0, false);
@@ -318,6 +321,13 @@ public class Hud implements Disposable {
             player1BalanceLabel.setText("$" + player1Balance);
         }
 
+        if (player0SpawnCoinsLabel != null) {
+            player0SpawnCoinsLabel.setText("SpawnCoins: " + player0SpawnCoins);
+        }
+        if (player1SpawnCoinsLabel != null) {
+            player1SpawnCoinsLabel.setText("SpawnCoins: " + player1SpawnCoins);
+        }
+
         healthPlayer0Label.setText("" + healthPlayer0);
         healthPlayer1Label.setText("" + healthPlayer0);
 
@@ -327,7 +337,7 @@ public class Hud implements Disposable {
     /**
      * setzt und aktualisiert den Rundenzähler
      */
-    public void setRoundCounter() {
+    private void setRoundCounter() {
         currentRoundLabel.setText("Runde: " + roundCounter++);
     }
 
@@ -583,8 +593,13 @@ public class Hud implements Disposable {
                             switch (selectedItem) {
                                 case ("Upgrade"):
                                     inputHandler.playerFieldRightClicked(team, posX, posY, true, false);
+                                    break;
                                 case ("Verkaufen"):
                                     inputHandler.playerFieldRightClicked(team, posX, posY, false, true);
+                                    if (team >= 0 && team < towerMaps.size()) {
+                                        towerMaps.get(team)[posX][posY] = 0;
+                                    }
+                                    break;
                                 default:
                                     break;
                             }
@@ -622,7 +637,13 @@ public class Hud implements Disposable {
                     Tower.TowerType[] towerTypes = Tower.TowerType.values();
                     towerSelectBox.setItems(towerTypes);
                     towerSelectBox.setSize(140, 20);
-                    towerSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
+
+                    if (team == 1) {
+                        towerSelectBox.setPosition((tileMapButton.getX() + x) - 140, tileMapButton.getY() + y);
+                    } else
+                        towerSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
+
+
                     hudGroup.addActor(towerSelectBox);
                     towerSelectBox.addListener(new ChangeListener() {
                         @Override
@@ -671,8 +692,8 @@ public class Hud implements Disposable {
      *
      * @param playerID Die ID des Spielers, dessen Bankguthaben initialisiert werden soll.
      */
-    public void initBankBalance(int playerID) {
-        // Zugriff auf den Spielerzustand des GameState
+    void initBankBalance(int playerID) {
+        // Zugriff auf den Spieler zustand des GameState
         PlayerState[] playerStates = gameState.getPlayerStates();
 
         // Überprüfung der Spieler-ID und Aktualisierung des entsprechenden Bankguthabens
@@ -683,7 +704,6 @@ public class Hud implements Disposable {
         }
         updateUIElements();
     }
-
 
     /**
      * Setzt das Bankguthaben für den angegebenen Spieler
@@ -702,7 +722,32 @@ public class Hud implements Disposable {
     }
 
     /**
+     */
+    public void initSpawnCoins(int playerID) {
+        PlayerState[] playerStates = gameState.getPlayerStates();
+
+        // Überprüfung der Spieler-ID und Aktualisierung des entsprechenden Bankguthabens
+        if (playerID == 0) {
+            player0SpawnCoins = playerStates[0].getSpawnCoins();
+        } else if (playerID == 1) {
+            player1SpawnCoins = playerStates[1].getSpawnCoins();
+        }
+        updateUIElements();
+    }
+
+    public void setSpawnCoins(int playerID, int coins) {
+        if (playerID == 0) {
+            player0SpawnCoins = coins;
+
+        } else if (playerID == 1) {
+            player1SpawnCoins = coins;
+        }
+        updateUIElements();
+    }
+
+    /**
      * Initialisiert Leben des Spielers und aktualisiert die entsprechende Lebensleiste sowie visuelle Elemente
+     *
      * @param playerID Die ID des Spielers, dessen Leben initialisiert werden soll
      */
     public void initPlayerHealth(int playerID) {
@@ -723,6 +768,7 @@ public class Hud implements Disposable {
 
     /**
      * Aktualisiert den Gesundheitswert eines Spielers.
+     *
      * @param playerID Die ID des Spielers.
      * @param health   Der neue Gesundheitswert.
      */

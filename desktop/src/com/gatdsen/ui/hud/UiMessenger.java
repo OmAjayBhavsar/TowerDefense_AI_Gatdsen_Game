@@ -82,6 +82,15 @@ public class UiMessenger {
     }
 
     /**
+     * Setze SpawnCoins für bestimmten Spieler
+     * @param playerID Spieler
+     * @param coins Anzahl der SpawnCoins
+     */
+    public void setSpawnCoins(int playerID, int coins){
+        hud.setSpawnCoins(playerID, coins);
+    }
+
+    /**
      * Aktualisiert die Leben eines bestimmten Spielers im HUD
      *
      * @param playerID Die ID des Spielers, dessen Leben aktualisiert wird
