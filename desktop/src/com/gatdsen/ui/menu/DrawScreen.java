@@ -29,9 +29,7 @@ public class DrawScreen extends BaseMenuScreen{
     }
 
     @Override
-    GADS.ScreenState getNext() {
-        return GADS.ScreenState.MAINSCREEN;
-    }
+    GADS.ScreenState getNext() {return null;}
 
     @Override
     GADS.ScreenState getPrev() {

@@ -256,7 +256,7 @@ public class Hud implements Disposable {
             teamButtons[i].setSize((gameState.getBoardSizeX() * tileSize) / 10.0f, (gameState.getBoardSizeY() * tileSize) / 10.0f);
             hudGroup.addActor(teamButtons[i]);
             teamButtons[i].setPosition((arrayPositionTileMaps[i].x) / 10.0f, (arrayPositionTileMaps[i].y) / 10.0f);
-            //teamButtons[i].setColor(Color.CLEAR);
+            teamButtons[i].setColor(Color.CLEAR);
             initPlayerHealth(i);
             initBankBalance(i);
             initSpawnCoins(i);
