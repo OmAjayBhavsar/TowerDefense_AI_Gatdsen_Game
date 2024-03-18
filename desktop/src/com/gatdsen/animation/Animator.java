@@ -179,8 +179,8 @@ public class Animator implements Screen, AnimationLogProcessor {
                     },
                     () -> {
                         GameEnemy enemy = new GameEnemy(spawnAction.getLevel(), spawnAction.getMaxHealth());
-                        enemy.setRelPos(spawnAction.getPos().x * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().x,
-                                spawnAction.getPos().y * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().y);
+                        enemy.setRelPos(spawnAction.getPos().x * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().x -100,
+                                spawnAction.getPos().y * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().y -75);
 
                         animator.root.add(enemy);
                         return enemy;
@@ -199,8 +199,8 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             Vector2 mapPos = animator.playerMaps[moveAction.getTeam()].getPos();
 
-            Vector2 start = new Vector2(moveAction.getPos().x * tileSize + mapPos.x, moveAction.getPos().y * tileSize + mapPos.y);
-            Vector2 end = new Vector2(moveAction.getDes().x * tileSize + mapPos.x, moveAction.getDes().y * tileSize + mapPos.y);
+            Vector2 start = new Vector2(moveAction.getPos().x * tileSize + mapPos.x-100, moveAction.getPos().y * tileSize + mapPos.y-75);
+            Vector2 end = new Vector2(moveAction.getDes().x * tileSize + mapPos.x-100, moveAction.getDes().y * tileSize + mapPos.y-75);
 
             Path enemyPath = new LinearPath(start, end, 500);
 
