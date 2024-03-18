@@ -232,7 +232,9 @@ public class Hud implements Disposable {
 
         Table playerTable = new Table();
         playerTable.defaults().pad(10);
-        playerTable.add(new Label("Spieler 1", skin)).width(playerTableWidth);
+        Label player0Label = new Label("Spieler 1", skin);
+        player0Label.setColor(Color.BLACK);
+        playerTable.add(player0Label).width(playerTableWidth);
         playerTable.add(player0SpawnCoinsLabel).center();
         playerTable.add(player0BalanceLabel).width(playerTableWidth);
         playerTable.add(healthBarPlayer0).width(playerTableWidth);
@@ -240,7 +242,9 @@ public class Hud implements Disposable {
         playerTable.add(healthBarPlayer1).width(playerTableWidth);
         playerTable.add(player1BalanceLabel).width(playerTableWidth);
         playerTable.add(player1SpawnCoinsLabel);
-        playerTable.add(new Label("Spieler 2", skin)).width(playerTableWidth);
+        Label player1Label = new Label("Spieler 2", skin);
+        player1Label.setColor(Color.BLACK);
+        playerTable.add(player1Label).width(playerTableWidth);
 
         Table mainTable = new Table();
         mainTable.defaults().pad(10);
