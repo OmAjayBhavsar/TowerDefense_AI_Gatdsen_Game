@@ -3,7 +3,6 @@ package com.gatdsen.simulation;
 import com.gatdsen.simulation.action.Action;
 import com.gatdsen.simulation.action.ProjectileAction;
 import com.gatdsen.simulation.action.TowerAttackAction;
-import com.gatdsen.simulation.tower.BasicTower;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -99,19 +98,8 @@ public abstract class Tower implements Serializable {
      * @param board Map auf der nachgeschaut wird
      * @return Liste der umliegenden Tiles
      */
-    private List<Tile> getNeighbours(int range, Tile[][] board) {
-        int diameter = (range * 2) + 1;
-        List<Tile> neighbours = new ArrayList<>(diameter * diameter - 1);
-        IntRectangle rec = new IntRectangle(0, 0, board.length - 1, board[0].length - 1);
-        for (int i = 0; i < diameter; i++) {
-            for (int j = 0; j < diameter; j++) {
-                if (rec.contains(pos.x - range + i, pos.y - range + j)) {
-                    neighbours.add(board[pos.x - range + i][pos.y - range + j]);
-                }
-
-            }
-        }
-        return neighbours;
+    protected List<Tile> getNeighbours(int range, Tile[][] board) {
+        return Tile.getNeighbours(range, pos, board);
     }
 
     /**

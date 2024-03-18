@@ -4,7 +4,6 @@ import com.gatdsen.simulation.*;
 import com.gatdsen.simulation.action.Action;
 import com.gatdsen.simulation.action.EnemyEMPAction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class EmpEnemy extends Enemy {
@@ -23,7 +22,7 @@ public class EmpEnemy extends Enemy {
     public EmpEnemy(PlayerState playerState, int level, PathTile posTile) {
         super(playerState, level, posTile);
         type = Type.EMP_ENEMY;
-        health = 150 * level;
+        health = 120 * level;
         damage = 5 * level;
     }
 
@@ -50,24 +49,14 @@ public class EmpEnemy extends Enemy {
     }
 
     /**
-     * Gibt die Nachbar-Felder des Gegners zurück.
-     * @param range
-     * @param board
-     * @return Liste der Nachbar-Felder
+     * Gibt die umliegenden Tiles in einer bestimmten Reichweite zurück
+     *
+     * @param range Reichweite um das Tile herum
+     * @param board Map auf der nachgeschaut wird
+     * @return Liste der umliegenden Tiles
      */
     private List<Tile> getNeighbours(int range, Tile[][] board) {
-        IntVector2 pos = posTile.getPosition();
-        int diameter = (range * 2) + 1;
-        List<Tile> neighbours = new ArrayList<>(diameter * diameter - 1);
-        IntRectangle rec = new IntRectangle(0, 0, board.length - 1, board[0].length - 1);
-        for (int i = 0; i < diameter; i++) {
-            for (int j = 0; j < diameter; j++) {
-                if (rec.contains(pos.x - range + i, pos.y - range + j)) {
-                    neighbours.add(board[pos.x - range + i][pos.y - range + j]);
-                }
-            }
-        }
-        return neighbours;
+        return Tile.getNeighbours(range, posTile.getPosition(), board);
     }
 
     public int getRange() {
