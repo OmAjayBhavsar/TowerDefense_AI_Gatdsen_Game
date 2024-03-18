@@ -129,6 +129,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
                         // Tower Actions
                         put(TowerPlaceAction.class, ActionConverters::convertTowerPlaceAction);
+                        put(TowerUpgradeAction.class, ActionConverters::convertTowerUpgradeAction);
                         put(TowerAttackAction.class, ActionConverters::convertTowerAttackAction);
                         put(ProjectileAction.class, ActionConverters::convertProjectileAction);
                         put(TowerDestroyAction.class, ActionConverters::convertTowerDestroyAction);
