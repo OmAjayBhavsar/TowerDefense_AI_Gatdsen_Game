@@ -354,7 +354,8 @@ public class Animator implements Screen, AnimationLogProcessor {
                     updateCurrency.getDelay(),
                     animator.uiMessenger,
                     updateCurrency.getTeam(),
-                    updateCurrency.getNewCurrency());
+                    updateCurrency.getNewCurrency(),
+                    updateCurrency.getNewSpawnCurrency());
 
             return new ExpandedAction(currencyAction);
         }
