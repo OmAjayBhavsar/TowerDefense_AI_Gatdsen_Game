@@ -41,10 +41,10 @@ public class PlayerAttribute extends Attribute {
         playerSelectBox.setItems(availablePlayers);
         Table playerChooseTable = new Table();
 
-        playerChooseTable.columnDefaults(0).width(100);
-        playerChooseTable.columnDefaults(1).width(100);
+        playerChooseTable.columnDefaults(0).width(200);
+        playerChooseTable.columnDefaults(1).width(200);
         playerChooseTable.add(textLabelPlayer).colspan(4).pad(10);
-        playerChooseTable.add(playerSelectBox).colspan(4).pad(10).width(80).row();
+        playerChooseTable.add(playerSelectBox).colspan(4).pad(10).width(200).row();
 
         return playerChooseTable;
     }

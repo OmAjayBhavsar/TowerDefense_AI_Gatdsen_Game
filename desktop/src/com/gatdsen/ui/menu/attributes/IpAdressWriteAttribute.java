@@ -13,10 +13,10 @@ public class IpAdressWriteAttribute extends Attribute{
         textLabelIP.setAlignment(Align.right);
         TextField ipAddressInputField = new TextField("", skin);
         ipAddressInputField.setAlignment(Align.center);
-        IpAddressTable.columnDefaults(0).width(100);
-        IpAddressTable.columnDefaults(1).width(100);
+        IpAddressTable.columnDefaults(0).width(200);
+        IpAddressTable.columnDefaults(1).width(200);
         IpAddressTable.add(textLabelIP).colspan(4).pad(10).right();
-        IpAddressTable.add(ipAddressInputField).colspan(4).pad(10).width(80).row();
+        IpAddressTable.add(ipAddressInputField).colspan(4).pad(10).width(200).row();
         return IpAddressTable;
     }
 

@@ -67,10 +67,6 @@ public class UiMessenger {
 
     }
 
-    public void teamScore(int team, float score) {
-        hud.adjustScores(team, score);
-    }
-
     /**
      * Setzt das Guthaben der Bank für einen bestimmten Spieler
      *

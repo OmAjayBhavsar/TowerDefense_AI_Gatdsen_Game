@@ -88,8 +88,6 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
 
     @Override
     public void init(GameState state, String[] playerNames, String[][] skins) {
-        //ToDo das Spiel startet, entferne Wartebildschirm usw.
-
         int worldWidth = (state.getBoardSizeX() * 2 + 10) * 200;
         int worldHeight = (state.getBoardSizeY() + 5) * 200;
 
@@ -167,7 +165,6 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         //animator als Actor?
         //simulation als Actor?
         Gdx.input.setInputProcessor(hud.getInputProcessor());
-
     }
 
     /**
@@ -217,5 +214,9 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
 
     public void skipTurnStart() {
         hud.skipTurnStart();
+    }
+
+    public Viewport getViewport(){
+        return gameViewport;
     }
 }

@@ -30,10 +30,10 @@ public class MapAttribute extends Attribute {
         String[] sortedMapNames = MapRetriever.getInstance().getMapNames();
         Arrays.sort(sortedMapNames);
         mapSelectBox.setItems(sortedMapNames);
-        mapTable.columnDefaults(0).width(100);
-        mapTable.columnDefaults(1).width(100);
+        mapTable.columnDefaults(0).width(200);
+        mapTable.columnDefaults(1).width(200);
         mapTable.add(textLabelMap).colspan(4).pad(10).center();
-        mapTable.add(mapSelectBox).colspan(4).pad(10).width(80).row();
+        mapTable.add(mapSelectBox).colspan(4).pad(10).width(200).row();
         return mapTable;
     }
 

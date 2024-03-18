@@ -11,9 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -29,7 +26,6 @@ import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.hud.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Class for taking care of the User Interface.
@@ -38,7 +34,8 @@ import java.util.Arrays;
  */
 public class Hud implements Disposable {
 
-    private Stage stage;
+    private final Stage stage;
+    private final Stage ingameStage;
     private final InputHandler inputHandler;
     private final InputMultiplexer inputMultiplexer;
     private final TurnTimer turnTimer;
@@ -49,8 +46,6 @@ public class Hud implements Disposable {
     private final UiMessenger uiMessenger;
     private float renderingSpeed;
     private boolean debugVisible;
-    private float[] scores;
-    private String[] names;
     private final ScoreView scoreView;
     private final Skin skin = AssetContainer.MainMenuAssets.skin;
     Viewport hudViewport;
@@ -61,18 +56,18 @@ public class Hud implements Disposable {
     protected GADS gameInstance;
     private GameState gameState;
     private int health;
-    private int buttonWidth;
-    private ProgressBar healthBarPlayer0 = new ProgressBar(0, health, 1, false, skin);
-    private ProgressBar healthBarPlayer1 = new ProgressBar(0, health, 1, false, skin);
+    private final ProgressBar healthBarPlayer0 = new ProgressBar(0, health, 1, false, skin);
+    private final ProgressBar healthBarPlayer1 = new ProgressBar(0, health, 1, false, skin);
     private int roundCounter;
     private int healthPlayer0 = health;
     private int healthPlayer1 = health;
-    public Group hudGroup = new Group();
+    public Group ingameGroup = new Group();
+    public Group popupGroup = new Group();
     public TileMap tileMap;
     private SelectBox<Tower.TowerType> towerSelectBox;
     private SelectBox<String> towerSellUpgrade;
     private SelectBox fireModeSelectBox;
-    private ArrayList<int[][]> towerMaps = new ArrayList<>();
+    private final ArrayList<int[][]> towerMaps = new ArrayList<>();
     private Label player0BalanceLabel;
     private Label player1BalanceLabel;
     private Label player0SpawnCoinsLabel;
@@ -80,7 +75,9 @@ public class Hud implements Disposable {
     private Label currentRoundLabel;
     private Label healthPlayer0Label;
     private Label healthPlayer1Label;
-    private VerticalGroup mainVerticalGroup;
+    private final VerticalGroup mainVerticalGroup;
+    private final Vector2 comboBoxSize;
+
 
     /**
      * Initialisiert das HUD-Objekt
@@ -90,6 +87,7 @@ public class Hud implements Disposable {
      */
     public Hud(InGameScreen ingameScreen, GADS gameInstance, int screenWidth, int screenHeight) {
 
+        comboBoxSize = new Vector2(140, 20);
         this.gameInstance = gameInstance;
         this.inGameScreen = ingameScreen;
         this.uiMessenger = new UiMessenger(this);
@@ -101,11 +99,13 @@ public class Hud implements Disposable {
         turnPopupContainer = new Container<ImagePopup>();
         hudViewport = new FitViewport(screenWidth / 10f, screenHeight / 10f);
         stage = new Stage(hudViewport);
+        ingameStage = new Stage(ingameScreen.getViewport());
         // Kombination von Eingaben von beiden Prozessoren (Spiel und UI)
         inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(inputHandler);
+        //inputMultiplexer.addProcessor(inputHandler);
         inputHandler.setUiMessenger(uiMessenger);// für die Simulation benötigt
         inputMultiplexer.addProcessor(stage);
+        inputMultiplexer.addProcessor(ingameStage);
         scoreView = new ScoreView(null);
         mainVerticalGroup = new VerticalGroup();
         mainVerticalGroup.setFillParent(true);
@@ -120,21 +120,19 @@ public class Hud implements Disposable {
      * @param tileSize              Die Größe der Tiles
      * @param tileMap               Die TileMap des Spiels
      */
-
     public void init(GameState gameState, Vector2[] arrayPositionTileMaps, int tileSize, TileMap tileMap) {
         int playerTableWidth = 80;
         renderingSpeed = 1;
         player0Balance = 100;
         player1Balance = 100;
         health = 300;
-        buttonWidth = 150;
+        int buttonWidth = 150;
         roundCounter = 0;
         TextButton restartGameButton;
         TextButton nextRoundButton;
         TextButton backToMainMenuButton;
-
+        towerMaps.clear();
         this.gameState = gameState;
-
         healthBarPlayer0.setValue(health);
         healthBarPlayer0.setAnimateDuration(0.25f);
         healthBarPlayer1.setValue(health);
@@ -243,7 +241,8 @@ public class Hud implements Disposable {
         mainVerticalGroup.addActor(mainTable);
 
         stage.addActor(mainVerticalGroup);
-        stage.addActor(hudGroup);
+        stage.addActor(popupGroup);
+        ingameStage.addActor(ingameGroup);
 
         int numberOfTeams = gameState.getPlayerCount();
         TextButton[] teamButtons;
@@ -253,9 +252,9 @@ public class Hud implements Disposable {
             int[][] towerMap = new int[gameState.getBoardSizeX()][gameState.getBoardSizeY()];
             towerMaps.add(towerMap);
             teamButtons[i] = tileMapButton(i, tileMap);
-            teamButtons[i].setSize((gameState.getBoardSizeX() * tileSize) / 10.0f, (gameState.getBoardSizeY() * tileSize) / 10.0f);
-            hudGroup.addActor(teamButtons[i]);
-            teamButtons[i].setPosition((arrayPositionTileMaps[i].x) / 10.0f, (arrayPositionTileMaps[i].y) / 10.0f);
+            teamButtons[i].setSize(((gameState.getBoardSizeX() * tileSize)), (gameState.getBoardSizeY() * tileSize));
+            ingameGroup.addActor(teamButtons[i]);
+            teamButtons[i].setPosition((arrayPositionTileMaps[i].x), (arrayPositionTileMaps[i].y));
             teamButtons[i].setColor(Color.CLEAR);
             initPlayerHealth(i);
             initBankBalance(i);
@@ -264,7 +263,6 @@ public class Hud implements Disposable {
         if (turnPopupContainer.hasChildren()) {
             turnPopupContainer.removeActorAt(0, false);
         }
-        stage.addActor(mainVerticalGroup);
     }
 
     /**
@@ -284,7 +282,6 @@ public class Hud implements Disposable {
      * @param names Ein Array mit den Namen der Spieler
      */
     public void setPlayerNames(String[] names) {
-        this.names = names;
     }
 
 
@@ -342,6 +339,8 @@ public class Hud implements Disposable {
     public void draw() {
         stage.getViewport().apply(true);
         stage.draw();
+        ingameStage.getViewport().apply(true);
+        ingameStage.draw();
         if (scoreView != null) {
             scoreView.draw();
         }
@@ -457,8 +456,8 @@ public class Hud implements Disposable {
     public void clear() {
         stage.clear();
         mainVerticalGroup.clear();
-        hudGroup.clear(); // Entferne alle Elemente aus der Hud-Gruppe
-        for (Actor actor : hudGroup.getChildren()) {
+        ingameGroup.clear(); // Entferne alle Elemente aus der Hud-Gruppe
+        for (Actor actor : ingameGroup.getChildren()) {
             if (actor instanceof TextButton) {
                 actor.remove(); // Entferne jeden TextButton aus der Hud-Gruppe
             }
@@ -480,20 +479,6 @@ public class Hud implements Disposable {
     public void toggleScores() {
         if (scoreView != null) {
             scoreView.toggleEnabled();
-        }
-    }
-
-    /**
-     * Passt die Punktzahl für das angegebene Team im HUD an
-     *
-     * @param team  Das Team, dessen Punktzahl angepasst wird
-     * @param score Die neue Punktzahl für das Team
-     */
-    public void adjustScores(int team, float score) {
-        this.scores[team] = score;
-
-        if (scoreView != null) {
-            scoreView.adjustScores(scores);
         }
     }
 
@@ -531,6 +516,10 @@ public class Hud implements Disposable {
             turnPopupContainer.getActor().remove();
     }
 
+    private Vector2 ingameToHudCoordinates(float x, float y) {
+        return stage.screenToStageCoordinates(ingameStage.stageToScreenCoordinates(new Vector2(x, y)));
+    }
+
     /**
      * Erstellt und gibt einen TextButton für die TileMap eines Teams zurück
      *
@@ -554,15 +543,16 @@ public class Hud implements Disposable {
              */
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                int posX = (int) ((x / tileMap.getTileSize()) * 10);
-                int posY = (int) ((y / tileMap.getTileSize()) * 10);
+                int posX = (int) ((x / tileMap.getTileSize()));
+                int posY = (int) ((y / tileMap.getTileSize()));
+                Vector2 coords = ingameToHudCoordinates(tileMapButton.getX() + x, tileMapButton.getY() + y);
                 if (button == Input.Buttons.RIGHT && tileMap.getTile(posX, posY) == 0 && towerMaps.get(team)[posX][posY] == 1) {
                     closeSelectBox();
                     towerSellUpgrade = new SelectBox<>(skin);
                     towerSellUpgrade.setItems("Upgrade", "Verkaufen");
-                    towerSellUpgrade.setSize(140, 20);
-                    towerSellUpgrade.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
-                    hudGroup.addActor(towerSellUpgrade);
+                    towerSellUpgrade.setSize(comboBoxSize.x, comboBoxSize.y);
+                    towerSellUpgrade.setPosition(coords.x, coords.y);
+                    popupGroup.addActor(towerSellUpgrade);
                     towerSellUpgrade.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent changeEvent, Actor actor) {
@@ -592,9 +582,9 @@ public class Hud implements Disposable {
                     fireModeSelectBox = new SelectBox<>(skin);
                     Tower.TargetOption[] targetOption = Tower.TargetOption.values();
                     fireModeSelectBox.setItems((Object[]) targetOption);
-                    fireModeSelectBox.setSize(140, 20);
-                    fireModeSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
-                    hudGroup.addActor(fireModeSelectBox);
+                    fireModeSelectBox.setSize(comboBoxSize.x, comboBoxSize.y);
+                    fireModeSelectBox.setPosition(coords.x, coords.y);
+                    popupGroup.addActor(fireModeSelectBox);
                     fireModeSelectBox.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
@@ -613,15 +603,15 @@ public class Hud implements Disposable {
                     towerSelectBox = new SelectBox<>(skin);
                     Tower.TowerType[] towerTypes = Tower.TowerType.values();
                     towerSelectBox.setItems(towerTypes);
-                    towerSelectBox.setSize(140, 20);
+                    towerSelectBox.setSize(comboBoxSize.x, comboBoxSize.y);
 
                     if (team == 1) {
-                        towerSelectBox.setPosition((tileMapButton.getX() + x) - 140, tileMapButton.getY() + y);
+                        towerSelectBox.setPosition(coords.x - comboBoxSize.x, coords.y);
                     } else
-                        towerSelectBox.setPosition(tileMapButton.getX() + x, tileMapButton.getY() + y);
+                        towerSelectBox.setPosition(coords.x, coords.y);
 
 
-                    hudGroup.addActor(towerSelectBox);
+                    popupGroup.addActor(towerSelectBox);
                     towerSelectBox.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
@@ -649,7 +639,7 @@ public class Hud implements Disposable {
      * Setzt den InputProcessor auf die Stage, um das HUD anzuzeigen.
      */
     public void show() {
-        Gdx.input.setInputProcessor(stage);
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     private void closeSelectBox() {
@@ -699,6 +689,7 @@ public class Hud implements Disposable {
     }
 
     /**
+     *
      */
     public void initSpawnCoins(int playerID) {
         PlayerState[] playerStates = gameState.getPlayerStates();

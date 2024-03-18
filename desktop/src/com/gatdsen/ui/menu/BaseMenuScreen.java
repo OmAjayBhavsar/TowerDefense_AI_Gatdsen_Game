@@ -146,14 +146,13 @@ public abstract class BaseMenuScreen extends ConfigScreen {
 
     /**
      * Aktualisieren der Darstellung des Hauptmenüs
-     * Rendert die Hintergrundtextur und Benutzeroberfläche wird aktualisiert und gezeichnet
+     * rendert die Hintergrundtextur und Benutzeroberfläche wird aktualisiert und gezeichnet
      *
      * @param delta The time in seconds since the last render
      */
     @Override
     public void render(float delta) {
         camera.update();
-
         backgroundViewport.apply(true);
         menuSpriteBatch.setProjectionMatrix(backgroundViewport.getCamera().combined);
         menuSpriteBatch.begin();

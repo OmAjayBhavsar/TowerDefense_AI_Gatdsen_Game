@@ -16,10 +16,10 @@ public class PortWriteAttribute extends Attribute{
         textLabelPort.setAlignment(Align.right);
         TextField portInputField = new TextField("", skin);
         portInputField.setAlignment(Align.center);
-        portTable.columnDefaults(0).width(100);
-        portTable.columnDefaults(1).width(100);
+        portTable.columnDefaults(0).width(200);
+        portTable.columnDefaults(1).width(200);
         portTable.add(textLabelPort).colspan(4).pad(10).right();
-        portTable.add(portInputField).colspan(4).pad(10).width(80).row();
+        portTable.add(portInputField).colspan(4).pad(10).width(200).row();
         return portTable;
     }
 
