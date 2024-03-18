@@ -52,7 +52,7 @@ public abstract class Tile implements Serializable {
      * @param board Map auf der nachgeschaut wird
      * @return Liste der umliegenden Tiles
      */
-    public static List<Tile> getNeighbours(int range, IntVector2 pos, Tile[][] board) {
+    static List<Tile> getNeighbours(int range, IntVector2 pos, Tile[][] board) {
         int diameter = (range * 2) + 1;
         List<Tile> neighbours = new ArrayList<>(diameter * diameter - 1);
         IntRectangle rec = new IntRectangle(0, 0, board.length - 1, board[0].length - 1);
