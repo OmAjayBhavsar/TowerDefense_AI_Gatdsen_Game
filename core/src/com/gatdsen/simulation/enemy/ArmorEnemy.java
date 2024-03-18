@@ -19,6 +19,6 @@ public class ArmorEnemy extends Enemy {
 
 
     public static int getPrice(int level) {
-        return 100 * level;
+        return 10 * level;
     }
 }
