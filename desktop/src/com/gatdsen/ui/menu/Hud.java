@@ -194,18 +194,31 @@ public class Hud implements Disposable {
                 int selectedPlayerInt;
                 Enemy.Type enemyType;
 
-                selectedPlayerInt = switch (selectedPlayer) {
-                    case "Spieler 1" -> 0;
-                    case "Spieler 2" -> 1;
-                    default -> 0;
-                };
+                switch (selectedPlayer) {
+                    case "Spieler 1":
+                        selectedPlayerInt = 0;
+                        break;
+                    case "Spieler 2":
+                        selectedPlayerInt = 1;
+                        break;
+                    default:
+                        selectedPlayerInt = 0;
+                }
 
-                enemyType = switch (selectedEnemy) {
-                    case "Schild-Maus" -> Enemy.Type.SHIELD_ENEMY;
-                    case "EMP-Maus" -> Enemy.Type.EMP_ENEMY;
-                    case "Rüstungs-Maus" -> Enemy.Type.ARMOR_ENEMY;
-                    default -> Enemy.Type.SHIELD_ENEMY;
-                };
+                switch (selectedEnemy) {
+                    case "Schild-Maus":
+                        enemyType = Enemy.Type.SHIELD_ENEMY;
+                        break;
+                    case "EMP-Maus":
+                        enemyType = Enemy.Type.EMP_ENEMY;
+                        break;
+                    case "Rüstungs-Maus":
+                        enemyType = Enemy.Type.ARMOR_ENEMY;
+                        break;
+                    default:
+                        enemyType = Enemy.Type.SHIELD_ENEMY;
+                }
+
                 inputHandler.playerBuyedEnemy(selectedPlayerInt, enemyType);
             }
         });
