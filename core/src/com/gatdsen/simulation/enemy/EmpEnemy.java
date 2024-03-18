@@ -13,9 +13,9 @@ public class EmpEnemy extends Enemy {
     private int cooldown = 3;
 
     /**
-     * Erstellt einen neuen Gegner.
+     * Erstellt einen neuen EMP-Gegner.
      *
-     * @param playerState
+     * @param playerState Der Spieler, dem der Gegner gehört.
      * @param level       Die Stufe des Gegners.
      * @param posTile     Die Position des Gegners.
      */
@@ -85,7 +85,13 @@ public class EmpEnemy extends Enemy {
         return new EmpEnemy(playerState, level, posTile);
     }
 
+    /**
+     * Gibt den Preis des Gegners zurück.
+     *
+     * @param level Die Stufe des Gegners.
+     * @return Der Preis des Gegners.
+     */
     public static int getPrice(int level) {
-        return 100 * level;
+        return 10 * level;
     }
 }

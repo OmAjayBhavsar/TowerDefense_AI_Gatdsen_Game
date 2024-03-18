@@ -295,6 +295,7 @@ public class PlayerState implements Serializable {
                 money -= tower.getUpgradePrice();
                 tower.upgrade();
                 head.addChild(new TowerUpgradeAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));
+                head.addChild(new UpdateCurrencyAction(0, money, spawnCoins, index));
             } else {
                 // ToDo: append error action
                 return head;
