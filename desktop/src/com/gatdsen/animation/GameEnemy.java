@@ -25,7 +25,7 @@ public class GameEnemy extends AnimatedEntity {
         this.level = level;
         healthbar = new Healthbar(maxHealth);
         this.add(healthbar);
-        healthbar.setRelPos(new Vector2(100, 70));
+        healthbar.setRelPos(new Vector2(100, 60));
 
         fonte.setColor(Color.WHITE);
         fonte.getData().setScale(5);
