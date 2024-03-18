@@ -141,6 +141,8 @@ public class InputHandler implements InputProcessor, com.gatdsen.manager.InputPr
         }
         if (towerType!=null && targetOption==null){
             currentPlayer.placeTower(x, y, towerType);
+        } else if (towerType == null && targetOption != null) {
+            currentPlayer.setTowerTarget(x, y, targetOption);
         }
     }
 

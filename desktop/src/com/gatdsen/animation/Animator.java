@@ -180,8 +180,8 @@ public class Animator implements Screen, AnimationLogProcessor {
                     },
                     () -> {
                         GameEnemy enemy = new GameEnemy(spawnAction.getLevel(), spawnAction.getMaxHealth());
-                        enemy.setRelPos(spawnAction.getPos().x * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().x,
-                                spawnAction.getPos().y * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().y);
+                        enemy.setRelPos(spawnAction.getPos().x * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().x -100,
+                                spawnAction.getPos().y * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().y -75);
 
                         animator.root.add(enemy);
                         return enemy;
@@ -197,16 +197,33 @@ public class Animator implements Screen, AnimationLogProcessor {
             int tileSize = animator.playerMaps[0].getTileSize();
             GameEnemy enemy = animator.enemies.get(moveAction.getId());
 
+
             Vector2 mapPos = animator.playerMaps[moveAction.getTeam()].getPos();
 
-            Vector2 start = new Vector2(moveAction.getPos().x * tileSize + mapPos.x, moveAction.getPos().y * tileSize + mapPos.y);
-            Vector2 end = new Vector2(moveAction.getDes().x * tileSize + mapPos.x, moveAction.getDes().y * tileSize + mapPos.y);
+            Vector2 start = new Vector2(moveAction.getPos().x * tileSize + mapPos.x-100, moveAction.getPos().y * tileSize + mapPos.y-75);
+            Vector2 end = new Vector2(moveAction.getDes().x * tileSize + mapPos.x-100, moveAction.getDes().y * tileSize + mapPos.y-75);
 
             Path enemyPath = new LinearPath(start, end, 500);
 
-            MoveAction moveEnemy = new MoveAction(moveAction.getDelay(), enemy, enemyPath.getDuration(), enemyPath);
+            ExecutorAction changeAnimation = new ExecutorAction(moveAction.getDelay(), () -> {
+                int direction = 0;
 
-            return new ExpandedAction(moveEnemy);
+                if ((moveAction.getDes().x - moveAction.getPos().x) < 0) direction = 3;
+                if ((moveAction.getDes().y - moveAction.getPos().y) < 0) direction = 2;
+                if ((moveAction.getDes().x - moveAction.getPos().x) > 0) direction = 1;
+                enemy.switchAnimation(direction);
+                return 0;
+            });
+
+            ExecutorAction toggleMove = new ExecutorAction(moveAction.getDelay(), () -> {
+                enemy.toggleMove(enemyPath.getDuration());
+                return 0;
+            });
+
+            MoveAction moveEnemy = new MoveAction(moveAction.getDelay(), enemy, enemyPath.getDuration(), enemyPath);
+            changeAnimation.setChildren(new Action[]{moveEnemy, toggleMove});
+
+            return new ExpandedAction(changeAnimation, moveEnemy);
         }
 
         private static ExpandedAction convertEnemyUpdateHealthAction(com.gatdsen.simulation.action.Action action, Animator animator) {

@@ -57,7 +57,7 @@ public class AssetContainer {
         public static TextureRegion aimCircle;
         public static ProgressBar.ProgressBarStyle healthbarStyle;
         public static Animation<TextureRegion>[] gameTowerAnimations;
-        public static Animation<TextureRegion>[] gameEnemyAnimations;
+        public static Animation<TextureRegion>[][] gameEnemyAnimations;
         public static TextureRegion pixel;
         public static Texture compressedBaseSkin;
         public static Texture uncompressedBaseSkin;
@@ -143,6 +143,13 @@ public class AssetContainer {
         public enum GameEnemyAnimationType {
             ANIMATION_TYPE_IDLE,
             ANIMATION_TYPE_WALKING
+        }
+
+        public enum Direction {
+            UP,
+            RIGHT,
+            DOWN,
+            LEFT
         }
     }
 
