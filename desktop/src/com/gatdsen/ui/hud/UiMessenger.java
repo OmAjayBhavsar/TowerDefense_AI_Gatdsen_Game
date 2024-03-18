@@ -51,8 +51,6 @@ public class UiMessenger {
      * @param
      */
     public void startTurnTimer(int turnTime, boolean currPlayerIsHuman) {
-        hud.layoutTable.clear();
-        hud.layoutHudElements();
         if (currPlayerIsHuman) {
             hud.startTurnTimer(turnTime);
         } else {
@@ -69,10 +67,6 @@ public class UiMessenger {
 
     }
 
-    public void teamScore(int team, float score) {
-        hud.adjustScores(team, score);
-    }
-
     /**
      * Setzt das Guthaben der Bank für einen bestimmten Spieler
      *
@@ -81,6 +75,15 @@ public class UiMessenger {
      */
     public void setBankBalance(int playerID, int balance) {
         hud.setBankBalance(playerID, balance);
+    }
+
+    /**
+     * Setze SpawnCoins für bestimmten Spieler
+     * @param playerID Spieler
+     * @param coins Anzahl der SpawnCoins
+     */
+    public void setSpawnCoins(int playerID, int coins){
+        hud.setSpawnCoins(playerID, coins);
     }
 
     /**

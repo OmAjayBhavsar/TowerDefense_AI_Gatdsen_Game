@@ -24,26 +24,26 @@ import com.gatdsen.ui.debugView.DebugView;
 public class InGameScreen extends ConfigScreen implements AnimationLogProcessor {
 
     private final Manager manager;
-    private Viewport gameViewport;
-    private float worldWidth = 50 * 200;
-    private float worldHeight = 30 * 200;
+    private final Viewport gameViewport;
 
     private float renderingSpeed = 1;
 
-    //should HUD be handled by GADS
-    private Hud hud;
-    private Animator animator;
+    //sollte das HUD von GADS verwaltet werden?
+    private final Hud hud;
+    private final Animator animator;
     private final GADS gameManager;
     private Run run;
 
-    private DebugView debugView;
+    private final DebugView debugView;
 
     public InGameScreen(GADS instance) {
 
         gameManager = instance;
+        float worldHeight = 30 * 200;
+        float worldWidth = 50 * 200;
         gameViewport = new FitViewport(worldWidth, worldHeight + 700);
 
-        hud = new Hud(this, gameManager);
+        hud = new Hud(this, gameManager, (int) worldWidth, (int) worldHeight);
 
         debugView = new DebugView(AssetContainer.MainMenuAssets.skin);
 
@@ -55,7 +55,6 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
 
     @Override
     protected void setRunConfig(RunConfig runConfig) {
-        //update runconfig
         super.setRunConfig(runConfig);
         this.runConfig.gui = true;
         this.runConfig.animationLogProcessor = this;
@@ -67,7 +66,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         }
     }
 
-    //gets called when the screen becomes the main screen of GADS
+    //wird aufgerufen, wenn der Bildschirm zum Hauptbildschirm von GADS wird
     @Override
     public void show() {
         hud.show();
@@ -75,7 +74,7 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
     }
 
     public void setRenderingSpeed(float speed) {
-        //negative deltaTime is not allowed
+        //negative deltaTime ist nicht erlaubt
         if (speed >= 0) this.renderingSpeed = speed;
     }
 
@@ -89,9 +88,11 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
 
     @Override
     public void init(GameState state, String[] playerNames, String[][] skins) {
-        //ToDo the game is starting remove waiting screen etc.
-        gameViewport.setWorldWidth((state.getBoardSizeX() * 2 + 10) * 200);
-        gameViewport.setWorldHeight((state.getBoardSizeY() + 5) * 200);
+        int worldWidth = (state.getBoardSizeX() * 2 + 10) * 200;
+        int worldHeight = (state.getBoardSizeY() + 5) * 200;
+
+        gameViewport.setWorldWidth(worldWidth);
+        gameViewport.setWorldHeight(worldHeight);
 
         animator.init(state, playerNames, skins);
 
@@ -100,13 +101,13 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         Vector2[] positionTileMaps = new Vector2[]{animator.playerMaps[0].getPos(), animator.playerMaps[1].getPos()};
 
         hud.setPlayerNames(playerNames);
-        hud.newGame(state, positionTileMaps, tileSize, animator.playerMaps[0]);
+        hud.init(state, positionTileMaps, tileSize, animator.playerMaps[0]);
     }
 
     /**
-     * Forwards the ActionLog to the Animator for processing
+     * Leitet das ActionLog an den Animator zur Verarbeitung weiter
      *
-     * @param log Queue of all {@link Action animation-related Actions}
+     * @param log Queue aller {@link Action animationsbezogenen Aktionen}
      */
     public void animate(ActionLog log) {
         animator.animate(log);
@@ -148,32 +149,36 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
      */
     @Override
     public void dispose() {
-        animator.dispose();
+        hud.clear();
         manager.stop(run);
+        gameManager.setScreen(GADS.ScreenState.MAINSCREEN, null);
+    }
+
+    public void shutdown() {
         hud.dispose();
+        manager.stop(run);
         gameManager.setScreen(GADS.ScreenState.MAINSCREEN, new RunConfig());
     }
 
     public void setupInput() {
 
-        //animator als actor?
-        //       simulation als actor?
+        //animator als Actor?
+        //simulation als Actor?
         Gdx.input.setInputProcessor(hud.getInputProcessor());
-
     }
 
     /**
-     * Converts Viewport/Screen-Coordinates to World/Ingame-Position
+     * Konvertiert Viewport-/Bildschirmkoordinaten in Welt-/Spielpositionen
      *
-     * @param coordinates to convert.
-     * @return Vector with World-Coordinate
+     * @param coordinates zu konvertieren.
+     * @return Vektor mit Weltkoordinate
      */
     public Vector2 toWorldCoordinates(Vector2 coordinates) {
         Vector3 position = gameViewport.unproject(new Vector3(coordinates.x, coordinates.y, 0));
         return new Vector2(position.x, position.y);
     }
 
-    //this section handles the input
+    //dieser Abschnitt behandelt die Eingabe
     public void processInputs(float[] ingameCameraDirection, float zoomPressed) {
         AnimatorCamera camera = animator.getCamera();
         camera.setDirections(ingameCameraDirection);
@@ -198,9 +203,9 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
     }
 
     /**
-     * Calls AnimatorCamera function to Zoom.
+     * Ruft die Funktion des AnimatorCamera zum Zoomen auf.
      *
-     * @param zoom Value that shall be added to the zoom
+     * @param zoom Wert, der zum Zoomen hinzugefügt werden soll
      */
     public void zoomCamera(float zoom) {
         AnimatorCamera camera = animator.getCamera();
@@ -209,5 +214,9 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
 
     public void skipTurnStart() {
         hud.skipTurnStart();
+    }
+
+    public Viewport getViewport(){
+        return gameViewport;
     }
 }
