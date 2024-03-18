@@ -259,6 +259,18 @@ public class Animator implements Screen, AnimationLogProcessor {
             return new ExpandedAction(summonTower);
         }
 
+        private static ExpandedAction convertTowerUpgradeAction(com.gatdsen.simulation.action.Action action, Animator animator) {
+            TowerUpgradeAction upgradeAction = (TowerUpgradeAction) action;
+            GameTower tower = animator.towers.get(upgradeAction.getId());
+
+            ExecutorAction upgrade = new ExecutorAction(upgradeAction.getDelay(), () -> {
+                tower.upgrade();
+                return 0;
+            });
+
+            return new ExpandedAction(upgrade);
+        }
+
         private static ExpandedAction convertTowerAttackAction(com.gatdsen.simulation.action.Action action, Animator animator) {
             TowerAttackAction towerAttack = (TowerAttackAction) action;
             GameTower tower = animator.towers.get(towerAttack.getId());
