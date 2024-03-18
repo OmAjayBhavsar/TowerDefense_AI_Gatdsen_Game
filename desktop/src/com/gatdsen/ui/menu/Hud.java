@@ -176,18 +176,25 @@ public class Hud implements Disposable {
 
         Label player0BalanceLabel = new Label("$" + player0Balance, skin);
         player0BalanceLabel.setAlignment(Align.center);
+        player0BalanceLabel.setColor(Color.BLACK);
         Label player1BalanceLabel = new Label("$" + player1Balance, skin);
         player1BalanceLabel.setAlignment(Align.center);
+        player1BalanceLabel.setColor(Color.BLACK);
         Label currentPlayer0 = new Label("Spieler 1", skin);
         currentPlayer0.setAlignment(Align.center);
+        currentPlayer0.setColor(Color.BLACK);
         Label currentPlayer1 = new Label("Spieler 2", skin);
         currentPlayer1.setAlignment(Align.center);
+        currentPlayer1.setColor(Color.BLACK);
         Label currentRoundLabel = new Label("Runde: " + roundCounter, skin);
         currentRoundLabel.setAlignment(Align.center);
+        currentRoundLabel.setColor(Color.BLACK);
         Label healthPlayer0Label = new Label("" + healthPlayer0, skin);
         healthPlayer0Label.setAlignment(Align.center);
+        healthPlayer0Label.setColor(Color.BLACK);
         Label healthPlayer1Label = new Label("" + healthPlayer1, skin);
         healthPlayer1Label.setAlignment(Align.center);
+        healthPlayer1Label.setColor(Color.BLACK);
         Label invisibleLabel = new Label("", skin);
         nextRoundButton = new TextButton("Zug beenden", skin);
         backToMainMenuButton = new TextButton("Hauptmenü", skin);
