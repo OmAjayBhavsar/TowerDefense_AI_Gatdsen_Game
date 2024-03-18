@@ -123,7 +123,7 @@ public class GADSAssetManager {
         IngameAssets.lossDisplay = atlas.findRegion("background/lose_screen");
         //Ingame
 
-        IngameAssets.background = atlas.findRegion("background/WeihnachtsBG");
+        IngameAssets.background = atlas.findRegion("background/game_background");
 
         IngameAssets.tileTextures = new TextureRegion[]{
                 atlas.findRegion("Tileset/grass_tile"),
