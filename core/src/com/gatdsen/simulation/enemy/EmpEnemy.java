@@ -48,17 +48,6 @@ public class EmpEnemy extends Enemy {
         return head;
     }
 
-    /**
-     * Gibt die umliegenden Tiles in einer bestimmten Reichweite zurück
-     *
-     * @param range Reichweite um das Tile herum
-     * @param board Map auf der nachgeschaut wird
-     * @return Liste der umliegenden Tiles
-     */
-    private List<Tile> getNeighbours(int range, Tile[][] board) {
-        return Tile.getNeighbours(range, posTile.getPosition(), board);
-    }
-
     public int getRange() {
         return range;
     }
