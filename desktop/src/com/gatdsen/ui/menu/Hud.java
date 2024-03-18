@@ -143,12 +143,19 @@ public class Hud implements Disposable {
 
 // Erstellen der Elemente
         player0BalanceLabel = new Label("$" + player0Balance, skin);
+        player0BalanceLabel.setColor(Color.BLACK);
         player1BalanceLabel = new Label("$" + player1Balance, skin);
+        player1BalanceLabel.setColor(Color.BLACK);
         player0SpawnCoinsLabel = new Label("SpawnCoins: " + player0SpawnCoins, skin);
+        player0SpawnCoinsLabel.setColor(Color.BLACK);
         player1SpawnCoinsLabel = new Label("SpawnCoins: " + player1SpawnCoins, skin);
+        player1SpawnCoinsLabel.setColor(Color.BLACK);
         currentRoundLabel = new Label("Runde: " + roundCounter, skin);
+        currentRoundLabel.setColor(Color.BLACK);
         healthPlayer0Label = new Label("" + healthPlayer0, skin);
+        healthPlayer0Label.setColor(Color.BLACK);
         healthPlayer1Label = new Label("" + healthPlayer1, skin);
+        healthPlayer1Label.setColor(Color.BLACK);
         nextRoundButton = new TextButton("Zug beenden", skin);
         backToMainMenuButton = new TextButton("Hauptmenü", skin);
         restartGameButton = new TextButton("Neustart", skin);

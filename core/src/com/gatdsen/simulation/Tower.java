@@ -330,11 +330,11 @@ public abstract class Tower implements Serializable {
 
         if (target != null) {
             head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex(), id));
-            Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 1);
-            path.setDuration(0);
-            head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));
-
-
+            if (type == TowerType.SNIPER_TOWER) {
+                Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 0.1f);
+                path.setDuration(0.5f);
+                head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));
+            }
             head = updateEnemyHealth(target, head);
             cooldown = getRechargeTime();
         }
