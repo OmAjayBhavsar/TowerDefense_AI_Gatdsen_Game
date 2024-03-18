@@ -120,7 +120,11 @@ public class InputHandler implements InputProcessor, com.gatdsen.manager.InputPr
      * @param enemyType Gibt an welcher Gegner Typ beim Gegenspieler gespawnt werden soll.
      */
     public void playerBuyedEnemy(int playerId, Enemy.Type enemyType) {
-        //ToDo @manager: implement code
+        HumanPlayer currentPlayer = currentPlayers.get(playerId);
+        if (currentPlayer == null) {
+            return;
+        }
+        currentPlayer.sendEnemyToPlayer(enemyType);
     }
 
     /**
