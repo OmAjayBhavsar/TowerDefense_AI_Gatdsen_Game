@@ -364,6 +364,7 @@ public class PlayerState implements Serializable {
      * @return neuer Kopf der Action-Liste
      */
     Action sendEnemy(Enemy.Type type, GameState gameState, Action head) {
+        enemyLevel = enemyLevel == 0 ? 1 : enemyLevel;
         if (spawnCoins >= Enemy.getEnemyTypePrice(type, enemyLevel)) {
             PlayerState playerState = gameState.getPlayerStates()[(index + 1) % 2];
             playerState.spawnEnemy(type);
