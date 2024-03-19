@@ -177,6 +177,7 @@ public class Hud implements Disposable {
              */
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                closeSelectBox();
                 inputHandler.endTurn();
                 updateUIElements();
             }
@@ -196,6 +197,7 @@ public class Hud implements Disposable {
         buyButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                closeSelectBox();
                 String selectedPlayer = playerSelectBox.getSelected();
                 String selectedEnemy = enemySelectBox.getSelected();
                 int selectedPlayerInt;
@@ -248,21 +250,31 @@ public class Hud implements Disposable {
 
         Table mainTable = new Table();
         mainTable.defaults().pad(10);
-        mainTable.add(new Label("", skin)).width(buttonWidth).row(); // Invisible label for spacing
-        mainTable.add(turnTimer).width(buttonWidth).row();
-        mainTable.add(new Label("", skin)).width(buttonWidth).row(); // Invisible label for spacing
+        mainTable.add(new Label("", skin)).width(buttonWidth).row();
+        mainTable.add(turnTimer).row();
         mainTable.add(nextRoundButton).colspan(3).width(buttonWidth).row();
-        mainTable.add(new Label("Shop zum Spawnen", skin)).colspan(3).row();
-        mainTable.add(new Label("von Gegnern", skin)).colspan(3).row();
+        mainTable.add(new Label("", skin)).width(buttonWidth).row();
+        Label shop0Label = new Label("Shop zum Spawnen", skin);
+        Label shop1Label = new Label("von Gegnern", skin);
+        shop0Label.setColor(Color.BLACK);
+        shop1Label.setColor(Color.BLACK);
+        mainTable.add(shop0Label).pad(1).colspan(3).row();
+        mainTable.add(shop1Label).pad(1).colspan(3).row();
         mainTable.add(playerSelectBox).colspan(3).width(buttonWidth).row();
         mainTable.add(enemySelectBox).colspan(3).width(buttonWidth).row();
         mainTable.add(buyButton).colspan(3).width(buttonWidth).row();
-        mainTable.add(new Label("", skin)).colspan(3).width(buttonWidth).row(); // Invisible label for spacing
-        mainTable.add(backToMainMenuButton).colspan(3).width(buttonWidth).row();
+
+        Table navigationTable = new Table();
+        navigationTable.bottom();
+        navigationTable.add(new Label("", skin)).width(buttonWidth).row();
+        navigationTable.add(new Label("", skin)).width(buttonWidth).row();
+        navigationTable.add(new Label("", skin)).width(buttonWidth).row();
+        navigationTable.add(backToMainMenuButton).colspan(3).width(buttonWidth);
 
         // Hinzufügen der Tabellen zur VerticalGroup
         mainVerticalGroup.addActor(playerTable);
         mainVerticalGroup.addActor(mainTable);
+        mainVerticalGroup.addActor(navigationTable);
 
         stage.addActor(mainVerticalGroup);
         stage.addActor(popupGroup);
@@ -594,9 +606,7 @@ public class Hud implements Disposable {
                                 default:
                                     break;
                             }
-                            if (towerSellUpgrade != null) {
-                                towerSellUpgrade.remove();
-                            }
+                            closeSelectBox();
                         }
                     });
                     return true;
@@ -615,9 +625,7 @@ public class Hud implements Disposable {
                             Tower.TargetOption targetOption;
                             targetOption = (Tower.TargetOption) fireModeSelectBox.getSelected();
                             inputHandler.playerFieldLeftClicked(team, posX, posY, null, targetOption);
-                            if (fireModeSelectBox != null) {
-                                fireModeSelectBox.remove();
-                            }
+                            closeSelectBox();
                         }
                     });
                     return true;
@@ -639,15 +647,17 @@ public class Hud implements Disposable {
                     towerSelectBox.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
-                            Tower.TowerType towerType;
-                            towerType = towerSelectBox.getSelected();
+                            Tower.TowerType towerType = towerSelectBox.getSelected();
+                            PlayerState[] playerStates = gameState.getPlayerStates();
+
                             inputHandler.playerFieldLeftClicked(team, posX, posY, towerType, null);
-                            if (team >= 0 && team < towerMaps.size()) {
-                                towerMaps.get(team)[posX][posY] = 1;
+                            int towerCost = Tower.getTowerPrice(towerType);
+                            if (towerCost <= playerStates[team].getMoney()) {
+                                if (team >= 0 && team < towerMaps.size()) {
+                                    towerMaps.get(team)[posX][posY] = 1;
+                                }
                             }
-                            if (towerSelectBox != null) {
-                                towerSelectBox.remove();
-                            }
+                            closeSelectBox();
                         }
                     });
                     return true;
