@@ -46,9 +46,9 @@ public class SniperTower extends Tower {
     @Override
     public int getDamage() {
         switch (level) {
-            case 1: return 100; // One shot one kill
-            case 2: return 200;
-            case 3: return 300;
+            case 1: return 150; // One shot one kill
+            case 2: return 250;
+            case 3: return 350;
             default: return 0;
         }
     }

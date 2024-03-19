@@ -4,6 +4,7 @@ import com.gatdsen.simulation.action.*;
 import com.gatdsen.simulation.enemy.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Die Klasse Enemy repräsentiert einen Gegner im Spiel.
@@ -157,4 +158,14 @@ public abstract class Enemy implements Serializable {
         return id;
     }
 
+    /**
+     * Gibt die umliegenden Tiles in einer bestimmten Reichweite zurück
+     *
+     * @param range Reichweite um das Tile herum
+     * @param board Map auf der nachgeschaut wird
+     * @return Liste der umliegenden Tiles
+     */
+    protected List<Tile> getNeighbours(int range, Tile[][] board) {
+        return Tile.getNeighbours(range, posTile.getPosition(), board);
+    }
 }
