@@ -1,9 +1,6 @@
 package com.gatdsen.simulation;
 
-import com.gatdsen.simulation.GameState.GameMode;
 import com.gatdsen.simulation.action.*;
-
-import java.util.Arrays;
 
 /**
  * Enthält die Logik, welche die Spielmechaniken bestimmt.
@@ -25,7 +22,6 @@ public class Simulation {
         gameState = new GameState(gameMode, mapName, playerCount, this);
         playerStates = gameState.getPlayerStates();
         actionLog = new ActionLog(new InitAction());
-
     }
 
     /**

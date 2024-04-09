@@ -9,19 +9,6 @@ import java.util.*;
 public class GameState implements Serializable {
 
     /**
-     * Enum für die verschiedenen Spielmodi
-     */
-    public enum GameMode {
-        Normal,
-        Campaign,
-        Exam_Admission,
-        Tournament_Phase_1,
-        Tournament_Phase_2,
-        Replay,
-        Christmas_Task
-    }
-
-    /**
      * Enum für die verschiedenen Feldtypen
      */
     public enum MapTileType {
@@ -51,18 +38,17 @@ public class GameState implements Serializable {
      */
     GameState(GameMode gameMode, String mapName, int playerCount, Simulation sim) {
         this.gameMode = gameMode;
-        this.map = MapLoader.getInstance().loadMap(
-                gameMode == GameMode.Campaign ? "campaign/" + mapName : mapName
-        );
-
+        this.map = MapLoader.getInstance().loadMap(gameMode.map);
         this.playerCount = playerCount;
         this.active = true;
         this.sim = sim;
         playerStates = new PlayerState[playerCount];
         Arrays.setAll(playerStates, index -> new PlayerState(this, index, 300, 100));
+        /*
         if (gameMode == GameMode.Christmas_Task) {
             playerStates[1] = new PlayerState(this, 1, 500, 0);
         }
+        */
     }
 
     /**

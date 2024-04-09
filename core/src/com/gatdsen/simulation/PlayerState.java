@@ -16,6 +16,7 @@ import java.util.Stack;
  */
 public class PlayerState implements Serializable {
     private final Tile[][] board;
+    private GameMode gameMode;
     private int health;
     private int money;
     private int spawnCoins;
@@ -39,6 +40,7 @@ public class PlayerState implements Serializable {
      * @param money     das Geld des Spielers
      */
     PlayerState(GameState gameState, int index, int health, int money) {
+        gameMode = gameState.getGameMode();
         this.index = index;
         int width = gameState.getBoardSizeX();
         int height = gameState.getBoardSizeY();
@@ -246,6 +248,13 @@ public class PlayerState implements Serializable {
      */
     Action placeTower(int x, int y, Tower.TowerType type, Action head) {
         if (board[x][y] != null) {
+            // ToDo: append error action
+            return head;
+        }
+
+        if (gameMode.getTowers().contains(type)) {
+            System.out.println("Für diesen Spielmodus darfst du nur folgenden Türme benutzen:");
+            System.out.println(gameMode.getTowers());
             // ToDo: append error action
             return head;
         }
