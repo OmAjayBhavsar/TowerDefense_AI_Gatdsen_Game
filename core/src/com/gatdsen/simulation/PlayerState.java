@@ -249,7 +249,7 @@ public class PlayerState implements Serializable {
             head.addChild(new ErrorAction("(" + x + ", " + y + ") is already occupied"));
         } else if (money < Tower.getTowerPrice(type)) {
             head.addChild(new ErrorAction("Not enough money to place Tower at (" + x + ", " + y + ")"));
-        } else if (!board[x][y].isBuildable()) {
+        } else if (board[x][y] != null && !board[x][y].isBuildable()) {
             head.addChild(new ErrorAction("Tile at (" + x + ", " + y + ") is not buildable"));
         } else {
             TowerTile towerTile = new TowerTile(this, x, y, type);
