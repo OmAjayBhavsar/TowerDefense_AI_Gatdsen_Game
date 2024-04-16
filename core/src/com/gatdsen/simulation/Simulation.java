@@ -3,8 +3,6 @@ package com.gatdsen.simulation;
 import com.gatdsen.simulation.GameState.GameMode;
 import com.gatdsen.simulation.action.*;
 
-import java.util.Arrays;
-
 /**
  * Enthält die Logik, welche die Spielmechaniken bestimmt.
  * Während die Simulation läuft werden alle Ereignisse in ActionLogs festgehalten, die anschließend durch das animation package dargestellt werden können.

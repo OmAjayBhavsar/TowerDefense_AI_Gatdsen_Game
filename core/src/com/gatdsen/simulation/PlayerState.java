@@ -246,32 +246,23 @@ public class PlayerState implements Serializable {
      */
     Action placeTower(int x, int y, Tower.TowerType type, Action head) {
         if (board[x][y] != null) {
-            // ToDo: append error action
-            return head;
+            head.addChild(new ErrorAction("(" + x + ", " + y + ") is already occupied"));
+        } else if (money < Tower.getTowerPrice(type)) {
+            head.addChild(new ErrorAction("Not enough money to place Tower at (" + x + ", " + y + ")"));
+        } else if (board[x][y] != null && !board[x][y].isBuildable()) {
+            head.addChild(new ErrorAction("Tile at (" + x + ", " + y + ") is not buildable"));
+        } else {
+            TowerTile towerTile = new TowerTile(this, x, y, type);
+
+            money -= Tower.getTowerPrice(type);
+            Action updateAction = new UpdateCurrencyAction(0, money, spawnCoins, index);
+            head.addChild(updateAction);
+
+            board[x][y] = towerTile;
+            IntVector2 pos = new IntVector2(x, y);
+            Action action = new TowerPlaceAction(0, pos, type.ordinal(), index, towerTile.getTower().getId());
+            head.addChild(action);
         }
-
-        TowerTile towerTile = new TowerTile(this, x, y, type);
-
-        if (money < Tower.getTowerPrice(type)) {
-            // ToDo: append error action
-            Tower.idCounter--;
-            return head;
-        }
-
-        if (board[x][y] != null && !board[x][y].isBuildable()) {
-            // ToDo: append error action
-            Tower.idCounter--;
-            return head;
-        }
-
-        money -= Tower.getTowerPrice(type);
-        Action updateAction = new UpdateCurrencyAction(0, money, spawnCoins, index);
-        head.addChild(updateAction);
-
-        board[x][y] = towerTile;
-        IntVector2 pos = new IntVector2(x, y);
-        Action action = new TowerPlaceAction(0, pos, type.ordinal(), index, towerTile.getTower().getId());
-        head.addChild(action);
         return head;
     }
 
@@ -285,10 +276,8 @@ public class PlayerState implements Serializable {
      */
     Action upgradeTower(int x, int y, Action head) {
         if (board[x][y] == null) {
-            // ToDo: append error action
-            return head;
-        }
-        if (board[x][y] instanceof TowerTile) {
+            head.addChild(new ErrorAction("No Tower at position (" + x + ", " + y + ")"));
+        } else if (board[x][y] instanceof TowerTile) {
             TowerTile towerTile = (TowerTile) board[x][y];
             Tower tower = towerTile.getTower();
             if (tower.getLevel() < Tower.getMaxLevel() && money >= tower.getUpgradePrice()) {
@@ -297,12 +286,14 @@ public class PlayerState implements Serializable {
                 head.addChild(new TowerUpgradeAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));
                 head.addChild(new UpdateCurrencyAction(0, money, spawnCoins, index));
             } else {
-                // ToDo: append error action
-                return head;
+                if (tower.getLevel() >= Tower.getMaxLevel()) {
+                    head.addChild(new ErrorAction("Tower (" + x + ", " + y + ") is already at max level"));
+                } else {
+                    head.addChild(new ErrorAction("Not enough money to upgrade Tower (" + x + ", " + y + ")"));
+                }
             }
         } else {
-            // ToDo: append error action
-            return head;
+            head.addChild(new ErrorAction("No Tower at position (" + x + ", " + y + ")"));
         }
         return head;
     }
@@ -317,10 +308,8 @@ public class PlayerState implements Serializable {
      */
     Action sellTower(int x, int y, Action head) {
         if (board[x][y] == null) {
-            // ToDo: append error action
-            return head;
-        }
-        if (board[x][y] instanceof TowerTile) {
+            head.addChild(new ErrorAction("No Tower at position (" + x + ", " + y + ")"));
+        } else if (board[x][y] instanceof TowerTile) {
             TowerTile towerTile = (TowerTile) board[x][y];
             Tower tower = towerTile.getTower();
             money += Tower.getTowerPrice(tower.type) / 2;
@@ -328,8 +317,7 @@ public class PlayerState implements Serializable {
             head.addChild(new TowerDestroyAction(0, towerTile.getPosition(), tower.getType().ordinal(), index, tower.getId()));
             board[x][y] = null;
         } else {
-            // ToDo: append error action
-            return head;
+            head.addChild(new ErrorAction("No Tower at position (" + x + ", " + y + ")"));
         }
         return head;
     }
@@ -348,10 +336,8 @@ public class PlayerState implements Serializable {
             TowerTile towerTile = (TowerTile) board[x][y];
             towerTile.getTower().setTargetOption(targetOption);
         } else {
-            // ToDo: append error action
-            return head;
+            head.addChild(new ErrorAction("No Tower at position (" + x + ", " + y + ")"));
         }
-
         return head;
     }
 
