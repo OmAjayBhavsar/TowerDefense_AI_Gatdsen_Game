@@ -1,4 +1,10 @@
 package com.gatdsen.simulation.gamemode;
 
-public class ExamAdmissionMode {
+import com.gatdsen.simulation.GameMode;
+
+public class ExamAdmissionMode extends GameMode {
+    public ExamAdmissionMode() {
+        super();
+        map = "ExamAdmission";
+    }
 }
