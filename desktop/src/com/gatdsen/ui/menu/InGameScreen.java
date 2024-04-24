@@ -60,6 +60,10 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
         this.runConfig.animationLogProcessor = this;
         this.runConfig.inputProcessor = hud.getInputHandler();
 
+        if (run != null) {
+            manager.stop(run);
+        }
+
         run = manager.startRun(this.runConfig);
         if (run == null) {
             throw new RuntimeException("Can't start game with an invalid RunConfig!");
@@ -156,7 +160,9 @@ public class InGameScreen extends ConfigScreen implements AnimationLogProcessor 
 
     public void shutdown() {
         hud.dispose();
-        manager.stop(run);
+        if (run != null) {
+            manager.stop(run);
+        }
         gameManager.setScreen(GADS.ScreenState.MAINSCREEN, new RunConfig());
     }
 
