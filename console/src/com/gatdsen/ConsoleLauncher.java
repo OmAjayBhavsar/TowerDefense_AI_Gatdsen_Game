@@ -8,7 +8,6 @@ import org.apache.commons.cli.CommandLine;
 public final class ConsoleLauncher extends Launcher {
 
     public static void main(String[] args) {
-        args = new String[]{"-g", "0", "-m", "map1", "WeakBot IdleBot", "-n"};
         System.out.println("Running GaTDsen Version: " + ConsoleLauncher.class.getPackage().getImplementationVersion());
         CommandLine params = getParamsFromArgs(args);
         if (params == null) {
