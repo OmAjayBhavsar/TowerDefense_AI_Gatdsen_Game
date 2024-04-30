@@ -15,11 +15,11 @@ public class Simulation {
      * erstellt eine neue Simulation
      *
      * @param gameMode    Modus in dem gespielt wird
-     * @param mapName     Map auf der gespielt wird
      * @param playerCount Anzahl Spieler
      */
-    public Simulation(GameMode gameMode, String mapName, int playerCount) {
-        gameState = new GameState(gameMode, mapName, playerCount, this);
+    public Simulation(GameMode gameMode, int playerCount) {
+        System.out.println("---" + gameMode.map);
+        gameState = new GameState(gameMode, playerCount, this);
         playerStates = gameState.getPlayerStates();
         actionLog = new ActionLog(new InitAction());
     }

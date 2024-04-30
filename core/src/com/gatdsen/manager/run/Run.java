@@ -4,7 +4,7 @@ import com.gatdsen.manager.CompletionHandler;
 import com.gatdsen.manager.game.Executable;
 import com.gatdsen.manager.Manager;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
-import com.gatdsen.simulation.GameState;
+import com.gatdsen.simulation.GameMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public abstract class Run {
 
     protected final Manager manager;
 
-    protected GameState.GameMode gameMode;
+    protected GameMode gameMode;
     private final List<Executable> games = new ArrayList<>();
 
     private boolean disposed = false;
@@ -35,19 +35,27 @@ public abstract class Run {
     }
 
     public static Run getRun(Manager manager, RunConfig runConfig) {
-        switch (runConfig.gameMode) {
-            case Campaign:
-            case Replay:
-            case Normal:
-            case Christmas_Task:
+        String gameModeName = runConfig.gameMode.getClass().getSimpleName();
+        // if the gameModeName contains a number in format x_y remove the x_y
+        if (gameModeName.contains("_")) {
+            gameModeName = gameModeName.substring(0, gameModeName.indexOf("_"));
+        }
+
+        switch (gameModeName) {
+            case "CampaignMode":
+            case "ReplayMode":
+            case "NormalMode":
+            case "ChristmasMode":
                 return new SingleGameRun(manager, runConfig);
-            case Exam_Admission:
-            case Tournament_Phase_1:
+            case "ExamAdmissionMode":
+            case "TournamentMode":
                 return new ParallelMultiGameRun(manager, runConfig);
-            case Tournament_Phase_2:
+            case "TournamentModePhase2":
                 return new TournamentRun(manager, runConfig);
             default:
-                throw new IllegalArgumentException(runConfig.gameMode.toString() + " is not processed by the Run interface");
+                throw new IllegalArgumentException(
+                        runConfig.gameMode.getClass().getName() + " is not processed by the Run interface"
+                );
         }
     }
 
@@ -67,15 +75,18 @@ public abstract class Run {
     public void dispose() {
         synchronized (schedulingLock) {
             disposed = true;
-            for (Executable game : games
-            ) {
+            for (Executable game : games) {
                 manager.stop(game);
             }
         }
     }
 
-    public GameState.GameMode getGameMode() {
-        return gameMode;
+    public String getGameModeName() {
+        String gameModeName = gameMode.getClass().getSimpleName();
+        if (gameModeName.contains("_")) {
+            gameModeName = gameModeName.substring(0, gameModeName.indexOf("_"));
+        }
+        return gameModeName;
     }
 
     public boolean isCompleted() {

@@ -10,7 +10,7 @@ public class CampaignMode1_2 extends GameMode {
         super();
         enemyBotHealth = 100;
         map = "Campaign1_2";
-        towers = new ArrayList<>();
-        towers.add(Tower.TowerType.AOE_TOWER);
+        towers.remove(2);
+        towers.remove(0);
     }
 }

@@ -252,7 +252,7 @@ public class PlayerState implements Serializable {
             return head;
         }
 
-        if (gameMode.getTowers().contains(type)) {
+        if (!gameMode.getTowers().contains(type)) {
             System.out.println("Für diesen Spielmodus darfst du nur folgenden Türme benutzen:");
             System.out.println(gameMode.getTowers());
             // ToDo: append error action
@@ -367,20 +367,20 @@ public class PlayerState implements Serializable {
     /**
      * Sendet einen Gegner zum Gegenspieler
      *
-     * @param type      Typ des Gegners
+     * @param enemyType      Typ des Gegners
      * @param gameState GameState
      * @param head      Kopf der Action-Liste
      * @return neuer Kopf der Action-Liste
      */
-    Action sendEnemy(Enemy.Type type, GameState gameState, Action head) {
+    Action sendEnemy(Enemy.EnemyType enemyType, GameState gameState, Action head) {
         enemyLevel = enemyLevel == 0 ? 1 : enemyLevel;
-        if (spawnCoins >= Enemy.getEnemyTypePrice(type, enemyLevel)) {
+        if (spawnCoins >= Enemy.getEnemyTypePrice(enemyType, enemyLevel)) {
             PlayerState playerState = gameState.getPlayerStates()[(index + 1) % 2];
-            playerState.spawnEnemy(type);
+            playerState.spawnEnemy(enemyType);
             Enemy enemy = playerState.spawnEnemies.peek();
-            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemyLevel, enemy.getHealth(), index, type, enemy.getId()));
+            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemyLevel, enemy.getHealth(), index, enemyType, enemy.getId()));
 
-            spawnCoins -= Enemy.getEnemyTypePrice(type, enemyLevel);
+            spawnCoins -= Enemy.getEnemyTypePrice(enemyType, enemyLevel);
             head.addChild(new UpdateCurrencyAction(0, money, spawnCoins, index));
         }
         return head;
@@ -389,10 +389,10 @@ public class PlayerState implements Serializable {
     /**
      * Initialisiert die Gegner, die gespawnt werden sollen
      *
-     * @param type Typ des Gegners
+     * @param enemyType Typ des Gegners
      */
-    void spawnEnemy(Enemy.Type type) {
-        switch (type) {
+    void spawnEnemy(Enemy.EnemyType enemyType) {
+        switch (enemyType) {
             case EMP_ENEMY:
                 spawnEnemies.push(new EmpEnemy(this, 1, spawnTile));
                 break;
@@ -424,7 +424,7 @@ public class PlayerState implements Serializable {
         while (!spawnEnemies.isEmpty()) {
             Enemy enemy = spawnEnemies.pop();
             spawnTile.getEnemies().add(enemy);
-            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemy.getLevel(), enemy.getHealth(), index, enemy.type, enemy.getId()));
+            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemy.getLevel(), enemy.getHealth(), index, enemy.enemyType, enemy.getId()));
         }
         return head;
     }

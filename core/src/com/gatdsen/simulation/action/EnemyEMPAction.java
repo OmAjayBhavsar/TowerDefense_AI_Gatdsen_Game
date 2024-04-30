@@ -18,13 +18,13 @@ public class EnemyEMPAction extends EnemyAction {
      * @param pos   Position des Gegners
      * @param level Level des Gegners
      * @param team  Team des Gegners
-     * @param type  Typ des Gegners
+     * @param enemyType  Typ des Gegners
      * @param range Reichweite des EMP-Angriffs
      * @param id    ID des Gegners
      */
 
-    public EnemyEMPAction(float delay, IntVector2 pos, int level, int team, Enemy.Type type, int range, int id) {
-        super(delay, pos, level, team, type, id);
+    public EnemyEMPAction(float delay, IntVector2 pos, int level, int team, Enemy.EnemyType enemyType, int range, int id) {
+        super(delay, pos, level, team, enemyType, id);
         this.range = range;
     }
 

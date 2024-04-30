@@ -45,7 +45,8 @@ public class MapAttribute extends Attribute {
      */
     @Override
     public RunConfig getConfig(RunConfig runConfig) {
-        runConfig.mapName = mapSelectBox.getSelected();
+        //runConfig.mapName = mapSelectBox.getSelected();
+        runConfig.gameMode.setMap(mapSelectBox.getSelected()); // TODO: Just a quickfix, needs to be changed because of public setter in sim gez. Dani
         return runConfig;
     }
 

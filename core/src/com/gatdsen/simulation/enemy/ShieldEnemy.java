@@ -17,7 +17,7 @@ public class ShieldEnemy extends Enemy {
      */
     public ShieldEnemy(PlayerState playerState, int level, PathTile posTile) {
         super(playerState, level, posTile);
-        type = Type.SHIELD_ENEMY;
+        enemyType = EnemyType.SHIELD_ENEMY;
         health = 150 * level;
         damage = 5 * level;
     }

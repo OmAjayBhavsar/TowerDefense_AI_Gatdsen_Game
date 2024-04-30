@@ -32,11 +32,10 @@ public class GameState implements Serializable {
      * Erstellt ein neues GameState-Objekt mit den angegebenen Attributen.
      *
      * @param gameMode    Spielmodus
-     * @param mapName     Name der Map als String
      * @param playerCount Anzahl der Spieler
      * @param sim         Simulation Instanz
      */
-    GameState(GameMode gameMode, String mapName, int playerCount, Simulation sim) {
+    GameState(GameMode gameMode, int playerCount, Simulation sim) {
         this.gameMode = gameMode;
         this.map = MapLoader.getInstance().loadMap(gameMode.map);
         this.playerCount = playerCount;

@@ -18,8 +18,8 @@ public class EnemyDefeatAction extends EnemyAction {
      * @param team  Team des Gegners
      * @param id    ID des Gegners
      */
-    public EnemyDefeatAction(float delay, IntVector2 pos, int level, int team, Enemy.Type type, int id) {
-        super(delay, pos, level, team, type, id);
+    public EnemyDefeatAction(float delay, IntVector2 pos, int level, int team, Enemy.EnemyType enemyType, int id) {
+        super(delay, pos, level, team, enemyType, id);
     }
 
     @Override

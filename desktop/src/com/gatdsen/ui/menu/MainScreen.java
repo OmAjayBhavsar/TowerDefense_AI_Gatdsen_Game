@@ -4,6 +4,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.gatdsen.simulation.GameState;
+import com.gatdsen.simulation.gamemode.ChristmasMode;
+import com.gatdsen.simulation.gamemode.ExamAdmissionMode;
+import com.gatdsen.simulation.gamemode.NormalMode;
+import com.gatdsen.simulation.gamemode.campaign.CampaignMode1_1;
 import com.gatdsen.ui.GADS;
 
 public class MainScreen extends BaseMenuScreen {
@@ -32,7 +36,7 @@ public class MainScreen extends BaseMenuScreen {
         normalGameModeButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                runConfig.gameMode = GameState.GameMode.Normal;
+                runConfig.gameMode = new NormalMode();
                 gameInstance.setScreen(GADS.ScreenState.NORMALMODESCREEN, runConfig);
             }
         });
@@ -42,7 +46,7 @@ public class MainScreen extends BaseMenuScreen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 //setRunConfig(RunConfig.fromGameMode(GameState.GameMode.Christmas_Task), runConfig));
-                runConfig.gameMode = GameState.GameMode.Christmas_Task;
+                runConfig.gameMode = new ChristmasMode();
                 gameInstance.setScreen(GADS.ScreenState.CHRISTMASTASKSCREEN, runConfig);
             }
         });
@@ -51,7 +55,7 @@ public class MainScreen extends BaseMenuScreen {
         examButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                runConfig.gameMode = GameState.GameMode.Exam_Admission;
+                runConfig.gameMode = new ExamAdmissionMode();
                 gameInstance.setScreen(GADS.ScreenState.EXAMMENUSCREEN, runConfig);
             }
         });
@@ -60,7 +64,7 @@ public class MainScreen extends BaseMenuScreen {
         campaignButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                runConfig.gameMode = GameState.GameMode.Campaign;
+                runConfig.gameMode = new CampaignMode1_1(); // TODO: richtige Kampagne auswählen gez. Dani
                 gameInstance.setScreen(GADS.ScreenState.CAMPAIGNSCREEN, runConfig);
             }
         });

@@ -1,11 +1,35 @@
 package com.gatdsen.simulation;
 
+import com.gatdsen.simulation.gamemode.ExamAdmissionMode;
+import com.gatdsen.simulation.gamemode.NormalMode;
+import com.gatdsen.simulation.gamemode.TournamentMode;
+import com.gatdsen.simulation.gamemode.campaign.*;
+import com.gatdsen.simulation.Tower.TowerType;
+import com.gatdsen.simulation.Enemy.EnemyType;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Abstrakte Klasse für die verschiedenen Spielmodi, welche die Standardwerte für die Spielmodi enthält.
  */
 public abstract class GameMode {
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends GameMode>[][] CampaignModes = new Class[][] {
+            {CampaignMode1_1.class, CampaignMode1_2.class},
+            {CampaignMode2_1.class, CampaignMode2_2.class},
+            {CampaignMode3_1.class, CampaignMode3_2.class},
+            {CampaignMode4_1.class, CampaignMode4_2.class},
+            {CampaignMode5_1.class, CampaignMode5_2.class},
+            {CampaignMode6_1.class, CampaignMode6_2.class}
+    };
+
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends GameMode>[] GameModes = new Class[] {
+            NormalMode.class, ExamAdmissionMode.class, TournamentMode.class
+    };
+
     protected int playerHealth;
     protected int enemyBotHealth;
     protected int playerMoney;
@@ -13,8 +37,8 @@ public abstract class GameMode {
     protected String enemyBot;
     protected String map;
     protected int wave;
-    protected List<Tower.TowerType> towers;
-    protected List<List<Enemy>> enemies;
+    protected List<TowerType> towers;
+    protected List<EnemyType> enemies;
 
     /**
      * Erstellt ein neues GameMode-Objekt mit den Standardwerten
@@ -27,8 +51,32 @@ public abstract class GameMode {
         enemyBot = "IdleBot";
         map = "map1";
         wave = 1;
-        towers = null;
-        enemies = null;
+        towers = new ArrayList<>();
+        towers.add(TowerType.BASIC_TOWER);
+        towers.add(TowerType.AOE_TOWER);
+        towers.add(TowerType.SNIPER_TOWER);
+        enemies = new ArrayList<>();
+        enemies.add(EnemyType.EMP_ENEMY);
+        enemies.add(EnemyType.SHIELD_ENEMY);
+        enemies.add(EnemyType.ARMOR_ENEMY);
+    }
+
+    public static GameMode getGameMode(int modeID) {
+        if (modeID >= 0 && modeID < GameModes.length) {
+            try {
+                return GameModes[modeID].getDeclaredConstructor().newInstance();
+            } catch (NoSuchMethodException | InvocationTargetException |
+                     InstantiationException | IllegalAccessException e) {
+                return null;
+            }
+        } else {
+            try {
+                return CampaignModes[modeID / 10 - 1][modeID % 10 - 1].getDeclaredConstructor().newInstance();
+            } catch (NoSuchMethodException | InvocationTargetException |
+                     InstantiationException | IllegalAccessException e) {
+                return null;
+            }
+        }
     }
 
     /**
@@ -73,6 +121,10 @@ public abstract class GameMode {
         return map;
     }
 
+    public void setMap(String map) {
+        this.map = map;
+    }
+
     /**
      * @return die Startwelle
      */
@@ -85,7 +137,7 @@ public abstract class GameMode {
      *
      * @return die Liste der Türme
      */
-    public List<Tower.TowerType> getTowers() {
+    public List<TowerType> getTowers() {
         return towers;
     }
 
@@ -94,7 +146,7 @@ public abstract class GameMode {
      *
      * @return die Liste der zu spawnenden Gegner
      */
-    public List<List<Enemy>> getEnemies() {
+    public List<EnemyType> getEnemies() {
         return enemies;
     }
 }

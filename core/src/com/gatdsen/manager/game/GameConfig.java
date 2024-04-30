@@ -4,8 +4,7 @@ import com.gatdsen.manager.AnimationLogProcessor;
 import com.gatdsen.manager.InputProcessor;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.RunConfig;
-import com.gatdsen.simulation.GameState.GameMode;
-
+import com.gatdsen.simulation.GameMode;
 import java.io.Serializable;
 
 public final class GameConfig implements Serializable {
