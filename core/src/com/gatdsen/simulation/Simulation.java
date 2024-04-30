@@ -18,7 +18,6 @@ public class Simulation {
      * @param playerCount Anzahl Spieler
      */
     public Simulation(GameMode gameMode, int playerCount) {
-        System.out.println("---" + gameMode.map);
         gameState = new GameState(gameMode, playerCount, this);
         playerStates = gameState.getPlayerStates();
         actionLog = new ActionLog(new InitAction());
