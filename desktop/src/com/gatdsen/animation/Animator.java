@@ -8,10 +8,7 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gatdsen.animation.action.*;
 import com.gatdsen.animation.action.Action;
-import com.gatdsen.animation.action.uiActions.MessageUiCurrencyAction;
-import com.gatdsen.animation.action.uiActions.MessageUiGameEndedAction;
-import com.gatdsen.animation.action.uiActions.MessageUiScoreAction;
-import com.gatdsen.animation.action.uiActions.MessageUiUpdateHealthAction;
+import com.gatdsen.animation.action.uiActions.*;
 import com.gatdsen.animation.entity.Entity;
 import com.gatdsen.animation.entity.ParticleEntity;
 import com.gatdsen.animation.entity.SpriteEntity;
@@ -120,6 +117,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(ScoreAction.class, ActionConverters::convertScoreAction);
                         put(UpdateCurrencyAction.class, ActionConverters::convertUpdateCurrencyAction);
                         put(UpdateHealthAction.class, ActionConverters::convertUpdateHealthAction);
+                        put(PlayerDeactivateAction.class, ActionConverters::convertPlayerDeactivateAction);
 
                         // Gegner Actions
                         put(EnemySpawnAction.class, ActionConverters::convertEnemySpawnAction);
@@ -168,6 +166,14 @@ public class Animator implements Screen, AnimationLogProcessor {
         private static ExpandedAction convertTurnStartAction(com.gatdsen.simulation.action.Action action, Animator animator) {
 
             return new ExpandedAction(new IdleAction(0, 0));
+        }
+
+        private static ExpandedAction convertPlayerDeactivateAction(com.gatdsen.simulation.action.Action action, Animator animator) {
+            PlayerDeactivateAction deactivateAction = (PlayerDeactivateAction) action;
+
+            MessageUiDisqualifyAction disqualifyAction = new MessageUiDisqualifyAction(deactivateAction.getDelay(), animator.uiMessenger, deactivateAction.getTeam(), deactivateAction.toString());
+
+            return new ExpandedAction(disqualifyAction);
         }
 
         private static ExpandedAction convertEnemySpawnAction(com.gatdsen.simulation.action.Action action, Animator animator) {
