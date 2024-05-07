@@ -642,17 +642,28 @@ public class Hud implements Disposable {
                     } else
                         towerSelectBox.setPosition(coords.x, coords.y);
 
-
                     popupGroup.addActor(towerSelectBox);
                     towerSelectBox.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
                             Tower.TowerType towerType = towerSelectBox.getSelected();
-                            PlayerState[] playerStates = gameState.getPlayerStates();
 
                             inputHandler.playerFieldLeftClicked(team, posX, posY, towerType, null);
                             int towerCost = Tower.getTowerPrice(towerType);
-                            if (towerCost <= playerStates[team].getMoney()) {
+
+                            int playerBalance = 0;
+                            switch (team) {
+                                case 0:
+                                    playerBalance = player0Balance;
+                                    break;
+                                case 1:
+                                    playerBalance = player1Balance;
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            if (towerCost <= playerBalance) {
                                 if (team >= 0 && team < towerMaps.size()) {
                                     towerMaps.get(team)[posX][posY] = 1;
                                 }
