@@ -32,19 +32,11 @@
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
  "tileheight":200,
- "tilesets":[
-        {
-         "firstgid":1,
-         "source":"C:\/Users\/lasse\/Desktop\/Gatdsen.tsx"
-        }, 
-        {
-         "firstgid":7,
-         "source":"C:\/Users\/lasse\/Desktop\/Gatdsen Campaign\/Campaign 3-1\/tiles.tsx"
-        }, 
-        {
-         "firstgid":12,
-         "source":"C:\/Users\/lasse\/Desktop\/dghsf.tsx"
-        }],
+  "tilesets":[
+    {
+      "firstgid":1,
+      "source":"tiledProject\/tileset\/test_tileset.tsx"
+    }],
  "tilewidth":200,
  "type":"map",
  "version":"1.10",
