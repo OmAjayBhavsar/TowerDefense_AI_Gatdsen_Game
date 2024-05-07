@@ -409,7 +409,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             if (winAction.getTeam() < 0) {
                 gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, true);
             } else {
-                gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, true, winAction.getTeam());
+                gameEndedAction = new MessageUiGameEndedAction(0, animator.uiMessenger, winAction.getTeam());
             }
 
             return new ExpandedAction(gameEndedAction);
