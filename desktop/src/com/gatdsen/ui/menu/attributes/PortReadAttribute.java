@@ -15,10 +15,10 @@ public class PortReadAttribute extends Attribute{
         textLabelPort.setAlignment(Align.right);
         Label textLabelPortRead = new Label("443 ", skin); //ToDo get port
         textLabelPort.setAlignment(Align.center);
-        portTable.columnDefaults(0).width(100);
-        portTable.columnDefaults(1).width(100);
+        portTable.columnDefaults(0).width(200);
+        portTable.columnDefaults(1).width(200);
         portTable.add(textLabelPort).colspan(4).pad(10).right();
-        portTable.add(textLabelPortRead).colspan(4).pad(10).width(80).row();
+        portTable.add(textLabelPortRead).colspan(4).pad(10).width(200).row();
         return portTable;
     }
 

@@ -16,7 +16,7 @@ public class BasicEnemy extends Enemy {
     public BasicEnemy(PlayerState playerState, int level, PathTile posTile) {
         super(playerState, level, posTile);
         type = Type.BASIC_ENEMY;
-        health = 100 * level;
+        health = 75 * level;
         damage = 10 * level;
     }
 

@@ -2,15 +2,10 @@ package com.gatdsen.ui.hud;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.gatdsen.manager.player.HumanPlayer;
+import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.Tower;
-import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.menu.Hud;
 import com.gatdsen.ui.menu.InGameScreen;
 
@@ -119,6 +114,20 @@ public class InputHandler implements InputProcessor, com.gatdsen.manager.InputPr
     }
 
     /**
+     *  Wird aufgerufen, wenn ein Gegner von Spieler playerID beim Gegenspieler gespawnt werden soll.
+     *
+     * @param playerId Spieleder ID, des Spielers, der den Kauf Befehl ausführt
+     * @param enemyType Gibt an welcher Gegner Typ beim Gegenspieler gespawnt werden soll.
+     */
+    public void playerBuyedEnemy(int playerId, Enemy.Type enemyType) {
+        HumanPlayer currentPlayer = currentPlayers.get(playerId);
+        if (currentPlayer == null) {
+            return;
+        }
+        currentPlayer.sendEnemyToPlayer(enemyType);
+    }
+
+    /**
      * Wird aufgerufen, wenn ein Spieler auf das Spielfeld links klickt, um einen Turm zu platzieren
      *
      * @param playerId Die ID des Spielers, der den Linksklick ausgeführt hat
@@ -133,8 +142,7 @@ public class InputHandler implements InputProcessor, com.gatdsen.manager.InputPr
         if (towerType!=null && targetOption==null){
             currentPlayer.placeTower(x, y, towerType);
         } else if (towerType == null && targetOption != null) {
-            //ToDo implement TargetOption action
-
+            currentPlayer.setTowerTarget(x, y, targetOption);
         }
     }
 

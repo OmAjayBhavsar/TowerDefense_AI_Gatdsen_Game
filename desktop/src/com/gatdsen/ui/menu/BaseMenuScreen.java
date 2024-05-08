@@ -81,11 +81,13 @@ public abstract class BaseMenuScreen extends ConfigScreen {
         Label titelLabel = new Label(getTitelString(), skin);
         title = new Image(titleSprite);
 
+        title.setScale(1.4f);
+
         menuTable = new Table(skin);
         Label invisibleLabel = new Label("",skin);
         menuTable.setFillParent(true);
         menuTable.center();
-        menuTable.add(title).pad(10).center().row();
+        menuTable.add(title).pad(30).center().row();
         menuTable.add(titelLabel).pad(10).center().row();
         menuTable.add(getContent(skin)).expandY().top().row();
         Table navigationTable = new Table(skin);
@@ -146,14 +148,13 @@ public abstract class BaseMenuScreen extends ConfigScreen {
 
     /**
      * Aktualisieren der Darstellung des Hauptmenüs
-     * Rendert die Hintergrundtextur und Benutzeroberfläche wird aktualisiert und gezeichnet
+     * rendert die Hintergrundtextur und Benutzeroberfläche wird aktualisiert und gezeichnet
      *
      * @param delta The time in seconds since the last render
      */
     @Override
     public void render(float delta) {
         camera.update();
-
         backgroundViewport.apply(true);
         menuSpriteBatch.setProjectionMatrix(backgroundViewport.getCamera().combined);
         menuSpriteBatch.begin();
@@ -174,10 +175,8 @@ public abstract class BaseMenuScreen extends ConfigScreen {
     @Override
     public void resize(int width, int height) {
         menuViewport.update(width, height, true);
-
         menuViewport.apply();
         backgroundViewport.update(width, height, true);
-
         backgroundViewport.apply();
         camera.update();
     }

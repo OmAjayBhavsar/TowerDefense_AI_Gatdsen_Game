@@ -30,7 +30,7 @@ public class TurnTimer extends Table {
 		timeDisplay = new ColoredLabelWithBackground("", AssetContainer.MainMenuAssets.skin, Color.RED, new TextureRegionDrawable(AssetContainer.IngameAssets.pixel));
 
 		//add both to the horizontal group for drawing them next to each other
-		add(timeDisplay).width(44);
+		add(timeDisplay).width(60);
 		timeDisplay.setFontScale(3);
 		this.turnTime = 0;
 		currInterval = 1;

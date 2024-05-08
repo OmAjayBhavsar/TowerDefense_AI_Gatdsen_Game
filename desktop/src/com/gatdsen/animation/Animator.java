@@ -181,8 +181,8 @@ public class Animator implements Screen, AnimationLogProcessor {
                     },
                     () -> {
                         GameEnemy enemy = new GameEnemy(spawnAction.getLevel(), spawnAction.getMaxHealth(), spawnAction.getType(), font);
-                        enemy.setRelPos(spawnAction.getPos().x * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().x,
-                                spawnAction.getPos().y * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().y);
+                        enemy.setRelPos(spawnAction.getPos().x * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().x -100,
+                                spawnAction.getPos().y * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().y -75);
 
                         animator.root.add(enemy);
                         return enemy;
@@ -384,7 +384,8 @@ public class Animator implements Screen, AnimationLogProcessor {
                     updateCurrency.getDelay(),
                     animator.uiMessenger,
                     updateCurrency.getTeam(),
-                    updateCurrency.getNewCurrency());
+                    updateCurrency.getNewCurrency(),
+                    updateCurrency.getNewSpawnCurrency());
 
             return new ExpandedAction(currencyAction);
         }

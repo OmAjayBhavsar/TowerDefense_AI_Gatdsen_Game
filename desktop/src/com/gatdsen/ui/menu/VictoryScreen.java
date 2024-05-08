@@ -35,7 +35,7 @@ public class VictoryScreen extends BaseMenuScreen {
 
     @Override
     GADS.ScreenState getNext() {
-        return GADS.ScreenState.MAINSCREEN;
+        return null;
     }
 
     @Override

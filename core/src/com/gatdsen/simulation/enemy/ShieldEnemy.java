@@ -9,7 +9,7 @@ public class ShieldEnemy extends Enemy {
     boolean isShielded = true;
 
     /**
-     * Erstellt einen neuen Gegner.
+     * Erstellt einen neuen Shield-Gegner.
      *
      * @param playerState Der Spieler, dem der Gegner gehört.
      * @param level       Die Stufe des Gegners.
@@ -18,7 +18,7 @@ public class ShieldEnemy extends Enemy {
     public ShieldEnemy(PlayerState playerState, int level, PathTile posTile) {
         super(playerState, level, posTile);
         type = Type.SHIELD_ENEMY;
-        health = 200 * level;
+        health = 150 * level;
         damage = 5 * level;
     }
 
@@ -30,11 +30,21 @@ public class ShieldEnemy extends Enemy {
     public void setShielded(boolean shielded) {
         isShielded = shielded;
     }
+
+    /**
+     * Gibt zurück, ob der Gegner geschützt ist.
+     * @return Ob der Gegner geschützt ist.
+     */
     public boolean isShielded() {
         return isShielded;
     }
 
+    /**
+     * Gibt den Preis des Gegners zurück.
+     * @param level
+     * @return Der Preis des Gegners.
+     */
     public static int getPrice(int level) {
-        return 100 * level;
+        return 10 * level;
     }
 }

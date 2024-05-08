@@ -125,7 +125,7 @@ public class GADSAssetManager {
         IngameAssets.lossDisplay = atlas.findRegion("background/lose_screen");
         //Ingame
 
-        IngameAssets.background = atlas.findRegion("background/backgroundWeihnachtsaufgabe");
+        IngameAssets.background = atlas.findRegion("background/game_background");
 
         IngameAssets.tileTextures = new TextureRegion[]{
                 atlas.findRegion("Tileset/grass_tile"),
@@ -168,14 +168,14 @@ public class GADSAssetManager {
 
         // Tower Animationen
         // Sniper Tower
-        IngameAssets.gameTowerAnimations[2][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1 / 5f, atlas.findRegions("mageCat_idle_down/mageCatWeinachten_idle_down"), Animation.PlayMode.LOOP);
-        IngameAssets.gameTowerAnimations[2][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("mageCat_attack_down/mageCatWeinachten_attack_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameTowerAnimations[2][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1 / 5f, atlas.findRegions("towers/mageCatWeinachten_idle_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameTowerAnimations[2][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("towers/mageCatWeinachten_attack_down"), Animation.PlayMode.LOOP);
         // AOE Tower
-        IngameAssets.gameTowerAnimations[1][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1 / 5f, atlas.findRegions("katanaCat_idle_down/katanaCat_idle_down"), Animation.PlayMode.LOOP);
-        IngameAssets.gameTowerAnimations[1][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("katanaCat_attack_down/katanaCat_attack_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameTowerAnimations[1][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1 / 5f, atlas.findRegions("towers/katanaCat_idle_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameTowerAnimations[1][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("towers/katanaCat_attack_down"), Animation.PlayMode.LOOP);
         // Basic Tower
-        IngameAssets.gameTowerAnimations[0][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1 / 5f, atlas.findRegions("minigunCat_idle_down/minigunCat_idle_down"), Animation.PlayMode.LOOP);
-        IngameAssets.gameTowerAnimations[0][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("minigunCat_attack_down/minigunCat_attack_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameTowerAnimations[0][GameTowerAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1 / 5f, atlas.findRegions("towers/minigunCat_idle_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameTowerAnimations[0][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("towers/minigunCat_attack_down"), Animation.PlayMode.LOOP);
 
         // Gegner Animationen
         IngameAssets.gameEnemyAnimations = new AtlasAnimation[Enemy.Type.values().length][Direction.values().length][GameEnemyAnimationType.values().length];
