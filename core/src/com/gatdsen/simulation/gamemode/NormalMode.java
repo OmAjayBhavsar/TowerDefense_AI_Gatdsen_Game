@@ -8,5 +8,6 @@ import com.gatdsen.simulation.GameMode;
 public class NormalMode extends GameMode {
     public NormalMode() {
         super();
+        enemyBot = null;
     }
 }
