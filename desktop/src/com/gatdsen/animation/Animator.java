@@ -180,7 +180,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         animator.enemies.put(spawnAction.getId(), enemy);
                     },
                     () -> {
-                        GameEnemy enemy = new GameEnemy(spawnAction.getLevel(), spawnAction.getMaxHealth(), font);
+                        GameEnemy enemy = new GameEnemy(spawnAction.getLevel(), spawnAction.getMaxHealth(), spawnAction.getType(), font);
                         enemy.setRelPos(spawnAction.getPos().x * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().x,
                                 spawnAction.getPos().y * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().y);
 
