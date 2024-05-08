@@ -182,13 +182,13 @@ public class GADSAssetManager {
 
         // normale Maus
         // hoch
-        IngameAssets.gameEnemyAnimations[0][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[0][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_up"), Animation.PlayMode.LOOP);
         IngameAssets.gameEnemyAnimations[0][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_up"), Animation.PlayMode.LOOP);
         // rechts
         IngameAssets.gameEnemyAnimations[0][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_right"), Animation.PlayMode.LOOP);
         IngameAssets.gameEnemyAnimations[0][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_right"), Animation.PlayMode.LOOP);
         // unten
-        IngameAssets.gameEnemyAnimations[0][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[0][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_down"), Animation.PlayMode.LOOP);
         IngameAssets.gameEnemyAnimations[0][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_down"), Animation.PlayMode.LOOP);
         // links
         IngameAssets.gameEnemyAnimations[0][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_left"), Animation.PlayMode.LOOP);
