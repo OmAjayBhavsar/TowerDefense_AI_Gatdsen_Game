@@ -63,6 +63,20 @@ public abstract class GameMode implements Serializable {
         enemies.add(EnemyType.ARMOR_ENEMY);
     }
 
+    // ToDo: Implement validate method
+    /**
+     * Überprüft, ob die GameMode-Konfiguration gültig ist.
+     *
+     * @return true, wenn die Konfiguration gültig ist, ansonsten false
+     */
+    // public abstract boolean validate();
+
+    /**
+     * Gibt den Spielmodus mit der gegebenen ID zurück.
+     *
+     * @param modeID ID des Spielmodus
+     * @return Spielmodus mit der gegebenen ID
+     */
     public static GameMode getGameMode(int modeID) {
         if (modeID >= 0 && modeID < GameModes.length) {
             try {
