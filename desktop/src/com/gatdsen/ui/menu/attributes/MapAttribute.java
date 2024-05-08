@@ -57,6 +57,6 @@ public class MapAttribute extends Attribute {
      */
     @Override
     public void setConfig(RunConfig runConfig) {
-        mapSelectBox.setSelected(runConfig.mapName);
+        mapSelectBox.setSelected(runConfig.gameMode.getMap());
     }
 }

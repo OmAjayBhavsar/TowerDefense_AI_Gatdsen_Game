@@ -13,7 +13,6 @@ public final class GameConfig implements Serializable {
     public final boolean gui;
     public final transient AnimationLogProcessor animationLogProcessor;
     public final transient InputProcessor inputProcessor;
-    public final String mapName;
     public final boolean replay;
     public final PlayerHandlerFactory[] playerFactories;
     public final int playerCount;
@@ -23,7 +22,6 @@ public final class GameConfig implements Serializable {
         gui = runConfig.gui;
         animationLogProcessor = runConfig.animationLogProcessor;
         inputProcessor = runConfig.inputProcessor;
-        mapName = runConfig.mapName;
         replay = runConfig.replay;
         playerFactories = runConfig.playerFactories.toArray(new PlayerHandlerFactory[0]);
         playerCount = playerFactories.length;
@@ -34,7 +32,6 @@ public final class GameConfig implements Serializable {
         gui = original.gui;
         animationLogProcessor = original.animationLogProcessor;
         inputProcessor = original.inputProcessor;
-        mapName = original.mapName;
         replay = original.replay;
         playerFactories = original.playerFactories;
         playerCount = original.playerCount;

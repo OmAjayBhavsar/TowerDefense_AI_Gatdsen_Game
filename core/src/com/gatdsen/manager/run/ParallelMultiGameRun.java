@@ -37,7 +37,7 @@ public class ParallelMultiGameRun extends Run {
             runConfig.playerFactories.add(LocalPlayerHandlerFactory.IDLE_BOT);
             getPlayerFactories().clear();
             getPlayerFactories().addAll(runConfig.playerFactories);
-            runConfig.mapName = "MangoMap";
+            runConfig.gameMode.setMap("MangoMap");
         }
         ArrayList<Integer> indices = new ArrayList<>();
         int playerCount = runConfig.playerFactories.size();

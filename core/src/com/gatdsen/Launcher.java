@@ -74,7 +74,6 @@ public abstract class Launcher {
     protected static RunConfig parseRunConfig(CommandLine params) {
         RunConfig runConfig = new RunConfig();
         runConfig.gui = !params.hasOption("n");
-        runConfig.mapName = params.getOptionValue("m", null);
         if (params.hasOption("p")) {
             runConfig.playerFactories = new ArrayList<>(List.of(PlayerHandlerFactory.getPlayerFactories(params.getOptionValue("p").trim().split("\\s+"))));
         }
@@ -89,6 +88,9 @@ public abstract class Launcher {
             return null;
         }
         runConfig.gameMode = gameMode;
+        if (params.hasOption("m")) {
+            runConfig.gameMode.setMap(params.getOptionValue("m", null));
+        }
         return runConfig;
     }
 
