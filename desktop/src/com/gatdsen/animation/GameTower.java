@@ -46,6 +46,10 @@ public class GameTower extends AnimatedEntity {
         }
     }
 
+    public void upgrade() {
+        level++;
+    }
+
     @Override
     public void draw(Batch batch, float deltaTime, float parentAlpha) {
         fonte.draw(batch, level.toString(), this.getPos().x + 10, this.getPos().y + 60);

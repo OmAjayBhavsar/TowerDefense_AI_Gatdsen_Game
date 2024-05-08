@@ -16,6 +16,7 @@ import com.gatdsen.simulation.action.ProjectileAction;
 import com.gatdsen.ui.assets.AssetContainer.IngameAssets;
 import com.gatdsen.ui.assets.AssetContainer.IngameAssets.GameTowerAnimationType;
 import com.gatdsen.ui.assets.AssetContainer.IngameAssets.GameEnemyAnimationType;
+import com.gatdsen.ui.assets.AssetContainer.IngameAssets.Direction;
 import com.gatdsen.ui.assets.AssetContainer.MainMenuAssets;
 
 import java.io.File;
@@ -123,7 +124,7 @@ public class GADSAssetManager {
         IngameAssets.lossDisplay = atlas.findRegion("background/lose_screen");
         //Ingame
 
-        IngameAssets.background = atlas.findRegion("background/WeihnachtsBG");
+        IngameAssets.background = atlas.findRegion("background/game_background");
 
         IngameAssets.tileTextures = new TextureRegion[]{
                 atlas.findRegion("Tileset/grass_tile"),
@@ -176,9 +177,21 @@ public class GADSAssetManager {
         IngameAssets.gameTowerAnimations[0][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("minigunCat_attack_down/minigunCat_attack_down"), Animation.PlayMode.LOOP);
 
         // Gegner Animationen
-        IngameAssets.gameEnemyAnimations = new AtlasAnimation[GameEnemyAnimationType.values().length];
-        IngameAssets.gameEnemyAnimations[GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemy/bigMouse_idle_left"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("bigMouse_running_left/bigMouse_running_left"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations = new AtlasAnimation[Direction.values().length][GameEnemyAnimationType.values().length];
+
+        // hoch
+        IngameAssets.gameEnemyAnimations[Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_up"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_up"), Animation.PlayMode.LOOP);
+        // rechts
+        IngameAssets.gameEnemyAnimations[Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_right"), Animation.PlayMode.LOOP);
+        // unten
+        IngameAssets.gameEnemyAnimations[Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_down"), Animation.PlayMode.LOOP);
+        // links
+        IngameAssets.gameEnemyAnimations[Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_left"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_left"), Animation.PlayMode.LOOP);
+
 
         // Projektile
         IngameAssets.projectiles.put(ProjectileAction.ProjectileType.STANDARD_TYPE, new AtlasAnimation(1/8f, atlas.findRegions("projectiles/magicBullet"), Animation.PlayMode.LOOP));
@@ -296,7 +309,8 @@ public class GADSAssetManager {
             for (String name :
                     namedFrames.keySet()) {
                 if (skins.containsKey(name)) {
-                    System.err.println("Warning: Skin with name " + name + " is hidden by another skin!");
+                    // TODO: Should this be logged?
+                    //System.err.println("Warning: Skin with name " + name + " is hidden by another skin!");
                     continue;
                 }
                 Map<Integer, Texture> indexedFrames = namedFrames.get(name);
@@ -314,7 +328,8 @@ public class GADSAssetManager {
             }
 
         } else {
-            System.err.println("Warning: No Skin-Dir found at " + skinDir.getAbsolutePath());
+            // TODO: Should this be logged?
+            //System.err.println("Warning: No Skin-Dir found at " + skinDir.getAbsolutePath());
         }
         IngameAssets.skins = skins;
     }

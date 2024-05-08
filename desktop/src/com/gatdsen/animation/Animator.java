@@ -130,6 +130,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
                         // Tower Actions
                         put(TowerPlaceAction.class, ActionConverters::convertTowerPlaceAction);
+                        put(TowerUpgradeAction.class, ActionConverters::convertTowerUpgradeAction);
                         put(TowerAttackAction.class, ActionConverters::convertTowerAttackAction);
                         put(ProjectileAction.class, ActionConverters::convertProjectileAction);
                         put(TowerDestroyAction.class, ActionConverters::convertTowerDestroyAction);
@@ -199,14 +200,30 @@ public class Animator implements Screen, AnimationLogProcessor {
 
             Vector2 mapPos = animator.playerMaps[moveAction.getTeam()].getPos();
 
-            Vector2 start = new Vector2(moveAction.getPos().x * tileSize + mapPos.x, moveAction.getPos().y * tileSize + mapPos.y);
-            Vector2 end = new Vector2(moveAction.getDes().x * tileSize + mapPos.x, moveAction.getDes().y * tileSize + mapPos.y);
+            Vector2 start = new Vector2(moveAction.getPos().x * tileSize + mapPos.x-100, moveAction.getPos().y * tileSize + mapPos.y-75);
+            Vector2 end = new Vector2(moveAction.getDes().x * tileSize + mapPos.x-100, moveAction.getDes().y * tileSize + mapPos.y-75);
 
             Path enemyPath = new LinearPath(start, end, 500);
 
-            MoveAction moveEnemy = new MoveAction(moveAction.getDelay(), enemy, enemyPath.getDuration(), enemyPath);
+            ExecutorAction changeAnimation = new ExecutorAction(moveAction.getDelay(), () -> {
+                int direction = 0;
 
-            return new ExpandedAction(moveEnemy);
+                if ((moveAction.getDes().x - moveAction.getPos().x) < 0) direction = 3;
+                if ((moveAction.getDes().y - moveAction.getPos().y) < 0) direction = 2;
+                if ((moveAction.getDes().x - moveAction.getPos().x) > 0) direction = 1;
+                enemy.switchAnimation(direction);
+                return 0;
+            });
+
+            ExecutorAction toggleMove = new ExecutorAction(moveAction.getDelay(), () -> {
+                enemy.toggleMove(enemyPath.getDuration());
+                return 0;
+            });
+
+            MoveAction moveEnemy = new MoveAction(moveAction.getDelay(), enemy, enemyPath.getDuration(), enemyPath);
+            changeAnimation.setChildren(new Action[]{moveEnemy, toggleMove});
+
+            return new ExpandedAction(changeAnimation, moveEnemy);
         }
 
         private static ExpandedAction convertEnemyUpdateHealthAction(com.gatdsen.simulation.action.Action action, Animator animator) {
@@ -258,6 +275,18 @@ public class Animator implements Screen, AnimationLogProcessor {
             });
 
             return new ExpandedAction(summonTower);
+        }
+
+        private static ExpandedAction convertTowerUpgradeAction(com.gatdsen.simulation.action.Action action, Animator animator) {
+            TowerUpgradeAction upgradeAction = (TowerUpgradeAction) action;
+            GameTower tower = animator.towers.get(upgradeAction.getId());
+
+            ExecutorAction upgrade = new ExecutorAction(upgradeAction.getDelay(), () -> {
+                tower.upgrade();
+                return 0;
+            });
+
+            return new ExpandedAction(upgrade);
         }
 
         private static ExpandedAction convertTowerAttackAction(com.gatdsen.simulation.action.Action action, Animator animator) {

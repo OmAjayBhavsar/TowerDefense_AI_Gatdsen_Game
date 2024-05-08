@@ -18,7 +18,7 @@ public class MessageUiScoreAction extends MessageUiAction {
 
     @Override
     protected void runAction(float oldTime, float current) {
-        uiMessenger.teamScore(team, score);
+        //uiMessenger.teamScore(team, score);
         endAction(oldTime);
     }
 }

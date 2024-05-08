@@ -2,7 +2,7 @@ package com.gatdsen.animation.action.uiActions;
 
 import com.gatdsen.ui.hud.UiMessenger;
 
-public class MessageUiCurrencyAction extends MessageUiAction{
+public class MessageUiCurrencyAction extends MessageUiAction {
     private final int team;
     private final int balance;
 
