@@ -51,6 +51,7 @@ public class Animator implements Screen, AnimationLogProcessor {
 
     public TileMap[] playerMaps;
 
+    static private BitmapFont font = new BitmapFont();
     private SortedMap<Integer, GameTower> towers;
     public SortedMap<Integer, GameEnemy> enemies;
 
@@ -179,7 +180,7 @@ public class Animator implements Screen, AnimationLogProcessor {
                         animator.enemies.put(spawnAction.getId(), enemy);
                     },
                     () -> {
-                        GameEnemy enemy = new GameEnemy(spawnAction.getLevel(), spawnAction.getMaxHealth());
+                        GameEnemy enemy = new GameEnemy(spawnAction.getLevel(), spawnAction.getMaxHealth(), spawnAction.getType(), font);
                         enemy.setRelPos(spawnAction.getPos().x * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().x -100,
                                 spawnAction.getPos().y * animator.playerMaps[0].getTileSize() + animator.playerMaps[spawnAction.getTeam()].getPos().y -75);
 
@@ -196,7 +197,6 @@ public class Animator implements Screen, AnimationLogProcessor {
             EnemyMoveAction moveAction = (EnemyMoveAction) action;
             int tileSize = animator.playerMaps[0].getTileSize();
             GameEnemy enemy = animator.enemies.get(moveAction.getId());
-
 
             Vector2 mapPos = animator.playerMaps[moveAction.getTeam()].getPos();
 
@@ -266,7 +266,7 @@ public class Animator implements Screen, AnimationLogProcessor {
             SummonAction<GameTower> summonTower = new SummonAction<GameTower>(action.getDelay(), target -> {
                 animator.towers.put(placeAction.getId(), target);
             }, () -> {
-                GameTower tower = new GameTower(1, placeAction.getType());
+                GameTower tower = new GameTower(1, placeAction.getType(), font);
                 tower.setRelPos(placeAction.getPos().x * animator.playerMaps[0].getTileSize() + animator.playerMaps[placeAction.getTeam()].getPos().x,
                         placeAction.getPos().y * animator.playerMaps[0].getTileSize() + animator.playerMaps[placeAction.getTeam()].getPos().y);
                 animator.root.add(tower);
