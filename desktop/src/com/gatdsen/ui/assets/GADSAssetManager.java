@@ -125,7 +125,7 @@ public class GADSAssetManager {
         IngameAssets.lossDisplay = atlas.findRegion("background/lose_screen");
         //Ingame
 
-        IngameAssets.background = atlas.findRegion("background/game_background");
+        IngameAssets.background = atlas.findRegion("background/backgroundWeihnachtsaufgabe");
 
         IngameAssets.tileTextures = new TextureRegion[]{
                 atlas.findRegion("Tileset/grass_tile"),
@@ -182,59 +182,59 @@ public class GADSAssetManager {
 
         // normale Maus
         // hoch
-        IngameAssets.gameEnemyAnimations[0][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("big_mouse/bigMouse_idle_up"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[0][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_right"), Animation.PlayMode.LOOP);
         IngameAssets.gameEnemyAnimations[0][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_up"), Animation.PlayMode.LOOP);
         // rechts
-        IngameAssets.gameEnemyAnimations[0][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("big_mouse/bigMouse_idle_right"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[0][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("big_mouse/bigMouse_running_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[0][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[0][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_right"), Animation.PlayMode.LOOP);
         // unten
-        IngameAssets.gameEnemyAnimations[0][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("big_mouse/bigMouse_idle_down"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[0][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("big_mouse/bigMouse_running_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[0][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[0][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_down"), Animation.PlayMode.LOOP);
         // links
-        IngameAssets.gameEnemyAnimations[0][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("big_mouse/bigMouse_idle_left"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[0][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("big_mouse/bigMouse_running_left"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[0][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/bigMouse_idle_left"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[0][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/bigMouse_running_left"), Animation.PlayMode.LOOP);
 
         // EMP Maus
         // hoch
-        IngameAssets.gameEnemyAnimations[1][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("emp_mouse/emp_mouse_idle_up"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[1][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("emp_mouse/emp_mouse_running_up"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[1][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/emp_mouse_idle_up"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[1][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/emp_mouse_running_up"), Animation.PlayMode.LOOP);
         // rechts
-        IngameAssets.gameEnemyAnimations[1][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("emp_mouse/emp_mouse_idle_right"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[1][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("emp_mouse/emp_mouse_running_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[1][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/emp_mouse_idle_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[1][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/emp_mouse_running_right"), Animation.PlayMode.LOOP);
         // unten
-        IngameAssets.gameEnemyAnimations[1][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("emp_mouse/emp_mouse_idle_down"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[1][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("emp_mouse/emp_mouse_running_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[1][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/emp_mouse_idle_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[1][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/emp_mouse_running_down"), Animation.PlayMode.LOOP);
         // links
-        IngameAssets.gameEnemyAnimations[1][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("emp_mouse/emp_mouse_idle_left"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[1][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("emp_mouse/emp_mouse_running_left"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[1][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/emp_mouse_idle_left"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[1][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/emp_mouse_running_left"), Animation.PlayMode.LOOP);
 
         // Schild Maus
         // hoch
-        IngameAssets.gameEnemyAnimations[2][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("shield_mouse/shield_mouse_idle_up"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[2][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("shield_mouse/shield_mouse_running_up"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[2][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/shield_mouse_idle_up"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[2][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/shield_mouse_running_up"), Animation.PlayMode.LOOP);
         // rechts
-        IngameAssets.gameEnemyAnimations[2][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("shield_mouse/shield_mouse_idle_right"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[2][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("shield_mouse/shield_mouse_running_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[2][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/shield_mouse_idle_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[2][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/shield_mouse_running_right"), Animation.PlayMode.LOOP);
         // unten
-        IngameAssets.gameEnemyAnimations[2][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("shield_mouse/shield_mouse_idle_down"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[2][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("shield_mouse/shield_mouse_running_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[2][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/shield_mouse_idle_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[2][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/shield_mouse_running_down"), Animation.PlayMode.LOOP);
         // links
-        IngameAssets.gameEnemyAnimations[2][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("shield_mouse/shield_mouse_idle_left"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[2][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("shield_mouse/shield_mouse_running_left"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[2][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/shield_mouse_idle_left"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[2][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/shield_mouse_running_left"), Animation.PlayMode.LOOP);
 
         // Armor Maus
         // hoch
-        IngameAssets.gameEnemyAnimations[3][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("armor_mouse/armor_mouse_idle_up"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[3][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("armor_mouse/armor_mouse_running_up"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[3][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/armor_mouse_idle_up"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[3][Direction.UP.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/armor_mouse_running_up"), Animation.PlayMode.LOOP);
         // rechts
-        IngameAssets.gameEnemyAnimations[3][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("armor_mouse/armor_mouse_idle_right"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[3][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("armor_mouse/armor_mouse_running_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[3][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/armor_mouse_idle_right"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[3][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/armor_mouse_running_right"), Animation.PlayMode.LOOP);
         // unten
-        IngameAssets.gameEnemyAnimations[3][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("armor_mouse/armor_mouse_idle_down"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[3][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("armor_mouse/armor_mouse_running_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[3][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/armor_mouse_idle_down"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[3][Direction.DOWN.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/armor_mouse_running_down"), Animation.PlayMode.LOOP);
         // links
-        IngameAssets.gameEnemyAnimations[3][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("armor_mouse/armor_mouse_idle_left"), Animation.PlayMode.LOOP);
-        IngameAssets.gameEnemyAnimations[3][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("armor_mouse/armor_mouse_running_left"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[3][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()] = new AtlasAnimation(1/10f, atlas.findRegions("enemies/armor_mouse_idle_left"), Animation.PlayMode.LOOP);
+        IngameAssets.gameEnemyAnimations[3][Direction.LEFT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_WALKING.ordinal()] = new AtlasAnimation(1 / 10f, atlas.findRegions("enemies/armor_mouse_running_left"), Animation.PlayMode.LOOP);
 
 
         // Projektile
