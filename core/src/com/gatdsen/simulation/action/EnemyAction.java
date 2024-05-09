@@ -53,8 +53,8 @@ public class EnemyAction extends TeamAction {
      *
      * @return Der Typ des Gegners, der die Action ausführt.
      */
-    public Enemy.Type getType() {
-        return type;
+    public Enemy.EnemyType getType() {
+        return enemyType;
     }
 
     /**
