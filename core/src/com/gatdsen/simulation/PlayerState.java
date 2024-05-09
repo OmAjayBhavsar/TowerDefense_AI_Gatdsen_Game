@@ -366,9 +366,6 @@ public class PlayerState implements Serializable {
         if (spawnCoins >= Enemy.getEnemyTypePrice(type, enemyLevel)) {
             PlayerState playerState = gameState.getPlayerStates()[(index + 1) % 2];
             playerState.spawnEnemy(type);
-            Enemy enemy = playerState.spawnEnemies.peek();
-            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemyLevel, enemy.getHealth(), index, type, enemy.getId()));
-
             spawnCoins -= Enemy.getEnemyTypePrice(type, enemyLevel);
             head.addChild(new UpdateCurrencyAction(0, money, spawnCoins, index));
         }
