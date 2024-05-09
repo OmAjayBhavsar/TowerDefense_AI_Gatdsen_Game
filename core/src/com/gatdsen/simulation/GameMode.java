@@ -17,6 +17,9 @@ import java.util.List;
  * Abstrakte Klasse für die verschiedenen Spielmodi, welche die Standardwerte für die Spielmodi enthält.
  */
 public abstract class GameMode implements Serializable {
+
+    // TODO: Refactor..
+    //       Using gameMode.getClass().getSimpleName() to check the type of game mode is like using instanceof but worse
     @SuppressWarnings("unchecked")
     private static final Class<? extends GameMode>[][] CampaignModes = new Class[][] {
             {CampaignMode1_1.class, CampaignMode1_2.class},
@@ -164,5 +167,13 @@ public abstract class GameMode implements Serializable {
      */
     public List<EnemyType> getEnemies() {
         return enemies;
+    }
+
+    public boolean isCampaignMode() {
+        return false;
+    }
+
+    public boolean isExamAdmissionMode() {
+        return false;
     }
 }

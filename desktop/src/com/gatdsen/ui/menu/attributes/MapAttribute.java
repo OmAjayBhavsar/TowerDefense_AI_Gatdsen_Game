@@ -27,7 +27,7 @@ public class MapAttribute extends Attribute {
         Label textLabelMap = new Label("Karte: ", skin);
         textLabelMap.setAlignment(Align.right);
         mapSelectBox = new SelectBox<>(skin);
-        String[] sortedMapNames = MapRetriever.getInstance().getMapNames();
+        String[] sortedMapNames = MapRetriever.getInstance().getDisplayableMapNames();
         Arrays.sort(sortedMapNames);
         mapSelectBox.setItems(sortedMapNames);
         mapTable.columnDefaults(0).width(200);

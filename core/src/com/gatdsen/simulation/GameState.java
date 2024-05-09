@@ -1,5 +1,7 @@
 package com.gatdsen.simulation;
 
+import com.gatdsen.manager.map.MapRetriever;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -37,7 +39,7 @@ public class GameState implements Serializable {
      */
     GameState(GameMode gameMode, int playerCount, Simulation sim) {
         this.gameMode = gameMode;
-        this.map = MapLoader.getInstance().loadMap(gameMode.map);
+        this.map = MapRetriever.getInstance().getMapFromGamemode(gameMode).getTileTypes();
         this.playerCount = playerCount;
         this.active = true;
         this.sim = sim;

@@ -1,8 +1,6 @@
 package com.gatdsen.simulation.gamemode.campaign;
 
-import com.gatdsen.simulation.GameMode;
-
-public class CampaignMode5_1 extends GameMode {
+public class CampaignMode5_1 extends CampaignMode {
     public CampaignMode5_1() {
         super();
         enemyBotHealth = 100;

@@ -1,11 +1,6 @@
 package com.gatdsen.simulation.gamemode.campaign;
 
-import com.gatdsen.simulation.GameMode;
-import com.gatdsen.simulation.Tower;
-
-import java.util.ArrayList;
-
-public class CampaignMode2_1 extends GameMode {
+public class CampaignMode2_1 extends CampaignMode {
     public CampaignMode2_1() {
         super();
         enemyBotHealth = 100;
