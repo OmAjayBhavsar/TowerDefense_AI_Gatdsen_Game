@@ -1,7 +1,6 @@
 package com.gatdsen.manager;
 
 import com.gatdsen.manager.command.*;
-import com.gatdsen.manager.player.data.penalty.Penalty;
 import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.Tower;
 
@@ -74,7 +73,7 @@ public final class Controller {
      * Sendet einen Gegner zu einem gegnerischen Spieler auf das Spielfeld.
      * @param enemyType Der Typ des Gegners, der gesendet werden soll
      */
-    public void sendEnemyToPlayer(Enemy.Type enemyType) {
+    public void sendEnemyToPlayer(Enemy.EnemyType enemyType) {
         queue(new SendEnemyToPlayerCommand(enemyType));
     }
 

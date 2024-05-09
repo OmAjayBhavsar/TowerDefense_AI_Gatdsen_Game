@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -26,6 +27,7 @@ import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.hud.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class for taking care of the User Interface.
@@ -201,7 +203,7 @@ public class Hud implements Disposable {
                 String selectedPlayer = playerSelectBox.getSelected();
                 String selectedEnemy = enemySelectBox.getSelected();
                 int selectedPlayerInt;
-                Enemy.Type enemyType;
+                Enemy.EnemyType enemyType;
 
                 switch (selectedPlayer) {
                     case "Spieler 1":
@@ -216,16 +218,16 @@ public class Hud implements Disposable {
 
                 switch (selectedEnemy) {
                     case "Schild-Maus":
-                        enemyType = Enemy.Type.SHIELD_ENEMY;
+                        enemyType = Enemy.EnemyType.SHIELD_ENEMY;
                         break;
                     case "EMP-Maus":
-                        enemyType = Enemy.Type.EMP_ENEMY;
+                        enemyType = Enemy.EnemyType.EMP_ENEMY;
                         break;
                     case "Rüstungs-Maus":
-                        enemyType = Enemy.Type.ARMOR_ENEMY;
+                        enemyType = Enemy.EnemyType.ARMOR_ENEMY;
                         break;
                     default:
-                        enemyType = Enemy.Type.SHIELD_ENEMY;
+                        enemyType = Enemy.EnemyType.SHIELD_ENEMY;
                 }
 
                 inputHandler.playerBuyedEnemy(selectedPlayerInt, enemyType);
@@ -633,8 +635,9 @@ public class Hud implements Disposable {
                     closeSelectBox();
                     Skin skin = AssetContainer.MainMenuAssets.skin;
                     towerSelectBox = new SelectBox<>(skin);
-                    Tower.TowerType[] towerTypes = Tower.TowerType.values();
-                    towerSelectBox.setItems(towerTypes);
+
+                    ArrayList<Tower.TowerType> towerArray = new ArrayList<>(gameState.getGameMode().getTowers());
+                    towerSelectBox.setItems(towerArray.toArray(new Tower.TowerType[0]));
                     towerSelectBox.setSize(comboBoxSize.x, comboBoxSize.y);
 
                     if (team == 1) {

@@ -144,10 +144,10 @@ public class HumanPlayer extends Player {
     /**
      * Ruft den {@link Controller} des {@link HumanPlayer} auf, um einen Gegner zu einem gegnerischen Spieler auf das
      * Spielfeld zu senden.
-     * @param type Der Typ des Gegners, der gesendet werden soll
+     * @param enemyType Der Typ des Gegners, der gesendet werden soll
      */
-    public void sendEnemyToPlayer(Enemy.Type type) {
-        controller.sendEnemyToPlayer(type);
+    public void sendEnemyToPlayer(Enemy.EnemyType enemyType) {
+        controller.sendEnemyToPlayer(enemyType);
     }
 
     /**

@@ -7,7 +7,7 @@ import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.manager.player.handler.ProcessPlayerHandler;
 import com.gatdsen.manager.run.RunResults;
-import com.gatdsen.simulation.GameState.GameMode;
+import com.gatdsen.simulation.GameMode;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -41,10 +41,9 @@ public abstract class Launcher {
                 .type(Number.class)
                 .desc("GameMode to be played (Default: 0)\n" +
                         "  0 - Normal\n" +
-                        "  1 - Campaign\n" +
-                        "  2 - Exam Admission\n" +
-                        "  3 - Tournament: Phase 1\n" +
-                        "  4 - Tournament: Phase 2").build());
+                        "  1 - Exam Admission\n" +
+                        "  2 - Tournament: Phase 1\n" +
+                        "  xy - Campaign week x task y\n").build());
         cliOptions.addOption(Option.builder("n")
                 .longOpt("nogui")
                 .desc("Runs the simulation without animation").build());
@@ -75,21 +74,23 @@ public abstract class Launcher {
     protected static RunConfig parseRunConfig(CommandLine params) {
         RunConfig runConfig = new RunConfig();
         runConfig.gui = !params.hasOption("n");
-        runConfig.mapName = params.getOptionValue("m", null);
         if (params.hasOption("p")) {
             runConfig.playerFactories = new ArrayList<>(List.of(PlayerHandlerFactory.getPlayerFactories(params.getOptionValue("p").trim().split("\\s+"))));
         }
         if (params.hasOption("r")) {
             runConfig.replay = true;
         }
-        int gameMode = Integer.parseInt(params.getOptionValue("g", "0"));
-        GameMode[] gameModes = GameMode.values();
-        if (gameMode < 0 || gameMode >= gameModes.length) {
-            System.err.println("Valid GameModes range from 0 to " + gameModes.length);
+        int gameModeID = Integer.parseInt(params.getOptionValue("g", "0"));
+        GameMode gameMode = GameMode.getGameMode(gameModeID);
+        if (gameMode == null) {
+            System.err.println("Invalid game mode: " + gameModeID);
             printHelp();
             return null;
         }
-        runConfig.gameMode = gameModes[gameMode];
+        runConfig.gameMode = gameMode;
+        if (params.hasOption("m")) {
+            runConfig.gameMode.setMap(params.getOptionValue("m", null));
+        }
         return runConfig;
     }
 
@@ -115,15 +116,15 @@ public abstract class Launcher {
         if (key != null && !key.isEmpty()) {
             builder.append("<").append(key).append(">");
         }
-        switch (run.getGameMode()) {
-            case Campaign:
+        switch (run.getGameModeName()) {
+            case "CampaignMode":
                 if (scores[0] > 0) {
                     builder.append("passed");
                 } else {
                     builder.append("failed");
                 }
                 break;
-            case Exam_Admission:
+            case "ExamAdmissionMode":
                 StringBuilder scoreBuilder = new StringBuilder();
                 appendResults(scoreBuilder, playerInformation, scores);
                 System.out.println(scoreBuilder);
@@ -133,12 +134,12 @@ public abstract class Launcher {
                     builder.append("failed");
                 }
                 break;
-            case Replay:
+            case "ReplayMode":
                 if (!results.getConfig().gui) {
                     builder.append("\nStarted a replay without GUI, so only the results will be printed: \n");
                 }
-            case Normal:
-            case Tournament_Phase_1:
+            case "NormalMode":
+            case "TournamentMode":
             default:
                 appendResults(builder, playerInformation, scores);
                 builder.append("\n");

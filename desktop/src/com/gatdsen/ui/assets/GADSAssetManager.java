@@ -321,7 +321,6 @@ public class GADSAssetManager {
         skins.put("mioSkin", IngameAssets.mioSkin);
         Map<String, Map<Integer, Texture>> namedFrames = new HashMap<>();
         File skinDir = new File("skins");
-        System.out.println(new File("").getAbsolutePath());
         if (skinDir.exists()) {
 
             for (File skinFile : Objects.requireNonNull(skinDir.listFiles(path -> path.getName().endsWith(".png") || path.getName().endsWith(".jpg")))) {

@@ -3,9 +3,8 @@ package com.gatdsen.manager;
 import com.gatdsen.manager.player.Bot;
 import com.gatdsen.manager.player.handler.LocalPlayerHandler;
 import com.gatdsen.manager.player.handler.PlayerClassReference;
-import com.gatdsen.simulation.GameState;
-import com.gatdsen.simulation.PlayerController;
 import com.gatdsen.simulation.Simulation;
+import com.gatdsen.simulation.gamemode.NormalMode;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,7 +20,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class TestBotMissTurn {
 
-    private final Simulation dummySimulation = new Simulation(GameState.GameMode.Normal, "map1", 2);
+    private final Simulation dummySimulation = new Simulation(new NormalMode(), 2);
 
     @Test
     public void testMissTurnThroughInitException() {

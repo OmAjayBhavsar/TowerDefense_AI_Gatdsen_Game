@@ -1,6 +1,9 @@
 package com.gatdsen.manager.map;
+
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.gatdsen.simulation.GameMode;
+import com.gatdsen.simulation.GameState;
 
 import java.io.*;
 import java.net.URI;
@@ -9,6 +12,9 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
 
+/**
+ * Diese Klasse ist für das Laden von Karten zuständig.
+ */
 public final class MapRetriever {
 
     private static final String MAP_FILE_EXTENSION = ".json";
@@ -40,20 +46,24 @@ public final class MapRetriever {
         System.arraycopy(externalMaps, 0, maps, internalMaps.length, externalMaps.length);
 
         if (maps.length == 0) {
-            maps = new Map[]{new Map("No maps could be loaded", 0)};
+            maps = new Map[]{new Map("No maps could be loaded", false, new GameState.MapTileType[0][0])};
         }
     }
 
-    public Map[] getMaps() {
-        return maps;
+    public Map getMapFromGamemode(GameMode gameMode) {
+        String mapName = gameMode.getMap();
+        for (Map map : maps) {
+            if (map.getName().equals(mapName)) {
+                if (!map.isHidden() || gameMode.isCampaignMode() || gameMode.isExamAdmissionMode()) {
+                    return map;
+                }
+            }
+        }
+        throw new MapNotFoundException(mapName);
     }
 
-    public String[] getMapNames() {
-        String[] mapNames = new String[maps.length];
-        for (int i = 0; i < maps.length; i++) {
-            mapNames[i] = maps[i].getName();
-        }
-        return mapNames;
+    public String[] getDisplayableMapNames() {
+        return Arrays.stream(maps).filter(map -> !map.isHidden()).map(Map::getName).toArray(String[]::new);
     }
 
     private Map[] getInternalMaps() {
@@ -80,7 +90,14 @@ public final class MapRetriever {
             mapStream = Files.list(mapDirectory);
             return mapStream
                     .filter(path -> path.getFileName().toString().endsWith(MAP_FILE_EXTENSION))
-                    .map(path -> createGameMap(path.getFileName().toString(), getClass().getResourceAsStream(INTERNAL_MAP_DIRECTORY + path.getFileName())))
+                    .map(path -> {
+                        String mapName = path.getFileName().toString().replace(MAP_FILE_EXTENSION, "");
+                        return createGameMap(
+                                mapName,
+                                isHiddenMap(mapName),
+                                getClass().getResourceAsStream(INTERNAL_MAP_DIRECTORY + path.getFileName())
+                        );
+                    })
                     .toArray(Map[]::new);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -97,6 +114,19 @@ public final class MapRetriever {
         }
     }
 
+    private static boolean isHiddenMap(String mapName) {
+        switch (mapName) {
+            case "Campaign1_1":
+            case "Campaign1_2":
+            case "Campaign2_1":
+            case "Campaign2_2":
+            case "Campaign3_1":
+            case "ExamAdmission":
+                return true;
+        }
+        return false;
+    }
+
     private Map[] getExternalMaps() {
         File[] files = new File(EXTERNAL_MAP_DIRECTORY).listFiles();
         if (files == null) {
@@ -106,7 +136,11 @@ public final class MapRetriever {
                 .filter(file -> file.getName().endsWith(MAP_FILE_EXTENSION))
                 .map(file -> {
                     try {
-                        return createGameMap(file.getName(), new FileInputStream(file));
+                        return createGameMap(
+                                file.getName().replace(MAP_FILE_EXTENSION, ""),
+                                false,
+                                new FileInputStream(file)
+                        );
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     }
@@ -114,34 +148,24 @@ public final class MapRetriever {
                 .toArray(Map[]::new);
     }
 
-    private Map createGameMap(String fileName, InputStream fileStream) {
-        JsonValue map = readJsonValueFromInputStream(fileStream);
+    private Map createGameMap(String mapName, boolean isHidden, InputStream fileStream) {
+        JsonValue jsonData = readJsonValueFromInputStream(fileStream);
 
-        int width = map.get("width").asInt();
-        int height = map.get("height").asInt();
+        int width = jsonData.get("width").asInt();
+        int height = jsonData.get("height").asInt();
 
-        JsonValue tileData = map.get("layers").get(0).get("data");
-        HashMap<Integer,Integer> teams=new LinkedHashMap<>();
+        GameState.MapTileType[][] tileTypes = new GameState.MapTileType[width][height];
+
+        JsonValue tileData = jsonData.get("layers").get(0).get("data");
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int type = tileData.get(i + (height - j - 1) * width).asInt();
-                if (type > 100) {
-                    if(teams.containsKey(type)){
-                        teams.replace(type,teams.get(type)+1);
-                    }
-                    else{teams.put(type,1);}
-                }
+                tileTypes[i][j] = GameState.MapTileType.values()[type - 2];
             }
         }
 
-        ArrayList<Integer> spawnpoints = new ArrayList<>(teams.values());
-        //get lowest number of spawnpoints
-        spawnpoints.sort(Comparator.naturalOrder());
-        if (spawnpoints.isEmpty()) {
-            spawnpoints.add(0);
-        }
-        return new Map(fileName.replace(MAP_FILE_EXTENSION, ""), spawnpoints.get(0), spawnpoints.size());
+        return new Map(mapName, isHidden, tileTypes);
     }
 
     private JsonValue readJsonValueFromInputStream(InputStream inputStream) {
