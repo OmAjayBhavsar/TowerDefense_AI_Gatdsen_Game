@@ -18,12 +18,12 @@ public class GameEnemy extends AnimatedEntity {
     private int moving = 0;
     private float moveDuration;
     private int cur = 1;
-    Enemy.Type type;
+    Enemy.EnemyType type;
     static private BitmapFont fonte = new BitmapFont();
     public Healthbar healthbar;
 
 
-    public GameEnemy(int level, int maxHealth, Enemy.Type type, BitmapFont fonts) {
+    public GameEnemy(int level, int maxHealth, Enemy.EnemyType type, BitmapFont fonts) {
         super(gameEnemyAnimations[type.ordinal()][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
 
         this.level = level;
