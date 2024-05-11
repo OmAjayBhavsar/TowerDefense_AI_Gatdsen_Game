@@ -257,7 +257,9 @@ public class PlayerState implements Serializable {
             return head;
         }
 
-        if (board[x][y] != null) {
+        if (x > board.length || y > board[0].length || x < 0 || y < 0){
+            head.addChild(new ErrorAction("Position (" + x + ", " + y + ") is out of bounds"));
+        } else if (board[x][y] != null) {
             head.addChild(new ErrorAction("(" + x + ", " + y + ") is already occupied"));
         } else if (money < Tower.getTowerPrice(type)) {
             head.addChild(new ErrorAction("Not enough money to place Tower at (" + x + ", " + y + ")"));
@@ -265,7 +267,7 @@ public class PlayerState implements Serializable {
             head.addChild(new ErrorAction("Tile at (" + x + ", " + y + ") is not buildable"));
         } else {
             TowerTile towerTile = new TowerTile(this, x, y, type);
-            
+
             money -= Tower.getTowerPrice(type);
             Action updateAction = new UpdateCurrencyAction(0, money, spawnCoins, index);
             head.addChild(updateAction);
