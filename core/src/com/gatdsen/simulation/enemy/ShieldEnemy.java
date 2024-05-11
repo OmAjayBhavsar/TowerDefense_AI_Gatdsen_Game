@@ -45,6 +45,6 @@ public class ShieldEnemy extends Enemy {
      * @return Der Preis des Gegners.
      */
     public static int getPrice(int level) {
-        return 10 * level;
+        return 8 * level;
     }
 }

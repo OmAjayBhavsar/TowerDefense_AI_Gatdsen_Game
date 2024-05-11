@@ -29,8 +29,8 @@ public class AOETower extends Tower {
      *
      * @param original der zu kopierende AOETower
      */
-    public AOETower(Tower original) {
-        super(original);
+    public AOETower(Tower original, PlayerState playerState) {
+        super(original, playerState);
     }
 
     /**
@@ -39,8 +39,8 @@ public class AOETower extends Tower {
      * @return eine Kopie des AOETower
      */
     @Override
-    protected Tower copy() {
-        return new AOETower(this);
+    protected Tower copy(PlayerState NewPlayerState) {
+        return new AOETower(this, NewPlayerState);
     }
 
     /**

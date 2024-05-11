@@ -26,8 +26,8 @@ public class SniperTower extends Tower {
      *
      * @param original der zu kopierende SniperTower
      */
-    public SniperTower(Tower original) {
-        super(original);
+    public SniperTower(Tower original, PlayerState playerState) {
+        super(original, playerState);
     }
 
     /**
@@ -36,8 +36,8 @@ public class SniperTower extends Tower {
      * @return eine Kopie des SniperTower
      */
     @Override
-    protected Tower copy() {
-        return new SniperTower(this);
+    protected Tower copy(PlayerState NewPlayerState) {
+        return new SniperTower(this, NewPlayerState);
     }
 
     /**

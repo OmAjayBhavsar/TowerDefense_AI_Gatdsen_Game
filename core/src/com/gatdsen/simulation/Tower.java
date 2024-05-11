@@ -76,8 +76,11 @@ public abstract class Tower implements Serializable {
      *
      * @param original der zu kopierende Tower
      */
-    protected Tower(Tower original) {
-        this(original.playerState, original.type, original.pos.x, original.pos.y, null);
+    protected Tower(Tower original, PlayerState playerState) {
+        this.playerState = playerState;
+        this.type = original.type;
+        this.pos = original.pos;
+        this.id = original.getId();
         this.level = original.level;
         this.cooldown = original.cooldown;
         this.inRange = original.inRange;
@@ -89,7 +92,7 @@ public abstract class Tower implements Serializable {
      *
      * @return eine Kopie des Towers
      */
-    protected abstract Tower copy();
+    protected abstract Tower copy(PlayerState NewPlayerstate);
 
     /**
      * Gibt die umliegenden Tiles in einer bestimmten Reichweite zurück

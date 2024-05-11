@@ -265,7 +265,7 @@ public class PlayerState implements Serializable {
             head.addChild(new ErrorAction("Tile at (" + x + ", " + y + ") is not buildable"));
         } else {
             TowerTile towerTile = new TowerTile(this, x, y, type);
-
+            
             money -= Tower.getTowerPrice(type);
             Action updateAction = new UpdateCurrencyAction(0, money, spawnCoins, index);
             head.addChild(updateAction);
@@ -387,13 +387,13 @@ public class PlayerState implements Serializable {
             spawnDelay++;
             switch (type) {
                 case EMP_ENEMY:
-                    spawnEnemies.push(new EmpEnemy(this, 1, spawnTile));
+                    spawnEnemies.push(new EmpEnemy(this, enemyLevel, spawnTile));
                     break;
                 case SHIELD_ENEMY:
-                    spawnEnemies.push(new ShieldEnemy(this, 1, spawnTile));
+                    spawnEnemies.push(new ShieldEnemy(this, enemyLevel, spawnTile));
                     break;
                 case ARMOR_ENEMY:
-                    spawnEnemies.push(new ArmorEnemy(this, 1, spawnTile));
+                    spawnEnemies.push(new ArmorEnemy(this, enemyLevel, spawnTile));
             }
         }
     }
@@ -412,6 +412,7 @@ public class PlayerState implements Serializable {
             else enemyLevel = 1 + actWave / 20;
 
             spawnEnemies.push(new BasicEnemy(this, enemyLevel, spawnTile));
+            enemyLevel = 1 + actWave/20;
         }
 
     }

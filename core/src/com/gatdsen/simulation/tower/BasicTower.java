@@ -28,8 +28,8 @@ public class BasicTower extends Tower {
      *
      * @param original der zu kopierende BasicTower
      */
-    public BasicTower(Tower original) {
-        super(original);
+    public BasicTower(Tower original, PlayerState playerState) {
+        super(original, playerState);
     }
 
     /**
@@ -38,8 +38,8 @@ public class BasicTower extends Tower {
      * @return eine Kopie des BasicTowers
      */
     @Override
-    protected Tower copy() {
-        return new BasicTower(this);
+    protected Tower copy(PlayerState newPlayerstate) {
+        return new BasicTower(this, newPlayerstate);
     }
 
     /**
