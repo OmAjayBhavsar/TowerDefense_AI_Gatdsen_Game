@@ -257,7 +257,7 @@ public class PlayerState implements Serializable {
             return head;
         }
 
-        if (x > board.length || y > board[0].length || x < 0 || y < 0){
+        if (x >= board.length || y >= board[0].length || x < 0 || y < 0){
             head.addChild(new ErrorAction("Position (" + x + ", " + y + ") is out of bounds"));
         } else if (board[x][y] != null) {
             head.addChild(new ErrorAction("(" + x + ", " + y + ") is already occupied"));
