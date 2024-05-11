@@ -2,7 +2,7 @@ package com.gatdsen.manager.player.handler;
 
 import com.gatdsen.manager.player.Bot;
 import com.gatdsen.manager.player.HumanPlayer;
-import com.gatdsen.manager.player.IdleBot;
+import com.gatdsen.manager.player.IdleBotOriginal;
 import com.gatdsen.manager.player.Player;
 
 import java.io.File;
@@ -29,8 +29,8 @@ public final class PlayerClassReference implements Serializable {
 
     /** Die Referenz auf den {@link HumanPlayer} */
     public static final PlayerClassReference HUMAN_PLAYER = new PlayerClassReference("HumanPlayer", HumanPlayer.class);
-    /** Die Referenz auf den {@link IdleBot} */
-    public static final PlayerClassReference IDLE_BOT = new PlayerClassReference("IdleBot", IdleBot.class);
+    /** Die Referenz auf den {@link IdleBotOriginal} */
+    public static final PlayerClassReference IDLE_BOT = new PlayerClassReference("IdleBot", IdleBotOriginal.class);
     /** Alle Referenzen auf die intern existierenden Spielerklassen */
     public static final Map<String, PlayerClassReference> INTERNAL_PLAYER_CLASS_REFERENCES = Map.of(HUMAN_PLAYER.fileName, HUMAN_PLAYER, IDLE_BOT.fileName, IDLE_BOT);
 
