@@ -57,9 +57,9 @@ public abstract class GameMode implements Serializable {
         map = "map1";
         wave = 1;
         towers = new ArrayList<>();
-        towers.add(TowerType.BASIC_TOWER);
-        towers.add(TowerType.AOE_TOWER);
-        towers.add(TowerType.SNIPER_TOWER);
+        towers.add(TowerType.MINIGUN_CAT);
+        towers.add(TowerType.CATANA_CAT);
+        towers.add(TowerType.MAGE_CAT);
         enemies = new ArrayList<>();
         enemies.add(EnemyType.EMP_ENEMY);
         enemies.add(EnemyType.SHIELD_ENEMY);

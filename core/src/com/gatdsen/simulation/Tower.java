@@ -20,9 +20,9 @@ public abstract class Tower implements Serializable {
      * Speichert die verschiedenen Typen von Türmen
      */
     public enum TowerType {
-        BASIC_TOWER,
-        AOE_TOWER,
-        SNIPER_TOWER
+        MINIGUN_CAT,
+        CATANA_CAT,
+        MAGE_CAT
     }
 
     /**
@@ -188,11 +188,11 @@ public abstract class Tower implements Serializable {
 
     public static int getTowerPrice(TowerType type) {
         switch (type) {
-            case BASIC_TOWER:
+            case MINIGUN_CAT:
                 return 80;
-            case AOE_TOWER:
+            case CATANA_CAT:
                 return 100;
-            case SNIPER_TOWER:
+            case MAGE_CAT:
                return 100;
             default:
                 return 0;
@@ -321,7 +321,7 @@ public abstract class Tower implements Serializable {
 
         if (target != null) {
             head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex(), id));
-            if (type == TowerType.SNIPER_TOWER) {
+            if (type == TowerType.MAGE_CAT) {
                 Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 0.1f);
                 path.setDuration(0.5f);
                 head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));

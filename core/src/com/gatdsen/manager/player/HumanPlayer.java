@@ -213,7 +213,7 @@ public class HumanPlayer extends Player {
                 selectedTile.x = Math.min(selectedTile.x + 1, state.getBoardSizeX() - 1);
                 break;
             case KEY_CHARACTER_TOWER_PLACE:
-                placeTower(selectedTile.x, selectedTile.y, Tower.TowerType.BASIC_TOWER);
+                placeTower(selectedTile.x, selectedTile.y, Tower.TowerType.MINIGUN_CAT);
                 break;
             case KEY_CHARACTER_TOWER_UPGRADE:
                 upgradeTower(selectedTile.x, selectedTile.y);
