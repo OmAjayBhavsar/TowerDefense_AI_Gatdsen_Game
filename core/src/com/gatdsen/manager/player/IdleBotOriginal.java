@@ -64,7 +64,7 @@ public class IdleBotOriginal extends Bot {
         }
         tmpTile = startTile.getNext().getNext();
     }
-    int counter = 0;
+    int counter = 2;
 
     /**
      * Wird aufgerufen, wenn der Spieler seinen Zug für die aktuelle Runde durchführen soll. Die erlaubte
@@ -85,7 +85,7 @@ public class IdleBotOriginal extends Bot {
         TowerType type = TowerType.values()[counter % TowerType.values().length];
         if (state.getMyPlayerState().getMoney() >= Tower.getTowerPrice(type)) {
             IntVector2 pos = tmpTile.getPosition();
-            controller.placeTower(pos.x + 1, pos.y + 1, type);
+            controller.placeTower(pos.x + 1, pos.y - 1, type);
             ++counter;
             tmpTile = tmpTile.getNext();
         }
