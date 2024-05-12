@@ -108,6 +108,9 @@ public final class RunConfig {
                     isValid = false;
                 }
                 break;
+            case "CampaignMode":
+                // Todo??
+                break;
             default:
                 throw new RuntimeException("RunConfig: Gamemode " + gameMode + " is not unlocked yet.\n");
         }
@@ -135,6 +138,7 @@ public final class RunConfig {
             case "NormalMode":
             case "ChristmasMode":
             case "ReplayMode":
+            case "CampaignMode":
                 break;
             default:
                 throw new RuntimeException("RunConfig: Gamemode " + gameMode + " is not unlocked yet.");

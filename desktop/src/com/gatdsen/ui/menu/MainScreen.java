@@ -64,11 +64,12 @@ public class MainScreen extends BaseMenuScreen {
         campaignButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                runConfig.gameMode = new CampaignMode1_1(); // TODO: richtige Kampagne auswählen gez. Dani
+                runConfig.gameMode = new CampaignMode1_1();
                 gameInstance.setScreen(GADS.ScreenState.CAMPAIGNSCREEN, runConfig);
             }
         });
         mainMenuTable.add(campaignButton).colspan(4).pad(10).width(200).row();
+        /*
         TextButton multiplayerButton = new TextButton("Mehrspieler", skin);
         multiplayerButton.addListener(new ChangeListener() {
             @Override
@@ -77,6 +78,8 @@ public class MainScreen extends BaseMenuScreen {
             }
         });
         mainMenuTable.add(multiplayerButton).colspan(4).pad(10).width(200).row();
+
+         */
         return mainMenuTable;
     }
 
