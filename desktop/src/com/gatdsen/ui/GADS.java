@@ -92,7 +92,7 @@ public class GADS extends Game {
             case EXAMMENUSCREEN:
                 return new ExamMenuScreen(this);
             case CAMPAIGNSCREEN:
-                return new CampaignMenuScreen(this);
+                return new CampaignBaseMenuScreen(this);
             case CHRISTMASTASKSCREEN:
                 return new ChristmasTaskScreen(this);
             case VICTORYSCREEN:
