@@ -10,7 +10,7 @@ import com.gatdsen.simulation.Tower;
 
 import java.util.Arrays;
 
-public class HumanPlayer extends Player {
+public final class HumanPlayer extends Player {
 
     enum Key {
         KEY_CHARACTER_TILE_UP,

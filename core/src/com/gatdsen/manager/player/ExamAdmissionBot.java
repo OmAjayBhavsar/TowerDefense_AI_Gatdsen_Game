@@ -5,42 +5,28 @@ import com.gatdsen.manager.StaticGameState;
 import com.gatdsen.simulation.*;
 import com.gatdsen.simulation.Tower.TowerType;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
- * In dieser Klasse implementiert ihr euren Bot.
+ * DISCLAIMER:
+ * <p>
+ * Bist du dir sicher, dass du diesen Code anschauen solltest? <p>
+ *   1. Der Bot ist echt nicht besonders gut und hat keine Chance gegen eine von dir gut durchdachte Lösung... <p>
+ *   2. Falls du dir erhoffst einen taktischen Vorteil zu erlangen, indem du dir den Code anschaust: Im Wettbewerb gegen
+ *      andere Studierende hast du auch nicht die Möglichkeit vorher deren Code zu sehen. <p>
+ *   3. Falls du unseren Code kopieren möchtest: Dies kann zur Disqualifikation am Wettbewerb und damit auch zum nicht
+ *      Erreichen der Klausurzulassung führen! <p>
  */
-public class IdleBotOriginal extends Bot {
+public final class ExamAdmissionBot extends Bot {
 
-    /**
-     * Hier müsst ihr euren vollständigen Namen angeben
-     *
-     * @return Euer vollständiger Name im Format: "Vorname(n) Nachname"
-     */
     @Override
     public String getStudentName() {
-        return "Max Musterstudent";
+        return "Gadsen: Tower Defense";
     }
 
-    /**
-     * Hier müsst ihr eure Matrikelnummer angeben
-     *
-     * @return Eure Matrikelnummer
-     */
     @Override
     public int getMatrikel() {
         return 42069;
     }
 
-    /**
-     * Hier könnt ihr eurem Bot einen (kreativen) Namen geben
-     *
-     * @return Der Name eures Bots
-     */
     @Override
     public String getName() {
         return "ExamBot";
@@ -48,6 +34,7 @@ public class IdleBotOriginal extends Bot {
 
     PathTile startTile;
     PathTile tmpTile;
+
     /**
      * Wird vor Beginn des Spiels aufgerufen. Die erlaubte Berechnungszeit für diese Methode beträgt 1 Sekunde.
      * Diese Methode kann daher verwendet werden, um Variablen zu initialisieren und einmalig, sehr rechenaufwändige
@@ -57,13 +44,13 @@ public class IdleBotOriginal extends Bot {
      */
     @Override
     public void init(StaticGameState state) {
-        System.out.println("Der Bot \"" + getName() + "\" wurde initialisiert!");
         startTile = state.getMyPlayerState().getCheeseTile();
         while (startTile.getPrev() != null) {
             startTile = startTile.getPrev();
         }
         tmpTile = startTile.getNext().getNext();
     }
+
     int counter = 2;
 
     /**

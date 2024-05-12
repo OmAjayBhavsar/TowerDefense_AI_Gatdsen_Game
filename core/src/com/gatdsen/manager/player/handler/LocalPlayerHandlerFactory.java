@@ -12,6 +12,7 @@ public final class LocalPlayerHandlerFactory extends PlayerHandlerFactory {
 
     public static final LocalPlayerHandlerFactory HUMAN_PLAYER = new LocalPlayerHandlerFactory(PlayerClassReference.HUMAN_PLAYER);
     public static final LocalPlayerHandlerFactory IDLE_BOT = new LocalPlayerHandlerFactory(PlayerClassReference.IDLE_BOT);
+    public static final LocalPlayerHandlerFactory EXAM_ADMISSION_BOT = new LocalPlayerHandlerFactory(PlayerClassReference.EXAM_ADMISSION_BOT);
 
     private final PlayerClassReference playerClassReference;
     private final String playerName;
