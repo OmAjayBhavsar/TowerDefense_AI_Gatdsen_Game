@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.gatdsen.animation.entity.AnimatedEntity;
 import com.gatdsen.animation.entity.Healthbar;
+import com.gatdsen.simulation.Enemy;
 import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.assets.AssetContainer.IngameAssets.GameEnemyAnimationType;
 import com.gatdsen.ui.assets.AssetContainer.IngameAssets.Direction;
@@ -17,12 +18,18 @@ public class GameEnemy extends AnimatedEntity {
     private int moving = 0;
     private float moveDuration;
     private int cur = 1;
+    Enemy.EnemyType type;
     static private BitmapFont fonte = new BitmapFont();
     public Healthbar healthbar;
 
-    public GameEnemy(int level, int maxHealth) {
-        super(gameEnemyAnimations[Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
+
+    public GameEnemy(int level, int maxHealth, Enemy.EnemyType type, BitmapFont fonts) {
+        super(gameEnemyAnimations[type.ordinal()][Direction.RIGHT.ordinal()][GameEnemyAnimationType.ANIMATION_TYPE_IDLE.ordinal()]);
+
         this.level = level;
+        this.type = type;
+        fonte = fonts;
+
         healthbar = new Healthbar(maxHealth);
         this.add(healthbar);
         healthbar.setRelPos(new Vector2(100, 60));
@@ -39,13 +46,13 @@ public class GameEnemy extends AnimatedEntity {
      */
     public void switchAnimation(int direction) {
         cur = direction;
-        setAnimation(gameEnemyAnimations[cur][moving]);
+        setAnimation(gameEnemyAnimations[type.ordinal()][cur][moving]);
     }
 
     public void toggleMove(float duration) {
         moving = 1;
         moveDuration = duration;
-        setAnimation(gameEnemyAnimations[cur][moving]);
+        setAnimation(gameEnemyAnimations[type.ordinal()][cur][moving]);
         resetAccTime();
     }
 
@@ -57,7 +64,7 @@ public class GameEnemy extends AnimatedEntity {
         //moving zurücksetzen, wenn Path zu Ende
         if (moving == 1 && getAccTime() >= moveDuration) {
             moving = 0;
-            setAnimation(gameEnemyAnimations[cur][moving]);
+            setAnimation(gameEnemyAnimations[type.ordinal()][cur][moving]);
             resetAccTime();
         }
     }

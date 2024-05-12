@@ -91,13 +91,13 @@ public class TournamentRun extends Run {
             config.playerFactories = new ArrayList<>();
             config.playerFactories.add(playerFactories.get(p1));
             config.playerFactories.add(playerFactories.get(p2));
-            config.mapName = "lukeMap"; //ToDo make dynamic
+            config.gameMode.setMap("lukeMap"); //ToDo make dynamic
             game1 = new Game(config.asGameConfig());
             game1.addCompletionListener(this::onGameComplete);
-            config.mapName = "Gadsrena"; //ToDo make dynamic
+            config.gameMode.setMap("Gadsrena"); //ToDo make dynamic
             game2 = new Game(config.asGameConfig());
             game2.addCompletionListener(this::onGameComplete);
-            config.mapName = "mondlandschaft"; //ToDo make dynamic
+            config.gameMode.setMap("mondlandschaft"); //ToDo make dynamic
             game3 = new Game(config.asGameConfig());
             game3.addCompletionListener(this::onGameComplete);
             manager.schedule(game1);

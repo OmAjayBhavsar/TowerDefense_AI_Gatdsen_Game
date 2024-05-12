@@ -1,6 +1,5 @@
 package com.gatdsen.simulation;
 
-import com.gatdsen.simulation.GameState.GameMode;
 import com.gatdsen.simulation.action.*;
 
 /**
@@ -16,14 +15,12 @@ public class Simulation {
      * erstellt eine neue Simulation
      *
      * @param gameMode    Modus in dem gespielt wird
-     * @param mapName     Map auf der gespielt wird
      * @param playerCount Anzahl Spieler
      */
-    public Simulation(GameMode gameMode, String mapName, int playerCount) {
-        gameState = new GameState(gameMode, mapName, playerCount, this);
+    public Simulation(GameMode gameMode, int playerCount) {
+        gameState = new GameState(gameMode, playerCount, this);
         playerStates = gameState.getPlayerStates();
         actionLog = new ActionLog(new InitAction());
-
     }
 
     /**

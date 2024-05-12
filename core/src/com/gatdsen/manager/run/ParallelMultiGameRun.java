@@ -23,7 +23,8 @@ public class ParallelMultiGameRun extends Run {
 
     protected ParallelMultiGameRun(Manager manager, RunConfig runConfig) {
         super(manager, runConfig);
-        if (runConfig.gameMode == GameState.GameMode.Exam_Admission) {
+        String gameModeName = runConfig.gameMode.getClass().getSimpleName();
+        if (gameModeName.equals("ExamAdmissionMode")) {
 
             //ToDo this is the config for the exam admission
 
@@ -36,7 +37,7 @@ public class ParallelMultiGameRun extends Run {
             runConfig.playerFactories.add(LocalPlayerHandlerFactory.IDLE_BOT);
             getPlayerFactories().clear();
             getPlayerFactories().addAll(runConfig.playerFactories);
-            runConfig.mapName = "MangoMap";
+            runConfig.gameMode.setMap("MangoMap");
         }
         ArrayList<Integer> indices = new ArrayList<>();
         int playerCount = runConfig.playerFactories.size();

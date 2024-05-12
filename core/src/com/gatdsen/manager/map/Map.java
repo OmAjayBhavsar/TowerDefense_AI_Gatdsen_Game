@@ -1,38 +1,40 @@
 package com.gatdsen.manager.map;
 
-public class Map {
+import com.gatdsen.simulation.GameState;
 
-	private final String mapName;
-	private final int numberOfSpawnpoints;
-	private final int numberOfTeams;
+/**
+ * Diese Klasse repräsentiert eine Karte.
+ */
+public final class Map {
 
+	private final String name;
+    private final boolean isHidden;
+    private final GameState.MapTileType[][] tileTypes;
 
-	public Map(String name, int spawnpoints, int numberOfTeams){
-		this.mapName=name;
-		this.numberOfSpawnpoints=spawnpoints;
-		this.numberOfTeams = numberOfTeams;
-
+    /**
+     * @param name Der Name der Karte
+     * @param isHidden Ob die Karte direkt über das UI ausgewählt werden kann oder versteckt bleiben soll
+     * @param tileTypes Die Tile-Typen der Karte
+     */
+	public Map(String name, boolean isHidden, GameState.MapTileType[][] tileTypes) {
+		this.name = name;
+        this.isHidden = isHidden;
+        this.tileTypes = tileTypes;
 	}
 
-	public Map(String name, int spawnpoints){
-		this(name,spawnpoints,0);
+	public String getName() {
+		return name;
 	}
 
-
-	public String getName(){
-		return this.mapName;
-	}
-
-	public String toString(){
+	public String toString() {
 		return getName();
 	}
 
-	/**
-	 * Returns the number of spawnpoints per team
-	 * @return
-	 */
-	public int getNumberOfSpawnpoints(){
-		return this.numberOfSpawnpoints;
-	}
-	public int getNuberOfTeams(){return this.numberOfTeams;}
+    public boolean isHidden() {
+        return isHidden;
+    }
+
+    public GameState.MapTileType[][] getTileTypes() {
+        return tileTypes;
+    }
 }

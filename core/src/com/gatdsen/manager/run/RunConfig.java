@@ -4,8 +4,10 @@ import com.gatdsen.manager.AnimationLogProcessor;
 import com.gatdsen.manager.game.GameConfig;
 import com.gatdsen.manager.InputProcessor;
 import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
+import com.gatdsen.manager.player.handler.PlayerClassReference;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
-import com.gatdsen.simulation.GameState.GameMode;
+import com.gatdsen.simulation.GameMode;
+import com.gatdsen.simulation.gamemode.NormalMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,16 +29,14 @@ public final class RunConfig {
         gui = original.gui;
         animationLogProcessor = original.animationLogProcessor;
         inputProcessor = original.inputProcessor;
-        mapName = original.mapName;
         replay = original.replay;
         playerFactories = new ArrayList<>(original.playerFactories);
     }
 
-    public GameMode gameMode = GameMode.Normal;
+    public GameMode gameMode = new NormalMode();
     public boolean gui = true;
     public AnimationLogProcessor animationLogProcessor = null;
     public InputProcessor inputProcessor = null;
-    public String mapName = null;
     public boolean replay = false;
     public List<PlayerHandlerFactory> playerFactories = new ArrayList<>();
 
@@ -69,9 +69,13 @@ public final class RunConfig {
      */
     private boolean validate(StringBuilder errorMessages) {
         boolean isValid = true;
-        switch (gameMode) {
-            case Normal:
-                if (mapName == null) {
+        String gameModeName = gameMode.getClass().getSimpleName();
+        if (gameModeName.contains("_")) {
+            gameModeName = gameModeName.substring(0, gameModeName.indexOf("_"));
+        }
+        switch (gameModeName) {
+            case "NormalMode":
+                if (gameMode.getMap() == null) {
                     appendStringToStringBuilder(errorMessages, "RunConfig: No map name was provided.\n");
                     isValid = false;
                 }
@@ -80,8 +84,8 @@ public final class RunConfig {
                     isValid = false;
                 }
                 break;
-            case Christmas_Task:
-                if (mapName != null) {
+            case "ChristmasMode":
+                if (gameMode.getMap() != null) {
                     appendStringToStringBuilder(errorMessages, "RunConfig: A map can't be provided for the christmas task.\n");
                     isValid = false;
                 }
@@ -90,8 +94,8 @@ public final class RunConfig {
                     isValid = false;
                 }
                 break;
-            case Replay:
-                if (mapName == null) {
+            case "ReplayMode":
+                if (gameMode.getMap() == null) {
                     appendStringToStringBuilder(errorMessages, "RunConfig: A replay file name has to be provided for the replay mode.\n");
                     isValid = false;
                 }
@@ -103,6 +107,9 @@ public final class RunConfig {
                     appendStringToStringBuilder(errorMessages, "RunConfig: Players can't be provided for the replay mode.\n");
                     isValid = false;
                 }
+                break;
+            case "CampaignMode":
+                // Todo??
                 break;
             default:
                 throw new RuntimeException("RunConfig: Gamemode " + gameMode + " is not unlocked yet.\n");
@@ -123,18 +130,22 @@ public final class RunConfig {
 
     public GameConfig asGameConfig() {
         RunConfig config = copy();
-        switch (gameMode) {
-            case Normal:
-                config.playerFactories = playerFactories;
-                break;
-            case Christmas_Task:
-                config.mapName = "map2";
-                config.playerFactories.add(LocalPlayerHandlerFactory.IDLE_BOT);
-                break;
-            case Replay:
+        String gameModeName = gameMode.getClass().getSimpleName();
+        if (gameModeName.contains("_")) {
+            gameModeName = gameModeName.substring(0, gameModeName.indexOf("_"));
+        }
+        switch (gameModeName) {
+            case "NormalMode":
+            case "ChristmasMode":
+            case "ReplayMode":
+            case "CampaignMode":
                 break;
             default:
                 throw new RuntimeException("RunConfig: Gamemode " + gameMode + " is not unlocked yet.");
+        }
+        PlayerClassReference enemyBot = gameMode.getEnemyBot();
+        if (enemyBot != null) {
+            config.playerFactories.add(PlayerHandlerFactory.getPlayerFactory(enemyBot));
         }
         return new GameConfig(config);
     }
@@ -153,7 +164,6 @@ public final class RunConfig {
                 ", gui=" + gui +
                 ", animationLogProcessor=" + animationLogProcessor +
                 ", inputProcessor=" + inputProcessor +
-                ", mapName=\"" + mapName + "\"" +
                 ", replay=" + replay +
                 ", players=" + playerFactories +
                 "}";

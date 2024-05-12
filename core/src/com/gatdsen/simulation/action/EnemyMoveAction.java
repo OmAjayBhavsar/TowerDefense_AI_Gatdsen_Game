@@ -20,8 +20,8 @@ public class EnemyMoveAction extends EnemyAction {
      * @param team  Team des Gegners
      * @param id    ID des Gegners
      */
-    public EnemyMoveAction(float delay, IntVector2 pos, IntVector2 des, int level, int team, Enemy.Type type, int id) {
-        super(delay, pos, level, team, type, id);
+    public EnemyMoveAction(float delay, IntVector2 pos, IntVector2 des, int level, int team, Enemy.EnemyType enemyType, int id) {
+        super(delay, pos, level, team, enemyType, id);
         this.des = des;
     }
 

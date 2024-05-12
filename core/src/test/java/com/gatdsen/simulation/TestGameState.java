@@ -1,4 +1,5 @@
 package com.gatdsen.simulation;
+import com.gatdsen.simulation.gamemode.NormalMode;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,7 +10,7 @@ public class TestGameState {
 
     @Before
     public void init() {
-        sim = new Simulation(GameState.GameMode.Normal, "map1", 2);
+        sim = new Simulation(new NormalMode(), 2);
         state = sim.getState();
     }
 

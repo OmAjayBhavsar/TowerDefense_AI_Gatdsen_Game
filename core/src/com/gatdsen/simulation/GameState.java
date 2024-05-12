@@ -1,5 +1,7 @@
 package com.gatdsen.simulation;
 
+import com.gatdsen.manager.map.MapRetriever;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -7,19 +9,6 @@ import java.util.*;
  * Repräsentiert ein laufendes Spiel mit allen dazugehörigen Daten
  */
 public class GameState implements Serializable {
-
-    /**
-     * Enum für die verschiedenen Spielmodi
-     */
-    public enum GameMode {
-        Normal,
-        Campaign,
-        Exam_Admission,
-        Tournament_Phase_1,
-        Tournament_Phase_2,
-        Replay,
-        Christmas_Task
-    }
 
     /**
      * Enum für die verschiedenen Feldtypen
@@ -45,24 +34,22 @@ public class GameState implements Serializable {
      * Erstellt ein neues GameState-Objekt mit den angegebenen Attributen.
      *
      * @param gameMode    Spielmodus
-     * @param mapName     Name der Map als String
      * @param playerCount Anzahl der Spieler
      * @param sim         Simulation Instanz
      */
-    GameState(GameMode gameMode, String mapName, int playerCount, Simulation sim) {
+    GameState(GameMode gameMode, int playerCount, Simulation sim) {
         this.gameMode = gameMode;
-        this.map = MapLoader.getInstance().loadMap(
-                gameMode == GameMode.Campaign ? "campaign/" + mapName : mapName
-        );
-
+        this.map = MapRetriever.getInstance().getMapFromGamemode(gameMode).getTileTypes();
         this.playerCount = playerCount;
         this.active = true;
         this.sim = sim;
         playerStates = new PlayerState[playerCount];
         Arrays.setAll(playerStates, index -> new PlayerState(this, index, 300, 100));
+        /*
         if (gameMode == GameMode.Christmas_Task) {
             playerStates[1] = new PlayerState(this, 1, 500, 0);
         }
+        */
     }
 
     /**

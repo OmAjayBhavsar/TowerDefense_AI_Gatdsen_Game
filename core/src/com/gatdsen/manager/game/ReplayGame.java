@@ -31,7 +31,7 @@ public class ReplayGame extends Executable {
                 return;
             }
             setStatus(Status.ACTIVE);
-            replay = ReplayRetriever.getInstance().loadReplay(config.mapName);
+            replay = ReplayRetriever.getInstance().loadReplay(config.gameMode.getMap());
             //Init the Log Processor
             if (config.gui) {
                 animationLogProcessor.init(
