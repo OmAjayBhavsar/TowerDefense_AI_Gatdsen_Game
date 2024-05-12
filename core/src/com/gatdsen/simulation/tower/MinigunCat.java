@@ -8,28 +8,28 @@ import com.gatdsen.simulation.TowerTile;
 import java.util.List;
 
 /**
- * Speichert einen BasicTower.
+ * Speichert einen MinigunCat.
  */
-public class BasicTower extends Tower {
+public class MinigunCat extends Tower {
     /**
-     * Erstellt einen BasicTower an der angegebenen Position.
+     * Erstellt einen MinigunCat an der angegebenen Position.
      *
      * @param playerState der PlayerState, zu dem der Tower gehört
      * @param x           x-Koordinate
      * @param y           y-Koordinate
      * @param board       die Map, auf der der Tower steht
      */
-    public BasicTower(PlayerState playerState, int x, int y, Tile[][] board) {
-        super(playerState, TowerType.BASIC_TOWER, x, y, board);
+    public MinigunCat(PlayerState playerState, int x, int y, Tile[][] board) {
+        super(playerState, TowerType.MINIGUN_CAT, x, y, board);
     }
 
     /**
      * Erstellt eine Kopie eines BasicTowers.
      *
-     * @param original der zu kopierende BasicTower
+     * @param original der zu kopierende MinigunCat
      */
-    public BasicTower(Tower original) {
-        super(original);
+    public MinigunCat(Tower original, PlayerState playerState) {
+        super(original, playerState);
     }
 
     /**
@@ -38,8 +38,8 @@ public class BasicTower extends Tower {
      * @return eine Kopie des BasicTowers
      */
     @Override
-    protected Tower copy() {
-        return new BasicTower(this);
+    protected Tower copy(PlayerState newPlayerstate) {
+        return new MinigunCat(this, newPlayerstate);
     }
 
     /**
@@ -57,8 +57,8 @@ public class BasicTower extends Tower {
     }
 
     /**
-     * Prüft, ob ein BasicTower in Reichweite ist.
-     * @return true, wenn ein BasicTower in Reichweite ist, sonst false
+     * Prüft, ob ein MinigunCat in Reichweite ist.
+     * @return true, wenn ein MinigunCat in Reichweite ist, sonst false
      */
     private boolean basicTowerInRange() {
         List<Tile> inRange = getNeighbours(getRange(), playerState.getBoard());
@@ -66,7 +66,7 @@ public class BasicTower extends Tower {
             if (tile == null || tile.getPosition().equals(pos)) continue;
             if (tile instanceof TowerTile) {
                 TowerTile towerTile = (TowerTile) tile;
-                if (towerTile.getTower().getType() == TowerType.BASIC_TOWER) {
+                if (towerTile.getTower().getType() == TowerType.MINIGUN_CAT) {
                     return true;
                 }
             }
@@ -83,7 +83,7 @@ public class BasicTower extends Tower {
     }
 
     /**
-     * @return Die Zeit, die der BasicTower zum Nachladen braucht
+     * @return Die Zeit, die der MinigunCat zum Nachladen braucht
      */
     @Override
     public int getRechargeTime() {

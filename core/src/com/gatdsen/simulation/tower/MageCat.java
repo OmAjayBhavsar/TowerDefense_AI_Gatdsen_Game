@@ -3,45 +3,44 @@ package com.gatdsen.simulation.tower;
 import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Tile;
 import com.gatdsen.simulation.Tower;
-import com.gatdsen.simulation.action.Action;
 
 /**
- * Speichert einen SniperTower.
+ * Speichert einen MageCat.
  */
-public class SniperTower extends Tower {
+public class MageCat extends Tower {
     /**
-     * Erstellt einen SniperTower an der angegebenen Position.
+     * Erstellt einen MageCat an der angegebenen Position.
      *
      * @param playerState der PlayerState, zu dem der Tower gehört
      * @param x           x-Koordinate
      * @param y           y-Koordinate
      * @param board       die Map, auf der der Tower steht
      */
-    public SniperTower(PlayerState playerState, int x, int y, Tile[][] board) {
-        super(playerState, TowerType.SNIPER_TOWER, x, y, board);
+    public MageCat(PlayerState playerState, int x, int y, Tile[][] board) {
+        super(playerState, TowerType.MAGE_CAT, x, y, board);
     }
 
     /**
-     * Erstellt eine Kopie eines SniperTower.
+     * Erstellt eine Kopie eines MageCat.
      *
-     * @param original der zu kopierende SniperTower
+     * @param original der zu kopierende MageCat
      */
-    public SniperTower(Tower original) {
-        super(original);
+    public MageCat(Tower original, PlayerState playerState) {
+        super(original, playerState);
     }
 
     /**
-     * Erstellt eine Kopie eines SniperTower.
+     * Erstellt eine Kopie eines MageCat.
      *
-     * @return eine Kopie des SniperTower
+     * @return eine Kopie des MageCat
      */
     @Override
-    protected Tower copy() {
-        return new SniperTower(this);
+    protected Tower copy(PlayerState NewPlayerState) {
+        return new MageCat(this, NewPlayerState);
     }
 
     /**
-     * @return Den Schaden des SniperTower
+     * @return Den Schaden des MageCat
      */
     @Override
     public int getDamage() {
@@ -54,7 +53,7 @@ public class SniperTower extends Tower {
     }
 
     /**
-     * @return Die Reichweite des SniperTower
+     * @return Die Reichweite des MageCat
      */
     @Override
     public int getRange() {
@@ -62,7 +61,7 @@ public class SniperTower extends Tower {
     }
 
     /**
-     * @return Die Zeit, die der SniperTower zum Nachladen braucht
+     * @return Die Zeit, die der MageCat zum Nachladen braucht
      */
     @Override
     public int getRechargeTime() {
@@ -75,7 +74,7 @@ public class SniperTower extends Tower {
     }
 
     /**
-     * @return Den Preis des SniperTower
+     * @return Den Preis des MageCat
      */
     @Override
     public int getUpgradePrice() {

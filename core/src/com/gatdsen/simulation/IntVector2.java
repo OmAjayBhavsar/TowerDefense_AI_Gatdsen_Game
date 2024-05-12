@@ -630,4 +630,12 @@ public class IntVector2 implements Serializable, Vector<IntVector2> {
         this.y += y;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "IntVector2{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }
