@@ -6,7 +6,7 @@ import com.gatdsen.manager.StaticGameState;
 /**
  * Dieser Bot repräsentiert einen Spieler, der keine Aktionen ausführt.
  */
-public class IdleBot extends Bot {
+public final class IdleBot extends Bot {
 
     @Override
     public String getName() {

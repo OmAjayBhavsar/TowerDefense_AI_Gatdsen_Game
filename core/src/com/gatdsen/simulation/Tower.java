@@ -20,9 +20,9 @@ public abstract class Tower implements Serializable {
      * Speichert die verschiedenen Typen von Türmen
      */
     public enum TowerType {
-        BASIC_TOWER,
-        AOE_TOWER,
-        SNIPER_TOWER
+        MINIGUN_CAT,
+        CATANA_CAT,
+        MAGE_CAT
     }
 
     /**
@@ -76,8 +76,11 @@ public abstract class Tower implements Serializable {
      *
      * @param original der zu kopierende Tower
      */
-    protected Tower(Tower original) {
-        this(original.playerState, original.type, original.pos.x, original.pos.y, null);
+    protected Tower(Tower original, PlayerState playerState) {
+        this.playerState = playerState;
+        this.type = original.type;
+        this.pos = original.pos;
+        this.id = original.getId();
         this.level = original.level;
         this.cooldown = original.cooldown;
         this.inRange = original.inRange;
@@ -89,7 +92,7 @@ public abstract class Tower implements Serializable {
      *
      * @return eine Kopie des Towers
      */
-    protected abstract Tower copy();
+    protected abstract Tower copy(PlayerState NewPlayerstate);
 
     /**
      * Gibt die umliegenden Tiles in einer bestimmten Reichweite zurück
@@ -185,11 +188,11 @@ public abstract class Tower implements Serializable {
 
     public static int getTowerPrice(TowerType type) {
         switch (type) {
-            case BASIC_TOWER:
+            case MINIGUN_CAT:
                 return 80;
-            case AOE_TOWER:
+            case CATANA_CAT:
                 return 100;
-            case SNIPER_TOWER:
+            case MAGE_CAT:
                return 100;
             default:
                 return 0;
@@ -318,7 +321,7 @@ public abstract class Tower implements Serializable {
 
         if (target != null) {
             head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex(), id));
-            if (type == TowerType.SNIPER_TOWER) {
+            if (type == TowerType.MAGE_CAT) {
                 Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 0.1f);
                 path.setDuration(0.5f);
                 head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));

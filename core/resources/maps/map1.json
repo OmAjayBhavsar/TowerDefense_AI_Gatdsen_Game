@@ -49,11 +49,6 @@
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
  "tileheight":16,
- "tilesets":[
-        {
-         "firstgid":1,
-         "source":"tiledProject\/tileset\/test_tileset.tsx"
-        }],
  "tilewidth":16,
  "type":"map",
  "version":"1.10",

@@ -5,6 +5,7 @@ public class ExamAdmissionMode extends PlayableGameMode {
     public ExamAdmissionMode() {
         super();
         map = "ExamAdmission";
+        enemyBot = PlayerClassReference.EXAM_ADMISSION_BOT;
     }
 
     @Override

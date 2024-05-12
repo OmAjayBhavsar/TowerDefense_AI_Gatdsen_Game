@@ -40,14 +40,14 @@ public class TowerTile extends Tile {
         super(x, y);
         Tower tower1 = null;
         switch (type) {
-            case BASIC_TOWER:
-                tower1 = new BasicTower(playerState, x, y, playerState.getBoard());
+            case MINIGUN_CAT:
+                tower1 = new MinigunCat(playerState, x, y, playerState.getBoard());
                 break;
-            case AOE_TOWER:
-                tower1 = new AOETower(playerState, x, y, playerState.getBoard());
+            case CATANA_CAT:
+                tower1 = new CatanaCat(playerState, x, y, playerState.getBoard());
                 break;
-            case SNIPER_TOWER:
-                tower1 = new SniperTower(playerState, x, y, playerState.getBoard());
+            case MAGE_CAT:
+                tower1 = new MageCat(playerState, x, y, playerState.getBoard());
 
         }
         this.tower = tower1;

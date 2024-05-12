@@ -255,7 +255,10 @@ public class PlayerState implements Serializable {
             ));
             return head;
         }
-        if (board[x][y] != null) {
+
+        if (x >= board.length || y >= board[0].length || x < 0 || y < 0){
+            head.addChild(new ErrorAction("Position (" + x + ", " + y + ") is out of bounds"));
+        } else if (board[x][y] != null) {
             head.addChild(new ErrorAction("(" + x + ", " + y + ") is already occupied"));
         } else if (money < Tower.getTowerPrice(type)) {
             head.addChild(new ErrorAction("Not enough money to place Tower at (" + x + ", " + y + ")"));
@@ -386,13 +389,13 @@ public class PlayerState implements Serializable {
         spawnDelay++;
         switch (type) {
             case EMP_ENEMY:
-                spawnEnemies.push(new EmpEnemy(this, 1, spawnTile));
+                spawnEnemies.push(new EmpEnemy(this, enemyLevel, spawnTile));
                 break;
             case SHIELD_ENEMY:
-                spawnEnemies.push(new ShieldEnemy(this, 1, spawnTile));
+                spawnEnemies.push(new ShieldEnemy(this, enemyLevel, spawnTile));
                 break;
             case ARMOR_ENEMY:
-                spawnEnemies.push(new ArmorEnemy(this, 1, spawnTile));
+                spawnEnemies.push(new ArmorEnemy(this, enemyLevel, spawnTile));
         }
     }
 
@@ -410,6 +413,7 @@ public class PlayerState implements Serializable {
             else enemyLevel = 1 + actWave / 20;
 
             spawnEnemies.push(new BasicEnemy(this, enemyLevel, spawnTile));
+            enemyLevel = 1 + actWave/20;
         }
 
     }

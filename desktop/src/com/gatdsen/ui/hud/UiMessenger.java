@@ -62,9 +62,12 @@ public class UiMessenger {
         hud.stopTurnTimer();
     }
 
-    public void gameEnded(boolean won, int team, boolean isDraw) {
-        hud.gameEnded(won, team, isDraw);
+    public void gameEnded(int team, boolean isDraw) {
+        hud.gameEnded(team, isDraw);
+    }
 
+    public void playerDisqualified (int team, String message) {
+        hud.playerDisqualified(team, message);
     }
 
     /**
