@@ -249,14 +249,12 @@ public class PlayerState implements Serializable {
      * @return neuer Kopf der Action-Liste
      */
     Action placeTower(int x, int y, Tower.TowerType type, Action head) {
-
         if (!gameMode.getTowers().contains(type)) {
-            System.out.println("Für diesen Spielmodus darfst du nur folgenden Türme benutzen:");
-            System.out.println(gameMode.getTowers());
-            // ToDo: append error action
+            head.addChild(new ErrorAction(
+                    "Für diesen Spielmodus darfst du nur folgenden Türme benutzen: " + gameMode.getTowers()
+            ));
             return head;
         }
-
         if (board[x][y] != null) {
             head.addChild(new ErrorAction("(" + x + ", " + y + ") is already occupied"));
         } else if (money < Tower.getTowerPrice(type)) {
@@ -362,6 +360,12 @@ public class PlayerState implements Serializable {
      * @return neuer Kopf der Action-Liste
      */
     Action sendEnemy(Enemy.EnemyType type, GameState gameState, Action head) {
+        if (!gameMode.getEnemies().contains(type)) {
+            head.addChild(new ErrorAction(
+                    "Für diesen Spielmodus darfst du nur folgenden Gegner verwenden: " + gameMode.getEnemies()
+            ));
+            return head;
+        }
         enemyLevel = enemyLevel == 0 ? 1 : enemyLevel;
         if (spawnCoins >= Enemy.getEnemyTypePrice(type, enemyLevel)) {
             PlayerState playerState = gameState.getPlayerStates()[(index + 1) % 2];
@@ -378,23 +382,17 @@ public class PlayerState implements Serializable {
      * @param type Typ des Gegners
      */
     void spawnEnemy(Enemy.EnemyType type) {
-
-        if (!gameMode.getEnemies().contains(type)){
-            System.out.println("Für diesen Spielmodus darfst du nur folgende Gegner verwenden:");
-            System.out.println(gameMode.getEnemies());
-        }else{
-            enemySpawn = true;
-            spawnDelay++;
-            switch (type) {
-                case EMP_ENEMY:
-                    spawnEnemies.push(new EmpEnemy(this, 1, spawnTile));
-                    break;
-                case SHIELD_ENEMY:
-                    spawnEnemies.push(new ShieldEnemy(this, 1, spawnTile));
-                    break;
-                case ARMOR_ENEMY:
-                    spawnEnemies.push(new ArmorEnemy(this, 1, spawnTile));
-            }
+        enemySpawn = true;
+        spawnDelay++;
+        switch (type) {
+            case EMP_ENEMY:
+                spawnEnemies.push(new EmpEnemy(this, 1, spawnTile));
+                break;
+            case SHIELD_ENEMY:
+                spawnEnemies.push(new ShieldEnemy(this, 1, spawnTile));
+                break;
+            case ARMOR_ENEMY:
+                spawnEnemies.push(new ArmorEnemy(this, 1, spawnTile));
         }
     }
 

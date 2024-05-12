@@ -1,25 +1,22 @@
 package com.gatdsen.simulation.gamemode;
 
-/**
- * Normaler Spielmodus gegen einen IdleBot
- */
-public class NormalMode extends PlayableGameMode {
+public class TournamentPhase1Mode extends PlayableGameMode {
 
-    public NormalMode() {
-        super();
-        resetPlayerFactories();
+    @Override
+    public boolean isAvailable() {
+        return false;
     }
 
     @Override
     public Type getType() {
-        return Type.NORMAL;
+        return Type.TOURNAMENT_PHASE_1;
     }
 
     @Override
     public String[] getIdentifiers() {
         return new String[]{
                 String.valueOf(getType().ordinal()),
-                "normal", "default"
+                "tournament_phase_1", "tournament_1",
         };
     }
 }

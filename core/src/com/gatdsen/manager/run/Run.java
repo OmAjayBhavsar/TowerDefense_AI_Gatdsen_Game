@@ -48,7 +48,7 @@ public abstract class Run {
             case "ChristmasMode":
                 return new SingleGameRun(manager, runConfig);
             case "ExamAdmissionMode":
-            case "TournamentMode":
+            case "TournamentPhase1Mode":
                 return new ParallelMultiGameRun(manager, runConfig);
             case "TournamentModePhase2":
                 return new TournamentRun(manager, runConfig);

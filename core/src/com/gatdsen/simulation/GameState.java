@@ -45,6 +45,7 @@ public class GameState implements Serializable {
         this.sim = sim;
         playerStates = new PlayerState[playerCount];
         Arrays.setAll(playerStates, index -> new PlayerState(this, index, 300, 100));
+        this.turn = gameMode.getStartTurn();
         /*
         if (gameMode == GameMode.Christmas_Task) {
             playerStates[1] = new PlayerState(this, 1, 500, 0);

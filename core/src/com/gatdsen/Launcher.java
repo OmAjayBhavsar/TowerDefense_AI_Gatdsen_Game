@@ -3,17 +3,14 @@ package com.gatdsen;
 import com.gatdsen.manager.player.data.BotInformation;
 import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.manager.run.Run;
-import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.manager.player.handler.ProcessPlayerHandler;
 import com.gatdsen.manager.run.RunResults;
-import com.gatdsen.simulation.GameMode;
+import com.gatdsen.simulation.gamemode.GameModeFactory;
 import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class Launcher {
 
@@ -28,7 +25,7 @@ public abstract class Launcher {
                 .builder("m")
                 .longOpt("map")
                 .hasArg()
-                .desc("(Required for -n) String name of the map without extension").build());
+                .desc("String name of the map without extension").build());
         cliOptions.addOption(Option
                 .builder("p")
                 .longOpt("players")
@@ -54,8 +51,12 @@ public abstract class Launcher {
                 .desc("When printing results, they will be encased by the given key, ensuring authenticity").build());
         cliOptions.addOption(Option
                 .builder("r")
-                .longOpt("replay")
-                .desc("Saves replay and results of the matches (WIP)").build());
+                .longOpt("record")
+                .desc("Saves replay and results of the matches").build());
+        cliOptions.addOption(Option
+                .builder("replay")
+                .hasArg()
+                .desc("Playes ").build());
     }
 
     protected static CommandLine getParamsFromArgs(String[] args) {
@@ -74,23 +75,22 @@ public abstract class Launcher {
     protected static RunConfig parseRunConfig(CommandLine params) {
         RunConfig runConfig = new RunConfig();
         runConfig.gui = !params.hasOption("n");
-        if (params.hasOption("p")) {
-            runConfig.playerFactories = new ArrayList<>(List.of(PlayerHandlerFactory.getPlayerFactories(params.getOptionValue("p").trim().split("\\s+"))));
-        }
         if (params.hasOption("r")) {
             runConfig.replay = true;
         }
-        int gameModeID = Integer.parseInt(params.getOptionValue("g", "0"));
-        GameMode gameMode = GameMode.getGameMode(gameModeID);
-        if (gameMode == null) {
-            System.err.println("Invalid game mode: " + gameModeID);
+        String gameModeIdentifier;
+        if (params.hasOption("replay")) {
+            gameModeIdentifier = "replay";
+        } else {
+            gameModeIdentifier = params.getOptionValue("g", "admission");
+        }
+        runConfig.gameMode = GameModeFactory.getInstance().getGameMode(gameModeIdentifier);
+        if (runConfig.gameMode == null) {
+            System.err.println("\"" + gameModeIdentifier + "\" is not a valid game mode.");
             printHelp();
             return null;
         }
-        runConfig.gameMode = gameMode;
-        if (params.hasOption("m")) {
-            runConfig.gameMode.setMap(params.getOptionValue("m", null));
-        }
+        runConfig.gameMode.parseFromCommandArguments(params);
         return runConfig;
     }
 
@@ -139,7 +139,7 @@ public abstract class Launcher {
                     builder.append("\nStarted a replay without GUI, so only the results will be printed: \n");
                 }
             case "NormalMode":
-            case "TournamentMode":
+            case "TournamentPhase1Mode":
             default:
                 appendResults(builder, playerInformation, scores);
                 builder.append("\n");

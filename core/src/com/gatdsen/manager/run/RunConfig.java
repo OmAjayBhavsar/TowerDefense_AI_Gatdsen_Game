@@ -33,7 +33,7 @@ public final class RunConfig {
         playerFactories = new ArrayList<>(original.playerFactories);
     }
 
-    public GameMode gameMode = new NormalMode();
+    public GameMode gameMode = null;
     public boolean gui = true;
     public AnimationLogProcessor animationLogProcessor = null;
     public InputProcessor inputProcessor = null;
@@ -68,48 +68,16 @@ public final class RunConfig {
      * @return true, wenn die RunConfig gültig ist, ansonsten false
      */
     private boolean validate(StringBuilder errorMessages) {
-        boolean isValid = true;
-        String gameModeName = gameMode.getClass().getSimpleName();
-        if (gameModeName.contains("_")) {
-            gameModeName = gameModeName.substring(0, gameModeName.indexOf("_"));
-        }
-        switch (gameModeName) {
-            case "NormalMode":
-                if (gameMode.getMap() == null) {
-                    appendStringToStringBuilder(errorMessages, "RunConfig: No map name was provided.\n");
-                    isValid = false;
-                }
-                if (playerFactories.size() != 2) {
-                    appendStringToStringBuilder(errorMessages, "RunConfig: Only two players are allowed in normal game mode.\n");
-                    isValid = false;
-                }
-                break;
-            case "ChristmasMode":
-                if (gameMode.getMap() != null) {
-                    appendStringToStringBuilder(errorMessages, "RunConfig: A map can't be provided for the christmas task.\n");
-                    isValid = false;
-                }
-                if (playerFactories.size() != 1) {
-                    appendStringToStringBuilder(errorMessages, "RunConfig: Only one player is allowed for the christmas task.\n");
-                    isValid = false;
-                }
-                break;
-            case "ReplayMode":
-                if (gameMode.getMap() == null) {
-                    appendStringToStringBuilder(errorMessages, "RunConfig: A replay file name has to be provided for the replay mode.\n");
-                    isValid = false;
-                }
-                if (replay) {
-                    appendStringToStringBuilder(errorMessages, "RunConfig: A replay of the replay mode can't be created. Why would you do that anyway??\n");
-                    isValid = false;
-                }
-                if (!playerFactories.isEmpty()) {
-                    appendStringToStringBuilder(errorMessages, "RunConfig: Players can't be provided for the replay mode.\n");
-                    isValid = false;
-                }
-                break;
-            default:
-                throw new RuntimeException("RunConfig: Gamemode " + gameMode + " is not unlocked yet.\n");
+        boolean isValid;
+        if (gameMode == null) {
+            appendStringToStringBuilder(errorMessages, "RunConfig: No game mode was provided.\n");
+            isValid = false;
+        } else {
+            isValid = gameMode.validate(errorMessages);
+            if (gameMode.getType() == GameMode.Type.REPLAY && replay) {
+                appendStringToStringBuilder(errorMessages, "RunConfig: A replay of the replay mode can't be created. Why would you do that anyway??\n");
+                isValid = false;
+            }
         }
         return isValid;
     }
@@ -126,24 +94,7 @@ public final class RunConfig {
     }
 
     public GameConfig asGameConfig() {
-        RunConfig config = copy();
-        String gameModeName = gameMode.getClass().getSimpleName();
-        if (gameModeName.contains("_")) {
-            gameModeName = gameModeName.substring(0, gameModeName.indexOf("_"));
-        }
-        switch (gameModeName) {
-            case "NormalMode":
-            case "ChristmasMode":
-            case "ReplayMode":
-                break;
-            default:
-                throw new RuntimeException("RunConfig: Gamemode " + gameMode + " is not unlocked yet.");
-        }
-        PlayerClassReference enemyBot = gameMode.getEnemyBot();
-        if (enemyBot != null) {
-            config.playerFactories.add(PlayerHandlerFactory.getPlayerFactory(enemyBot));
-        }
-        return new GameConfig(config);
+        return new GameConfig(copy());
     }
 
     /**
