@@ -4,20 +4,23 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.gatdsen.animation.entity.TileMap;
-import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerState;
@@ -27,7 +30,6 @@ import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.hud.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class for taking care of the User Interface.
@@ -79,6 +81,7 @@ public class Hud implements Disposable {
     private Label healthPlayer1Label;
     private final VerticalGroup mainVerticalGroup;
     private final Vector2 comboBoxSize;
+    private Image[] endGameMessages;
 
 
     /**
@@ -284,9 +287,18 @@ public class Hud implements Disposable {
 
         int numberOfTeams = gameState.getPlayerCount();
         TextButton[] teamButtons;
+        endGameMessages = new Image[numberOfTeams];
         teamButtons = new TextButton[numberOfTeams];
 
         for (int i = 0; i < numberOfTeams; i++) {
+
+            endGameMessages[i] = new Image();
+            endGameMessages[i].setPosition((arrayPositionTileMaps[i].x), (arrayPositionTileMaps[i].y));
+            endGameMessages[i].setSize(((gameState.getBoardSizeX() * tileSize)), (gameState.getBoardSizeY() * tileSize));
+            endGameMessages[i].setScaling(Scaling.fit);
+
+            ingameGroup.addActor(endGameMessages[i]);
+
             int[][] towerMap = new int[gameState.getBoardSizeX()][gameState.getBoardSizeY()];
             towerMaps.add(towerMap);
             teamButtons[i] = tileMapButton(i, tileMap);
@@ -298,6 +310,7 @@ public class Hud implements Disposable {
             initBankBalance(i);
             initSpawnCoins(i);
         }
+
         if (turnPopupContainer.hasChildren()) {
             turnPopupContainer.removeActorAt(0, false);
         }
@@ -523,12 +536,10 @@ public class Hud implements Disposable {
     /**
      * Zeigt das Ergebnis des Spiels an, einschließlich eines Hintergrundbilds und Popup-Fensters
      *
-     * @param won    Gibt an, ob das Team gewonnen hat
      * @param team   Das betroffene Team
      * @param isDraw Gibt an, ob das Spiel unentschieden endete
      */
-    public void gameEnded(boolean won, int team, boolean isDraw) {
-
+    public void gameEnded(int team, boolean isDraw) {
         //create a pixel with a set color that will be used as Background
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         //set the color to black
@@ -536,13 +547,24 @@ public class Hud implements Disposable {
         pixmap.fill();
         pixmap.dispose();
 
-        //determine sprite
         if (isDraw) {
-            gameInstance.setScreen(GADS.ScreenState.DRAWSCREEN, new RunConfig());
-        } else if (won && team == 0) {
-            gameInstance.setScreen(GADS.ScreenState.VICTORYSCREEN, new RunConfig());
+            for (int i = 0; i < endGameMessages.length; i++) {
+                setEndGameMessages(i, AssetContainer.IngameAssets.drawDisplay);
+            }
         } else {
-            gameInstance.setScreen(GADS.ScreenState.LOSSSCREEN, new RunConfig());
+            for (int i = 0; i < endGameMessages.length; i++) {
+                setEndGameMessages(i, i == team ? AssetContainer.IngameAssets.victoryDisplay : AssetContainer.IngameAssets.lossDisplay);
+            }
+        }
+    }
+
+    void setEndGameMessages(int team, TextureRegion endScreenTextureRegion) {
+        endGameMessages[team].setDrawable(new TextureRegionDrawable(endScreenTextureRegion));
+    }
+
+    public void playerDisqualified(int team, String message) {
+        for (int i = 0; i < endGameMessages.length; i++) {
+            setEndGameMessages(i, i == team ? AssetContainer.IngameAssets.lossDisplay : AssetContainer.IngameAssets.victoryDisplay);
         }
     }
 
@@ -617,7 +639,7 @@ public class Hud implements Disposable {
                     closeSelectBox();
                     fireModeSelectBox = new SelectBox<>(skin);
                     Tower.TargetOption[] targetOption = Tower.TargetOption.values();
-                    fireModeSelectBox.setItems((Object[]) targetOption);
+                    fireModeSelectBox.setItems(targetOption);
                     fireModeSelectBox.setSize(comboBoxSize.x, comboBoxSize.y);
                     fireModeSelectBox.setPosition(coords.x, coords.y);
                     popupGroup.addActor(fireModeSelectBox);

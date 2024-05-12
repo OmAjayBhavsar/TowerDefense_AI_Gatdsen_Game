@@ -34,11 +34,7 @@ public class GADS extends Game {
         EXAMMENUSCREEN,
         CHRISTMASTASKSCREEN,
         INGAMESCREEN,
-        LOADSCREEN,
-        VICTORYSCREEN,
-        LOSSSCREEN,
-        CAMPAIGNSCREEN,
-        DRAWSCREEN
+        CAMPAIGNSCREEN
     }
 
     /**
@@ -95,12 +91,6 @@ public class GADS extends Game {
                 return new CampaignBaseMenuScreen(this);
             case CHRISTMASTASKSCREEN:
                 return new ChristmasTaskScreen(this);
-            case VICTORYSCREEN:
-                return new VictoryScreen(this);
-            case DRAWSCREEN:
-                return new DrawScreen(this);
-            case LOSSSCREEN:
-                return new LossScreen(this);
             case MULTIPLAYERBASESCREEN:
                 return new MultiplayerBaseMenuScreen(this);
             case MULTIPLAYERJOINSCREEN:

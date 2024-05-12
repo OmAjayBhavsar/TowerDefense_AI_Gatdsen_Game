@@ -40,6 +40,7 @@ public abstract class PlayerHandler {
             turnsToMiss += ((MissTurnsPenalty) penalty).turns;
         } else if (penalty instanceof DisqualificationPenalty) {
             controller.disqualify();
+            //ToDo implementiere Action für Disqualifizierung
             turnsToMiss = -1;
         }
     }
