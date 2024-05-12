@@ -64,6 +64,7 @@ public class MainScreen extends BaseMenuScreen {
         campaignButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                runConfig.gameMode = new CampaignMode1_1();
                 gameInstance.setScreen(GADS.ScreenState.CAMPAIGNSCREEN, runConfig);
             }
         });
