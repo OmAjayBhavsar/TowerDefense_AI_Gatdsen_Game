@@ -9,7 +9,7 @@ public class CampaignMode1_1 extends CampaignMode {
 
     public CampaignMode1_1() {
         super();
-        setPlayerHealth(1, 100);
+        setPlayerHealth(0, 100);
         setMap("Campaign1_1");
         towers.remove(Tower.TowerType.CATANA_CAT);
         towers.remove(Tower.TowerType.MAGE_CAT);
