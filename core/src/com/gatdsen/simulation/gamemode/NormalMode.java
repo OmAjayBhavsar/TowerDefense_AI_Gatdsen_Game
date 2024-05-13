@@ -6,4 +6,8 @@ import com.gatdsen.simulation.GameMode;
  * Normaler Spielmodus gegen einen IdleBot
  */
 public class NormalMode extends GameMode {
+    public NormalMode() {
+        super();
+        enemyBot = null;
+    }
 }

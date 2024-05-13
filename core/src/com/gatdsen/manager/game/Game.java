@@ -46,7 +46,7 @@ public class Game extends Executable {
     }
 
     private void create() {
-        simulation = new Simulation(config.gameMode, config.mapName, config.playerCount);
+        simulation = new Simulation(config.gameMode, config.playerCount);
         state = simulation.getState();
         if (saveReplay)
             gameResults.setInitialState(state);

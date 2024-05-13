@@ -21,7 +21,7 @@ public class EmpEnemy extends Enemy {
 
     public EmpEnemy(PlayerState playerState, int level, PathTile posTile) {
         super(playerState, level, posTile);
-        type = Type.EMP_ENEMY;
+        enemyType = EnemyType.EMP_ENEMY;
         health = 120 * level;
         damage = 5 * level;
     }
@@ -41,7 +41,7 @@ public class EmpEnemy extends Enemy {
                 }
             }
             cooldown = 3;
-            head.addChild(new EnemyEMPAction(0, posTile.getPosition(), level, team, type, range, id));
+            head.addChild(new EnemyEMPAction(0, posTile.getPosition(), level, team, enemyType, range, id));
         } else {
             cooldown--;
         }
@@ -70,6 +70,6 @@ public class EmpEnemy extends Enemy {
      * @return Der Preis des Gegners.
      */
     public static int getPrice(int level) {
-        return 10 * level;
+        return 8 * level;
     }
 }

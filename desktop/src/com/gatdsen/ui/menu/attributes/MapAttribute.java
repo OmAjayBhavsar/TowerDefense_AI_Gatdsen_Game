@@ -27,7 +27,7 @@ public class MapAttribute extends Attribute {
         Label textLabelMap = new Label("Karte: ", skin);
         textLabelMap.setAlignment(Align.right);
         mapSelectBox = new SelectBox<>(skin);
-        String[] sortedMapNames = MapRetriever.getInstance().getMapNames();
+        String[] sortedMapNames = MapRetriever.getInstance().getDisplayableMapNames();
         Arrays.sort(sortedMapNames);
         mapSelectBox.setItems(sortedMapNames);
         mapTable.columnDefaults(0).width(200);
@@ -45,7 +45,8 @@ public class MapAttribute extends Attribute {
      */
     @Override
     public RunConfig getConfig(RunConfig runConfig) {
-        runConfig.mapName = mapSelectBox.getSelected();
+        //runConfig.mapName = mapSelectBox.getSelected();
+        runConfig.gameMode.setMap(mapSelectBox.getSelected()); // TODO: Just a quickfix, needs to be changed because of public setter in sim gez. Dani
         return runConfig;
     }
 
@@ -56,6 +57,6 @@ public class MapAttribute extends Attribute {
      */
     @Override
     public void setConfig(RunConfig runConfig) {
-        mapSelectBox.setSelected(runConfig.mapName);
+        mapSelectBox.setSelected(runConfig.gameMode.getMap());
     }
 }

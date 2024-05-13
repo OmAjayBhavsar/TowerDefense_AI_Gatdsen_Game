@@ -14,7 +14,7 @@ public class ArmorEnemy extends Enemy {
      */
     public ArmorEnemy(PlayerState playerState, int level, PathTile posTile) {
         super(playerState, level, posTile);
-        type = Type.ARMOR_ENEMY;
+        enemyType = EnemyType.ARMOR_ENEMY;
         health = 150 * level;
         damage = 5 * level;
     }
@@ -29,6 +29,6 @@ public class ArmorEnemy extends Enemy {
      * @return Der Preis des Gegners.
      */
     public static int getPrice(int level) {
-        return 10 * level;
+        return 8 * level;
     }
 }

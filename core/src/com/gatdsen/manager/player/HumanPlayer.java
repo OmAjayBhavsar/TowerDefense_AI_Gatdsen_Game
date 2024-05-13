@@ -10,7 +10,7 @@ import com.gatdsen.simulation.Tower;
 
 import java.util.Arrays;
 
-public class HumanPlayer extends Player {
+public final class HumanPlayer extends Player {
 
     enum Key {
         KEY_CHARACTER_TILE_UP,
@@ -144,10 +144,10 @@ public class HumanPlayer extends Player {
     /**
      * Ruft den {@link Controller} des {@link HumanPlayer} auf, um einen Gegner zu einem gegnerischen Spieler auf das
      * Spielfeld zu senden.
-     * @param type Der Typ des Gegners, der gesendet werden soll
+     * @param enemyType Der Typ des Gegners, der gesendet werden soll
      */
-    public void sendEnemyToPlayer(Enemy.Type type) {
-        controller.sendEnemyToPlayer(type);
+    public void sendEnemyToPlayer(Enemy.EnemyType enemyType) {
+        controller.sendEnemyToPlayer(enemyType);
     }
 
     /**
@@ -213,7 +213,7 @@ public class HumanPlayer extends Player {
                 selectedTile.x = Math.min(selectedTile.x + 1, state.getBoardSizeX() - 1);
                 break;
             case KEY_CHARACTER_TOWER_PLACE:
-                placeTower(selectedTile.x, selectedTile.y, Tower.TowerType.BASIC_TOWER);
+                placeTower(selectedTile.x, selectedTile.y, Tower.TowerType.MINIGUN_CAT);
                 break;
             case KEY_CHARACTER_TOWER_UPGRADE:
                 upgradeTower(selectedTile.x, selectedTile.y);

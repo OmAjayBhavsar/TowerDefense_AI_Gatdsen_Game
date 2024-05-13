@@ -9,42 +9,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Speichert einen AOETower.
+ * Speichert einen CatanaCat.
  */
-public class AOETower extends Tower {
+public class CatanaCat extends Tower {
     /**
-     * Erstellt einen AOETower an der angegebenen Position.
+     * Erstellt einen CatanaCat an der angegebenen Position.
      *
      * @param playerState der PlayerState, zu dem der Tower gehört
      * @param x           x-Koordinate
      * @param y           y-Koordinate
      * @param board       die Map, auf der der Tower steht
      */
-    public AOETower(PlayerState playerState, int x, int y, Tile[][] board) {
-        super(playerState, TowerType.AOE_TOWER, x, y, board);
+    public CatanaCat(PlayerState playerState, int x, int y, Tile[][] board) {
+        super(playerState, TowerType.CATANA_CAT, x, y, board);
     }
 
     /**
-     * Erstellt eine Kopie eines AOETower.
+     * Erstellt eine Kopie eines CatanaCat.
      *
-     * @param original der zu kopierende AOETower
+     * @param original der zu kopierende CatanaCat
      */
-    public AOETower(Tower original) {
-        super(original);
+    public CatanaCat(Tower original, PlayerState playerState) {
+        super(original, playerState);
     }
 
     /**
-     * Erstellt eine Kopie eines AOETower.
+     * Erstellt eine Kopie eines CatanaCat.
      *
-     * @return eine Kopie des AOETower
+     * @return eine Kopie des CatanaCat
      */
     @Override
-    protected Tower copy() {
-        return new AOETower(this);
+    protected Tower copy(PlayerState NewPlayerState) {
+        return new CatanaCat(this, NewPlayerState);
     }
 
     /**
-     * @return Den Schaden des AOETower
+     * @return Den Schaden des CatanaCat
      */
     @Override
     public int getDamage() {
@@ -57,7 +57,7 @@ public class AOETower extends Tower {
     }
 
     /**
-     * @return Die Reichweite des AOETower
+     * @return Die Reichweite des CatanaCat
      */
     @Override
     public int getRange() {
@@ -65,7 +65,7 @@ public class AOETower extends Tower {
     }
 
     /**
-     * @return Die Zeit, die der AOETower zum Nachladen braucht
+     * @return Die Zeit, die der CatanaCat zum Nachladen braucht
      */
     @Override
     public int getRechargeTime() {
@@ -78,7 +78,7 @@ public class AOETower extends Tower {
     }
 
     /**
-     * @return Den Preis des AOETower
+     * @return Den Preis des CatanaCat
      */
     @Override
     public int getUpgradePrice() {

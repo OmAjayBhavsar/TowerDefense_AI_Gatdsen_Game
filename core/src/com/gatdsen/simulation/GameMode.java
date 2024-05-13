@@ -1,20 +1,49 @@
 package com.gatdsen.simulation;
 
+import com.gatdsen.manager.player.handler.PlayerClassReference;
+import com.gatdsen.simulation.gamemode.ExamAdmissionMode;
+import com.gatdsen.simulation.gamemode.NormalMode;
+import com.gatdsen.simulation.gamemode.TournamentMode;
+import com.gatdsen.simulation.gamemode.campaign.*;
+import com.gatdsen.simulation.Tower.TowerType;
+import com.gatdsen.simulation.Enemy.EnemyType;
+
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Abstrakte Klasse für die verschiedenen Spielmodi, welche die Standardwerte für die Spielmodi enthält.
  */
-public abstract class GameMode {
+public abstract class GameMode implements Serializable {
+
+    // TODO: Refactor..
+    //       Using gameMode.getClass().getSimpleName() to check the type of game mode is like using instanceof but worse
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends GameMode>[][] CampaignModes = new Class[][] {
+            {CampaignMode1_1.class, CampaignMode1_2.class},
+            {CampaignMode2_1.class, CampaignMode2_2.class},
+            {CampaignMode3_1.class, CampaignMode3_2.class},
+            {CampaignMode4_1.class, CampaignMode4_2.class},
+            {CampaignMode5_1.class, CampaignMode5_2.class},
+            {CampaignMode6_1.class, CampaignMode6_2.class}
+    };
+
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends GameMode>[] GameModes = new Class[] {
+            NormalMode.class, ExamAdmissionMode.class, TournamentMode.class
+    };
+
     protected int playerHealth;
     protected int enemyBotHealth;
     protected int playerMoney;
     protected int enemyBotMoney;
-    protected String enemyBot;
+    protected PlayerClassReference enemyBot;
     protected String map;
     protected int wave;
-    protected List<Tower.TowerType> towers;
-    protected List<List<Enemy>> enemies;
+    protected List<TowerType> towers;
+    protected List<EnemyType> enemies;
 
     /**
      * Erstellt ein neues GameMode-Objekt mit den Standardwerten
@@ -24,11 +53,49 @@ public abstract class GameMode {
         enemyBotHealth = 300;
         playerMoney = 100;
         enemyBotMoney = 100;
-        enemyBot = "IdleBot";
+        enemyBot = PlayerClassReference.IDLE_BOT;
         map = "map1";
         wave = 1;
-        towers = null;
-        enemies = null;
+        towers = new ArrayList<>();
+        towers.add(TowerType.MINIGUN_CAT);
+        towers.add(TowerType.CATANA_CAT);
+        towers.add(TowerType.MAGE_CAT);
+        enemies = new ArrayList<>();
+        enemies.add(EnemyType.EMP_ENEMY);
+        enemies.add(EnemyType.SHIELD_ENEMY);
+        enemies.add(EnemyType.ARMOR_ENEMY);
+    }
+
+    // ToDo: Implement validate method
+    /**
+     * Überprüft, ob die GameMode-Konfiguration gültig ist.
+     *
+     * @return true, wenn die Konfiguration gültig ist, ansonsten false
+     */
+    // public abstract boolean validate();
+
+    /**
+     * Gibt den Spielmodus mit der gegebenen ID zurück.
+     *
+     * @param modeID ID des Spielmodus
+     * @return Spielmodus mit der gegebenen ID
+     */
+    public static GameMode getGameMode(int modeID) {
+        if (modeID >= 0 && modeID < GameModes.length) {
+            try {
+                return GameModes[modeID].getDeclaredConstructor().newInstance();
+            } catch (NoSuchMethodException | InvocationTargetException |
+                     InstantiationException | IllegalAccessException e) {
+                return null;
+            }
+        } else {
+            try {
+                return CampaignModes[modeID / 10 - 1][modeID % 10 - 1].getDeclaredConstructor().newInstance();
+            } catch (NoSuchMethodException | InvocationTargetException |
+                     InstantiationException | IllegalAccessException e) {
+                return null;
+            }
+        }
     }
 
     /**
@@ -60,9 +127,9 @@ public abstract class GameMode {
     }
 
     /**
-     * @return der Name des Gegnerbots
+     * @return die Klassenreferenz des Gegnerbots
      */
-    public String getEnemyBot() {
+    public PlayerClassReference getEnemyBot() {
         return enemyBot;
     }
 
@@ -71,6 +138,10 @@ public abstract class GameMode {
      */
     public String getMap() {
         return map;
+    }
+
+    public void setMap(String map) {
+        this.map = map;
     }
 
     /**
@@ -85,7 +156,7 @@ public abstract class GameMode {
      *
      * @return die Liste der Türme
      */
-    public List<Tower.TowerType> getTowers() {
+    public List<TowerType> getTowers() {
         return towers;
     }
 
@@ -94,7 +165,15 @@ public abstract class GameMode {
      *
      * @return die Liste der zu spawnenden Gegner
      */
-    public List<List<Enemy>> getEnemies() {
+    public List<EnemyType> getEnemies() {
         return enemies;
+    }
+
+    public boolean isCampaignMode() {
+        return false;
+    }
+
+    public boolean isExamAdmissionMode() {
+        return false;
     }
 }

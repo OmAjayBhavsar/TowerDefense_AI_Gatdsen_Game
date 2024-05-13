@@ -178,7 +178,7 @@ public class GADSAssetManager {
         IngameAssets.gameTowerAnimations[0][GameTowerAnimationType.ANIMATION_TYPE_ATTACK.ordinal()] = new AtlasAnimation(1/20f, atlas.findRegions("towers/minigunCat_attack_down"), Animation.PlayMode.LOOP);
 
         // Gegner Animationen
-        IngameAssets.gameEnemyAnimations = new AtlasAnimation[Enemy.Type.values().length][Direction.values().length][GameEnemyAnimationType.values().length];
+        IngameAssets.gameEnemyAnimations = new AtlasAnimation[Enemy.EnemyType.values().length][Direction.values().length][GameEnemyAnimationType.values().length];
 
         // normale Maus
         // hoch
@@ -321,7 +321,6 @@ public class GADSAssetManager {
         skins.put("mioSkin", IngameAssets.mioSkin);
         Map<String, Map<Integer, Texture>> namedFrames = new HashMap<>();
         File skinDir = new File("skins");
-        System.out.println(new File("").getAbsolutePath());
         if (skinDir.exists()) {
 
             for (File skinFile : Objects.requireNonNull(skinDir.listFiles(path -> path.getName().endsWith(".png") || path.getName().endsWith(".jpg")))) {

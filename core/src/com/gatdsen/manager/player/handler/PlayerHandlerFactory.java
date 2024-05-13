@@ -43,7 +43,11 @@ public abstract class PlayerHandlerFactory {
         return factories;
     }
 
+    public static PlayerHandlerFactory getPlayerFactory(PlayerClassReference classReference) {
+        return new LocalPlayerHandlerFactory(classReference);
+    }
+
     public static PlayerHandlerFactory getPlayerFactory(String fileName) {
-        return new LocalPlayerHandlerFactory(PlayerClassReference.getPlayerClassReference(fileName));
+        return getPlayerFactory(PlayerClassReference.getPlayerClassReference(fileName));
     }
 }

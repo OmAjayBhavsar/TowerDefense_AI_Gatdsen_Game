@@ -16,11 +16,14 @@ import java.util.Stack;
  */
 public class PlayerState implements Serializable {
     private final Tile[][] board;
+    private GameMode gameMode;
     private int health;
     private int money;
     private int spawnCoins;
     private int enemyLevel;
     private final int index;
+    private int spawnDelay;
+    private boolean enemySpawn;
     private PathTile spawnTile;
     private PathTile endTile;
 
@@ -39,6 +42,7 @@ public class PlayerState implements Serializable {
      * @param money     das Geld des Spielers
      */
     PlayerState(GameState gameState, int index, int health, int money) {
+        gameMode = gameState.getGameMode();
         this.index = index;
         int width = gameState.getBoardSizeX();
         int height = gameState.getBoardSizeY();
@@ -245,7 +249,17 @@ public class PlayerState implements Serializable {
      * @return neuer Kopf der Action-Liste
      */
     Action placeTower(int x, int y, Tower.TowerType type, Action head) {
-        if (board[x][y] != null) {
+
+        if (!gameMode.getTowers().contains(type)) {
+            System.out.println("Für diesen Spielmodus darfst du nur folgenden Türme benutzen:");
+            System.out.println(gameMode.getTowers());
+            // ToDo: append error action
+            return head;
+        }
+
+        if (x >= board.length || y >= board[0].length || x < 0 || y < 0){
+            head.addChild(new ErrorAction("Position (" + x + ", " + y + ") is out of bounds"));
+        } else if (board[x][y] != null) {
             head.addChild(new ErrorAction("(" + x + ", " + y + ") is already occupied"));
         } else if (money < Tower.getTowerPrice(type)) {
             head.addChild(new ErrorAction("Not enough money to place Tower at (" + x + ", " + y + ")"));
@@ -349,14 +363,11 @@ public class PlayerState implements Serializable {
      * @param head      Kopf der Action-Liste
      * @return neuer Kopf der Action-Liste
      */
-    Action sendEnemy(Enemy.Type type, GameState gameState, Action head) {
+    Action sendEnemy(Enemy.EnemyType type, GameState gameState, Action head) {
         enemyLevel = enemyLevel == 0 ? 1 : enemyLevel;
         if (spawnCoins >= Enemy.getEnemyTypePrice(type, enemyLevel)) {
             PlayerState playerState = gameState.getPlayerStates()[(index + 1) % 2];
             playerState.spawnEnemy(type);
-            Enemy enemy = playerState.spawnEnemies.peek();
-            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemyLevel, enemy.getHealth(), index, type, enemy.getId()));
-
             spawnCoins -= Enemy.getEnemyTypePrice(type, enemyLevel);
             head.addChild(new UpdateCurrencyAction(0, money, spawnCoins, index));
         }
@@ -368,25 +379,44 @@ public class PlayerState implements Serializable {
      *
      * @param type Typ des Gegners
      */
-    void spawnEnemy(Enemy.Type type) {
-        switch (type) {
-            case EMP_ENEMY:
-                spawnEnemies.push(new EmpEnemy(this, 1, spawnTile));
-                break;
-            case SHIELD_ENEMY:
-                spawnEnemies.push(new ShieldEnemy(this, 1, spawnTile));
-                break;
-            case ARMOR_ENEMY:
-                spawnEnemies.push(new ArmorEnemy(this, 1, spawnTile));
+    void spawnEnemy(Enemy.EnemyType type) {
+
+        if (!gameMode.getEnemies().contains(type)){
+            System.out.println("Für diesen Spielmodus darfst du nur folgende Gegner verwenden:");
+            System.out.println(gameMode.getEnemies());
+        }else{
+            enemySpawn = true;
+            spawnDelay++;
+            switch (type) {
+                case EMP_ENEMY:
+                    spawnEnemies.push(new EmpEnemy(this, enemyLevel, spawnTile));
+                    break;
+                case SHIELD_ENEMY:
+                    spawnEnemies.push(new ShieldEnemy(this, enemyLevel, spawnTile));
+                    break;
+                case ARMOR_ENEMY:
+                    spawnEnemies.push(new ArmorEnemy(this, enemyLevel, spawnTile));
+            }
         }
     }
 
+    /**
+     * Fügt den Gegner des aktuellen Zuges zur Spawnliste hinzu, falls kein Gegner vom Gegenspieler gespawned wurde
+     * @param wave Die aktuelle Welle
+     */
     void spawnEnemy(int wave) {
-        if (wave % 10 == 0) enemyLevel = wave / 2;
-        else if (wave % 5 == 0) enemyLevel = wave / 5 + 1;
-        else enemyLevel = 1 + wave / 20;
+        if (enemySpawn){
+             enemySpawn = false;
+        }else{
+            int actWave = wave - spawnDelay;
+            if (actWave % 10 == 0) enemyLevel = actWave / 2;
+            else if (actWave % 5 == 0) enemyLevel = actWave / 5 + 1;
+            else enemyLevel = 1 + actWave / 20;
 
-        spawnEnemies.push(new BasicEnemy(this, enemyLevel, spawnTile));
+            spawnEnemies.push(new BasicEnemy(this, enemyLevel, spawnTile));
+            enemyLevel = 1 + actWave/20;
+        }
+
     }
 
     /**
@@ -401,7 +431,7 @@ public class PlayerState implements Serializable {
         while (!spawnEnemies.isEmpty()) {
             Enemy enemy = spawnEnemies.pop();
             spawnTile.getEnemies().add(enemy);
-            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemy.getLevel(), enemy.getHealth(), index, enemy.type, enemy.getId()));
+            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemy.getLevel(), enemy.getHealth(), index, enemy.enemyType, enemy.getId()));
         }
         return head;
     }
@@ -413,21 +443,7 @@ public class PlayerState implements Serializable {
      * @return der neue Action Head
      */
     Action moveEnemies(Action head) {
-        /*
-        TODO: All enemies should be moved at the same time
-        System.out.println("MoveEnemies");
-        PathTile actual = endTile;
-        while (actual.getPrev() != null) {
-            if (!actual.getEnemies().isEmpty()) {
-                for (Enemy enemy : actual.getEnemies()) {
-                    head = enemy.move(head);
-                }
-            }
-            actual = actual.getPrev();
-        }
 
-        if (!actual.getEnemies().isEmpty()) for(Enemy enemy : actual.getEnemies()) head = enemy.move(head);
-        return head;*/
         PathTile actual = endTile;
         while (actual.getPrev() != null) {
             List<Enemy> enemiesCopy = new ArrayList<>(actual.getEnemies());
@@ -452,7 +468,6 @@ public class PlayerState implements Serializable {
      * @return neuer Kopf der Action-Liste
      */
     Action setHealth(int damage, Action head) {
-        // do heal action if damage is negative
         health -= damage;
         Action updateHealthAction = new UpdateHealthAction(0, health, index);
         head.addChild(updateHealthAction);

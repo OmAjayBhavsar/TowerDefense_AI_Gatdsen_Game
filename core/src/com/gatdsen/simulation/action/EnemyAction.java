@@ -10,7 +10,7 @@ public class EnemyAction extends TeamAction {
     private final IntVector2 pos;
     private final int level;
 
-    private final Enemy.Type type;
+    private final Enemy.EnemyType enemyType;
     private final int id;
 
     /**
@@ -22,11 +22,11 @@ public class EnemyAction extends TeamAction {
      * @param team  Das Team, dem der Gegner angehört.
      * @param id    Die ID des Gegners, der die Action ausführt.
      */
-    public EnemyAction(float delay, IntVector2 pos, int level, int team, Enemy.Type type, int id) {
+    public EnemyAction(float delay, IntVector2 pos, int level, int team, Enemy.EnemyType enemyType, int id) {
         super(delay, team);
         this.pos = pos;
         this.level = level;
-        this.type = type;
+        this.enemyType = enemyType;
         this.id = id;
     }
 
@@ -53,8 +53,8 @@ public class EnemyAction extends TeamAction {
      *
      * @return Der Typ des Gegners, der die Action ausführt.
      */
-    public Enemy.Type getType() {
-        return type;
+    public Enemy.EnemyType getType() {
+        return enemyType;
     }
 
     /**
