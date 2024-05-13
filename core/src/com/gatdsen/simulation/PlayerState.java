@@ -17,7 +17,7 @@ import java.util.Stack;
  */
 public class PlayerState implements Serializable {
     private final Tile[][] board;
-    private PlayableGameMode gameMode;
+    private transient PlayableGameMode gameMode;
     private int health;
     private int money;
     private int spawnCoins;

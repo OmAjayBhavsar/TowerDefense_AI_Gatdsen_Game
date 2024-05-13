@@ -25,7 +25,7 @@ public class GameState implements Serializable {
 
     private final PlayerState[] playerStates;
     private final MapTileType[][] map;
-    private final PlayableGameMode gameMode;
+    private final transient PlayableGameMode gameMode;
     private final int playerCount;
     private final transient Simulation sim;
     private int turn;
