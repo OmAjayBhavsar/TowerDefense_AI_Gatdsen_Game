@@ -121,6 +121,9 @@ public final class MapRetriever {
             case "Campaign2_2":
             case "Campaign3_1":
             case "ExamAdmission":
+            case "ExamAdmission2":
+            case "ExamAdmission3":
+            case "ExamAdmission4":
                 return true;
         }
         return false;
