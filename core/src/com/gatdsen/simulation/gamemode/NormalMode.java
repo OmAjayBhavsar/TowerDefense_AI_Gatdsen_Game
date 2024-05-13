@@ -11,6 +11,11 @@ public class NormalMode extends PlayableGameMode {
     }
 
     @Override
+    public String getDisplayName() {
+        return "Normal";
+    }
+
+    @Override
     public Type getType() {
         return Type.NORMAL;
     }

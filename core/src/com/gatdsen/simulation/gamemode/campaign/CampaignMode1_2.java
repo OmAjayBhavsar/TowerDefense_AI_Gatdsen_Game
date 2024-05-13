@@ -1,15 +1,18 @@
 package com.gatdsen.simulation.gamemode.campaign;
 
+import com.gatdsen.simulation.PlayerState;
+import com.gatdsen.simulation.Tower;
+
 import java.time.LocalDateTime;
 
 public class CampaignMode1_2 extends CampaignMode {
 
     public CampaignMode1_2() {
         super();
-        enemyBotHealth = 100;
-        map = "Campaign1_2";
-        towers.remove(2);
-        towers.remove(0);
+        setPlayerHealth(1, 100);
+        setMap("Campaign1_2");
+        towers.remove(Tower.TowerType.MINIGUN_CAT);
+        towers.remove(Tower.TowerType.MAGE_CAT);
     }
 
     @Override
@@ -18,11 +21,17 @@ public class CampaignMode1_2 extends CampaignMode {
     }
 
     @Override
-    public String[] getIdentifiers() {
-        return new String[]{
-                "Campaign1_2", "Campaign 1.2",
-                "c1_2", "c1.2",
-                "1_2"
-        };
+    protected int getCampaignWeek() {
+        return 1;
+    }
+
+    @Override
+    protected int getCampaignTask() {
+        return 2;
+    }
+
+    @Override
+    public int calculateSpawnCoinsForRound(PlayerState playerState) {
+        return 0;
     }
 }

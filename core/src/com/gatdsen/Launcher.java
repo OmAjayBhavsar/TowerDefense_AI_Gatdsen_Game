@@ -6,11 +6,13 @@ import com.gatdsen.manager.run.Run;
 import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.manager.player.handler.ProcessPlayerHandler;
 import com.gatdsen.manager.run.RunResults;
+import com.gatdsen.simulation.GameMode;
 import com.gatdsen.simulation.gamemode.GameModeFactory;
 import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
 public abstract class Launcher {
 
@@ -35,12 +37,15 @@ public abstract class Launcher {
                 .builder("g")
                 .longOpt("gamemode")
                 .hasArg()
-                .type(Number.class)
-                .desc("GameMode to be played (Default: 0)\n" +
-                        "  0 - Normal\n" +
-                        "  1 - Exam Admission\n" +
-                        "  2 - Tournament: Phase 1\n" +
-                        "  xy - Campaign week x task y\n").build());
+                .desc(
+                        "GameModes to be played\n" +
+                                String.join(
+                                        ", ",
+                                        Arrays.stream(GameModeFactory.getInstance().getAvailableGameModes())
+                                                .map(gameMode -> gameMode.getDisplayName() + " (" + gameMode.getIdentifiers()[0] + ")")
+                                                .toArray(String[]::new)
+                                )
+                ).build());
         cliOptions.addOption(Option.builder("n")
                 .longOpt("nogui")
                 .desc("Runs the simulation without animation").build());
@@ -56,7 +61,7 @@ public abstract class Launcher {
         cliOptions.addOption(Option
                 .builder("replay")
                 .hasArg()
-                .desc("Playes ").build());
+                .desc("Name of the replay to show").build());
     }
 
     protected static CommandLine getParamsFromArgs(String[] args) {

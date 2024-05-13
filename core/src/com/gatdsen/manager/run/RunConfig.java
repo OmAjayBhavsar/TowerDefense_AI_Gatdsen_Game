@@ -3,11 +3,8 @@ package com.gatdsen.manager.run;
 import com.gatdsen.manager.AnimationLogProcessor;
 import com.gatdsen.manager.game.GameConfig;
 import com.gatdsen.manager.InputProcessor;
-import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
-import com.gatdsen.manager.player.handler.PlayerClassReference;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.simulation.GameMode;
-import com.gatdsen.simulation.gamemode.NormalMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +27,6 @@ public final class RunConfig {
         animationLogProcessor = original.animationLogProcessor;
         inputProcessor = original.inputProcessor;
         replay = original.replay;
-        playerFactories = new ArrayList<>(original.playerFactories);
     }
 
     public GameMode gameMode = null;
@@ -58,7 +54,7 @@ public final class RunConfig {
      * @return true, wenn die RunConfig gültig ist, ansonsten false
      */
     public boolean validateSilent() {
-        return validate(null);
+        return validate(new StringBuilder());
     }
 
     /**
@@ -70,27 +66,16 @@ public final class RunConfig {
     private boolean validate(StringBuilder errorMessages) {
         boolean isValid;
         if (gameMode == null) {
-            appendStringToStringBuilder(errorMessages, "RunConfig: No game mode was provided.\n");
+            errorMessages.append("RunConfig: No game mode was provided.\n");
             isValid = false;
         } else {
             isValid = gameMode.validate(errorMessages);
             if (gameMode.getType() == GameMode.Type.REPLAY && replay) {
-                appendStringToStringBuilder(errorMessages, "RunConfig: A replay of the replay mode can't be created. Why would you do that anyway??\n");
+                errorMessages.append("RunConfig: A replay of the replay mode can't be created. Why would you do that anyway??\n");
                 isValid = false;
             }
         }
         return isValid;
-    }
-
-    /**
-     * Hilfsmethode, um einen String an einen StringBuilder anzuhängen, falls der StringBuilder nicht null ist.
-     * @param builder Der StringBuilder, an den der String angehängt werden soll
-     * @param string Der String, der an den StringBuilder angehängt werden soll
-     */
-    private static void appendStringToStringBuilder(StringBuilder builder, String string) {
-        if (builder != null) {
-            builder.append(string);
-        }
     }
 
     public GameConfig asGameConfig() {
@@ -112,7 +97,6 @@ public final class RunConfig {
                 ", animationLogProcessor=" + animationLogProcessor +
                 ", inputProcessor=" + inputProcessor +
                 ", replay=" + replay +
-                ", players=" + playerFactories +
                 "}";
     }
 }

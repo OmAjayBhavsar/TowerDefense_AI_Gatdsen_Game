@@ -1,11 +1,18 @@
 package com.gatdsen.simulation.gamemode;
 
+import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
+
 public class ExamAdmissionMode extends PlayableGameMode {
 
     public ExamAdmissionMode() {
         super();
-        map = "ExamAdmission";
-        enemyBot = PlayerClassReference.EXAM_ADMISSION_BOT;
+        setMap("ExamAdmission", "ExamAdmission2", "ExamAdmission3", "ExamAdmission4");
+        setPlayerFactory(1, LocalPlayerHandlerFactory.EXAM_ADMISSION_BOT);
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "Exam Admission";
     }
 
     @Override

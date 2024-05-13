@@ -8,6 +8,11 @@ public class TournamentPhase2Mode extends PlayableGameMode {
     }
 
     @Override
+    public String getDisplayName() {
+        return "Turnier Phase 2";
+    }
+
+    @Override
     public Type getType() {
         return Type.TOURNAMENT_PHASE_2;
     }

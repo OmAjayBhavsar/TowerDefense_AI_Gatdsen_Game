@@ -7,8 +7,13 @@ public class ChristmasMode extends PlayableGameMode {
 
     public ChristmasMode() {
         super();
-        enemyBotHealth = 500;
-        map = "map2";
+        setPlayerHealth(1, 500);
+        setMap("map2");
+    }
+
+    @Override
+    public String getDisplayName() {
+        return "Weihnachtsaufgabe";
     }
 
     @Override

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class TestBotMissTurn {
 
-    private final Simulation dummySimulation = new Simulation(new NormalMode(), 2);
+    private final Simulation dummySimulation = new Simulation(new NormalMode(), "map1", 2);
 
     @Test
     public void testMissTurnThroughInitException() {

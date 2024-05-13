@@ -10,7 +10,7 @@ public class TestGameState {
 
     @Before
     public void init() {
-        sim = new Simulation(new NormalMode(), 2);
+        sim = new Simulation(new NormalMode(), "map1",2);
         state = sim.getState();
     }
 

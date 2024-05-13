@@ -5,10 +5,12 @@ import com.gatdsen.manager.command.Command;
 import com.gatdsen.manager.player.data.PlayerType;
 import com.gatdsen.manager.player.handler.PlayerHandler;
 import com.gatdsen.manager.player.data.PlayerInformation;
+import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.PlayerState;
 import com.gatdsen.simulation.Simulation;
 import com.gatdsen.simulation.action.ActionLog;
+import com.gatdsen.simulation.gamemode.PlayableGameMode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,38 +35,43 @@ public class Game extends Executable {
     private GameResults gameResults;
     private Simulation simulation;
     private GameState state;
+    private final PlayerHandlerFactory[] playerFactories;
+    private final String mapName;
     private PlayerHandler[] playerHandlers;
 
     private long seed = BASE_SEED;
 
     private Thread simulationThread;
 
-    public Game(GameConfig config) {
+    public Game(GameConfig config, PlayerHandlerFactory[] playerFactories, String mapName) {
         super(config);
         gameResults = new GameResults(config);
         gameResults.setStatus(getStatus());
+        this.playerFactories = playerFactories;
+        this.mapName = mapName;
     }
 
     private void create() {
-        simulation = new Simulation(config.gameMode, config.playerCount);
+        int playerCount = playerFactories.length;
+        simulation = new Simulation((PlayableGameMode) config.gameMode, mapName, playerCount);
         state = simulation.getState();
         if (saveReplay)
             gameResults.setInitialState(state);
 
-        playerHandlers = new PlayerHandler[config.playerCount];
+        playerHandlers = new PlayerHandler[playerCount];
         @SuppressWarnings("unchecked")
-        Future<PlayerHandler>[] playerHandlerFutures = (Future<PlayerHandler>[]) new Future[config.playerCount];
-        for (int playerIndex = 0; playerIndex < config.playerCount; playerIndex++) {
-            playerHandlerFutures[playerIndex] = config.playerFactories[playerIndex].createPlayerHandler(
+        Future<PlayerHandler>[] playerHandlerFutures = (Future<PlayerHandler>[]) new Future[playerCount];
+        for (int playerIndex = 0; playerIndex < playerCount; playerIndex++) {
+            playerHandlerFutures[playerIndex] = playerFactories[playerIndex].createPlayerHandler(
                     playerIndex,
                     simulation.getController(playerIndex),
                     config.inputProcessor
             );
         }
         @SuppressWarnings("unchecked")
-        Future<Long>[] longFutures = (Future<Long>[]) new Future[config.playerCount];
+        Future<Long>[] longFutures = (Future<Long>[]) new Future[playerCount];
         int gameNumber = Game.gameNumber.get();
-        for (int playerIndex = 0; playerIndex < config.playerCount; playerIndex++) {
+        for (int playerIndex = 0; playerIndex < playerCount; playerIndex++) {
             PlayerHandler playerHandler;
             try {
                 playerHandler = playerHandlerFutures[playerIndex].get();
@@ -84,9 +91,9 @@ public class Game extends Executable {
             }
         }
 
-        Future<?>[] futures = new Future[config.playerCount];
+        Future<?>[] futures = new Future[playerCount];
         PlayerState[] playerStates = state.getPlayerStates();
-        for (int playerIndex = 0; playerIndex < config.playerCount; playerIndex++) {
+        for (int playerIndex = 0; playerIndex < playerCount; playerIndex++) {
             // Wenn der PlayerState des Spielers deaktiviert ist, da er bspw. disqualifiziert wurde, wird der Spieler
             // übersprungen und dessen executeTurn() nicht aufgerufen.
             if (playerStates[playerIndex].isDeactivated()) {
@@ -153,6 +160,7 @@ public class Game extends Executable {
 
             PlayerState[] playerStates = state.getPlayerStates();
             Future<?>[] futures = new Future[playerHandlers.length];
+            Object commandHandlerLock = new Object();
             for (int playerIndex = 0; playerIndex < playerHandlers.length; playerIndex++) {
                 // Wenn der PlayerState des Spielers deaktiviert ist, da er bspw. keine Leben mehr hat oder
                 // disqualifiziert wurde, wird der Spieler übersprungen und dessen executeTurn() nicht aufgerufen.
@@ -171,19 +179,21 @@ public class Game extends Executable {
                 futures[playerIndex] = playerHandler.executeTurn(
                         state,
                         (List<Command> commands) -> {
-                            for (Command command : commands) {
-                                // Contains action produced by the commands execution
-                                ActionLog log = command.run(playerHandler);
-                                if (log == null) {
-                                    continue;
-                                }
-                                if (saveReplay) {
-                                    gameResults.addActionLog(log);
-                                }
-                                if (gui) {
-                                    animationLogProcessor.animate(log);
-                                    // ToDo: discuss synchronisation for human players
-                                    // animationLogProcessor.awaitNotification();
+                            synchronized (commandHandlerLock) {
+                                for (Command command : commands) {
+                                    // Contains action produced by the commands execution
+                                    ActionLog log = command.run(playerHandler);
+                                    if (log == null) {
+                                        continue;
+                                    }
+                                    if (saveReplay) {
+                                        gameResults.addActionLog(log);
+                                    }
+                                    if (gui) {
+                                        animationLogProcessor.animate(log);
+                                        // ToDo: discuss synchronisation for human players
+                                        // animationLogProcessor.awaitNotification();
+                                    }
                                 }
                             }
                         }

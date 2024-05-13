@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.manager.map.MapRetriever;
+import com.gatdsen.simulation.gamemode.PlayableGameMode;
 
 import java.util.Arrays;
 
@@ -46,7 +47,7 @@ public class MapAttribute extends Attribute {
     @Override
     public RunConfig getConfig(RunConfig runConfig) {
         //runConfig.mapName = mapSelectBox.getSelected();
-        runConfig.gameMode.setMap(mapSelectBox.getSelected()); // TODO: Just a quickfix, needs to be changed because of public setter in sim gez. Dani
+        ((PlayableGameMode) runConfig.gameMode).setMap(mapSelectBox.getSelected()); // TODO: Just a quickfix, needs to be changed because of public setter in sim gez. Dani
         return runConfig;
     }
 
@@ -57,6 +58,11 @@ public class MapAttribute extends Attribute {
      */
     @Override
     public void setConfig(RunConfig runConfig) {
-        mapSelectBox.setSelected(runConfig.gameMode.getMap());
+        String mapName = null;
+        PlayableGameMode gameMode = (PlayableGameMode) runConfig.gameMode;
+        if (!gameMode.getMaps().isEmpty()) {
+            mapName = gameMode.getMaps().get(0);
+        }
+        mapSelectBox.setSelected(mapName);
     }
 }

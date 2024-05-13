@@ -6,8 +6,8 @@ public class CampaignMode3_1 extends CampaignMode {
 
     public CampaignMode3_1() {
         super();
-        enemyBotHealth = 100;
-        map = "Campaign3_1";
+        setPlayerHealth(1, 100);
+        setMap("Campaign3_1");
     }
 
     @Override
@@ -16,11 +16,12 @@ public class CampaignMode3_1 extends CampaignMode {
     }
 
     @Override
-    public String[] getIdentifiers() {
-        return new String[]{
-                "Campaign3_1", "Campaign 3.1", "Campaign 3",
-                "c3_1", "c3.1", "c3",
-                "3_1"
-        };
+    protected int getCampaignWeek() {
+        return 3;
+    }
+
+    @Override
+    protected int getCampaignTask() {
+        return 1;
     }
 }

@@ -16,6 +16,11 @@ public final class ReplayMode extends GameMode {
     }
 
     @Override
+    public String getDisplayName() {
+        return "Replay";
+    }
+
+    @Override
     public Type getType() {
         return Type.REPLAY;
     }
@@ -36,5 +41,14 @@ public final class ReplayMode extends GameMode {
         } else if (params.hasOption("m")) {
             setReplayName(params.getOptionValue("m"));
         }
+    }
+
+    @Override
+    public boolean validate(StringBuilder errorMessages) {
+        if (replayName == null) {
+            errorMessages.append("A replay file name has to be provided for the replay mode.\n");
+            return false;
+        }
+        return true;
     }
 }
