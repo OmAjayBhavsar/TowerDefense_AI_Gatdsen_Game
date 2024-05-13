@@ -7,6 +7,7 @@ import com.gatdsen.manager.replay.ReplayException;
 import com.gatdsen.manager.replay.ReplayRetriever;
 import com.gatdsen.simulation.GameState;
 import com.gatdsen.simulation.action.ActionLog;
+import com.gatdsen.simulation.gamemode.ReplayMode;
 
 import java.io.*;
 import java.util.Arrays;
@@ -31,7 +32,9 @@ public class ReplayGame extends Executable {
                 return;
             }
             setStatus(Status.ACTIVE);
-            replay = ReplayRetriever.getInstance().loadReplay(config.gameMode.getMap());
+            replay = ReplayRetriever.getInstance().loadReplay(
+                    ((ReplayMode) config.gameMode).getReplayName()
+            );
             //Init the Log Processor
             if (config.gui) {
                 animationLogProcessor.init(

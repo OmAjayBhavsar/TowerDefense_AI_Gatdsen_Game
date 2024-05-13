@@ -1,6 +1,7 @@
 package com.gatdsen.simulation;
 
 import com.gatdsen.simulation.action.*;
+import com.gatdsen.simulation.gamemode.PlayableGameMode;
 
 /**
  * Enthält die Logik, welche die Spielmechaniken bestimmt.
@@ -15,10 +16,11 @@ public class Simulation {
      * erstellt eine neue Simulation
      *
      * @param gameMode    Modus in dem gespielt wird
+     * @param mapName     Name der Map
      * @param playerCount Anzahl Spieler
      */
-    public Simulation(GameMode gameMode, int playerCount) {
-        gameState = new GameState(gameMode, playerCount, this);
+    public Simulation(PlayableGameMode gameMode, String mapName, int playerCount) {
+        gameState = new GameState(gameMode, mapName, playerCount, this);
         playerStates = gameState.getPlayerStates();
         actionLog = new ActionLog(new InitAction());
     }
@@ -78,8 +80,9 @@ public class Simulation {
             head = playerState.spawnEnemies(head, gameState.getTurn());
         }
 
+        PlayableGameMode gameMode = gameState.getGameMode();
         for (PlayerState playerState : playerStates) {
-            head = playerState.updateSpawnCoins(1, head);
+            head = playerState.updateSpawnCoins(gameMode.calculateSpawnCoinsForRound(playerState), head);
         }
 
         int winner = -1;

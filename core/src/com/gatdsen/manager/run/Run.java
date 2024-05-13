@@ -3,14 +3,13 @@ package com.gatdsen.manager.run;
 import com.gatdsen.manager.CompletionHandler;
 import com.gatdsen.manager.game.Executable;
 import com.gatdsen.manager.Manager;
-import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.simulation.GameMode;
+import com.gatdsen.simulation.gamemode.PlayableGameMode;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Run {
-
 
     private boolean completed = false;
 
@@ -23,39 +22,28 @@ public abstract class Run {
     private final List<Executable> games = new ArrayList<>();
 
     private boolean disposed = false;
-    private final List<PlayerHandlerFactory> playerFactories;
 
     protected final RunResults results;
 
     public Run(Manager manager, RunConfig runConfig) {
-        this.playerFactories = new ArrayList<>(runConfig.playerFactories);
         gameMode = runConfig.gameMode;
         this.manager = manager;
         results = new RunResults(runConfig);
     }
 
     public static Run getRun(Manager manager, RunConfig runConfig) {
-        String gameModeName = runConfig.gameMode.getClass().getSimpleName();
-        // if the gameModeName contains a number in format x_y remove the x_y
-        if (gameModeName.contains("_")) {
-            gameModeName = gameModeName.substring(0, gameModeName.indexOf("_"));
+        GameMode gameMode = runConfig.gameMode;
+        if (gameMode.getType() == GameMode.Type.TOURNAMENT_PHASE_2) {
+            return new TournamentRun(manager, runConfig);
         }
-
-        switch (gameModeName) {
-            case "CampaignMode":
-            case "ReplayMode":
-            case "NormalMode":
-            case "ChristmasMode":
-                return new SingleGameRun(manager, runConfig);
-            case "ExamAdmissionMode":
-            case "TournamentMode":
-                return new ParallelMultiGameRun(manager, runConfig);
-            case "TournamentModePhase2":
-                return new TournamentRun(manager, runConfig);
-            default:
-                throw new IllegalArgumentException(
-                        runConfig.gameMode.getClass().getName() + " is not processed by the Run interface"
-                );
+        if (gameMode.getType() == GameMode.Type.REPLAY) {
+            return new SingleGameRun(manager, runConfig);
+        }
+        List<String> maps = ((PlayableGameMode) gameMode).getMaps();
+        if (maps.size() > 1) {
+            return new ParallelMultiGameRun(manager, runConfig);
+        } else {
+            return new SingleGameRun(manager, runConfig);
         }
     }
 
@@ -81,20 +69,8 @@ public abstract class Run {
         }
     }
 
-    public String getGameModeName() {
-        String gameModeName = gameMode.getClass().getSimpleName();
-        if (gameModeName.contains("_")) {
-            gameModeName = gameModeName.substring(0, gameModeName.indexOf("_"));
-        }
-        return gameModeName;
-    }
-
     public boolean isCompleted() {
         return completed;
-    }
-
-    public List<PlayerHandlerFactory> getPlayerFactories() {
-        return playerFactories;
     }
 
     protected void complete() {
@@ -124,7 +100,6 @@ public abstract class Run {
                 ", completionListeners=" + completionListeners +
                 ", gameMode=" + gameMode +
                 ", games=" + games +
-                ", players=" + playerFactories +
                 ", results=" + results +
                 '}';
     }

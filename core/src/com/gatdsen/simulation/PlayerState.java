@@ -5,6 +5,7 @@ import com.gatdsen.simulation.enemy.ArmorEnemy;
 import com.gatdsen.simulation.enemy.BasicEnemy;
 import com.gatdsen.simulation.enemy.EmpEnemy;
 import com.gatdsen.simulation.enemy.ShieldEnemy;
+import com.gatdsen.simulation.gamemode.PlayableGameMode;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.Stack;
  */
 public class PlayerState implements Serializable {
     private final Tile[][] board;
-    private GameMode gameMode;
+    private PlayableGameMode gameMode;
     private int health;
     private int money;
     private int spawnCoins;
@@ -41,7 +42,7 @@ public class PlayerState implements Serializable {
      * @param health    die Lebenspunkte des Spielers
      * @param money     das Geld des Spielers
      */
-    PlayerState(GameState gameState, int index, int health, int money) {
+    PlayerState(GameState gameState, int index, int health, int money, int spawnCoins) {
         gameMode = gameState.getGameMode();
         this.index = index;
         int width = gameState.getBoardSizeX();
@@ -49,6 +50,7 @@ public class PlayerState implements Serializable {
         board = new Tile[width][height];
         this.health = health;
         this.money = money;
+        this.spawnCoins = spawnCoins;
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -249,11 +251,10 @@ public class PlayerState implements Serializable {
      * @return neuer Kopf der Action-Liste
      */
     Action placeTower(int x, int y, Tower.TowerType type, Action head) {
-
         if (!gameMode.getTowers().contains(type)) {
-            System.out.println("Für diesen Spielmodus darfst du nur folgenden Türme benutzen:");
-            System.out.println(gameMode.getTowers());
-            // ToDo: append error action
+            head.addChild(new ErrorAction(
+                    "Für diesen Spielmodus darfst du nur folgenden Türme benutzen: " + gameMode.getTowers()
+            ));
             return head;
         }
 
@@ -364,6 +365,12 @@ public class PlayerState implements Serializable {
      * @return neuer Kopf der Action-Liste
      */
     Action sendEnemy(Enemy.EnemyType type, GameState gameState, Action head) {
+        if (!gameMode.getEnemies().contains(type)) {
+            head.addChild(new ErrorAction(
+                    "Für diesen Spielmodus darfst du nur folgende Gegner verwenden: " + gameMode.getEnemies()
+            ));
+            return head;
+        }
         enemyLevel = enemyLevel == 0 ? 1 : enemyLevel;
         if (spawnCoins >= Enemy.getEnemyTypePrice(type, enemyLevel)) {
             PlayerState playerState = gameState.getPlayerStates()[(index + 1) % 2];
@@ -380,23 +387,17 @@ public class PlayerState implements Serializable {
      * @param type Typ des Gegners
      */
     void spawnEnemy(Enemy.EnemyType type) {
-
-        if (!gameMode.getEnemies().contains(type)){
-            System.out.println("Für diesen Spielmodus darfst du nur folgende Gegner verwenden:");
-            System.out.println(gameMode.getEnemies());
-        }else{
-            enemySpawn = true;
-            spawnDelay++;
-            switch (type) {
-                case EMP_ENEMY:
-                    spawnEnemies.push(new EmpEnemy(this, enemyLevel, spawnTile));
-                    break;
-                case SHIELD_ENEMY:
-                    spawnEnemies.push(new ShieldEnemy(this, enemyLevel, spawnTile));
-                    break;
-                case ARMOR_ENEMY:
-                    spawnEnemies.push(new ArmorEnemy(this, enemyLevel, spawnTile));
-            }
+        enemySpawn = true;
+        spawnDelay++;
+        switch (type) {
+            case EMP_ENEMY:
+                spawnEnemies.push(new EmpEnemy(this, enemyLevel, spawnTile));
+                break;
+            case SHIELD_ENEMY:
+                spawnEnemies.push(new ShieldEnemy(this, enemyLevel, spawnTile));
+                break;
+            case ARMOR_ENEMY:
+                spawnEnemies.push(new ArmorEnemy(this, enemyLevel, spawnTile));
         }
     }
 
@@ -484,6 +485,9 @@ public class PlayerState implements Serializable {
      * @return neuer Kopf der Action-Liste
      */
     Action updateMoney(int money, Action head) {
+        if (money == 0) {
+            return head;
+        }
         this.money += money;
         Action updateMoneyAction = new UpdateCurrencyAction(0, this.money, this.spawnCoins, index);
         head.addChild(updateMoneyAction);
@@ -492,6 +496,9 @@ public class PlayerState implements Serializable {
     }
 
     Action updateSpawnCoins(int spawnCoins, Action head) {
+        if (spawnCoins == 0) {
+            return head;
+        }
         this.spawnCoins += spawnCoins;
         Action updateSpawnCoinsAction = new UpdateCurrencyAction(0, money, this.spawnCoins, index);
         head.addChild(updateSpawnCoinsAction);

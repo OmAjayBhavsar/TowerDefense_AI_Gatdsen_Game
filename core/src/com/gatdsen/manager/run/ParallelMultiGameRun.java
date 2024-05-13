@@ -9,6 +9,7 @@ import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.simulation.GameState;
+import com.gatdsen.simulation.gamemode.PlayableGameMode;
 
 import java.util.*;
 
@@ -23,63 +24,47 @@ public class ParallelMultiGameRun extends Run {
 
     protected ParallelMultiGameRun(Manager manager, RunConfig runConfig) {
         super(manager, runConfig);
-        String gameModeName = runConfig.gameMode.getClass().getSimpleName();
-        if (gameModeName.equals("ExamAdmissionMode")) {
-
-            //ToDo this is the config for the exam admission
-
-            if (runConfig.playerFactories.size() != 1) {
-                System.err.println("Exam Admission only accepts exactly 1 player");
-                complete();
-                return;
-            }
-
-            runConfig.playerFactories.add(LocalPlayerHandlerFactory.IDLE_BOT);
-            getPlayerFactories().clear();
-            getPlayerFactories().addAll(runConfig.playerFactories);
-            runConfig.gameMode.setMap("MangoMap");
-        }
-        ArrayList<Integer> indices = new ArrayList<>();
-        int playerCount = runConfig.playerFactories.size();
-        for (int i = 0; i < playerCount; i++) {
+        //ArrayList<Integer> indices = new ArrayList<>();
+        PlayableGameMode gameMode = (PlayableGameMode) runConfig.gameMode;
+        PlayerHandlerFactory[] playerFactories = gameMode.getPlayerFactories();
+        int playerCount = playerFactories.length;
+        /*for (int i = 0; i < playerCount; i++) {
             indices.add(i);
-        }
+        }*/
         results.setPlayerInformation(new PlayerInformation[playerCount]);
         results.setScores(new float[playerCount]);
-        List<List<Integer>> listOfMatchUps = subsetK(indices, playerCount);
-        List<List<Integer>> permListOfMatchUps = new ArrayList<>();
-        for (List<Integer> matchUp : listOfMatchUps) {
+        //List<List<Integer>> listOfMatchUps = subsetK(indices, playerCount);
+        List<List<Integer>> permListOfMatchUps = List.of(List.of(0, 1));
+        /*for (List<Integer> matchUp : listOfMatchUps) {
             permListOfMatchUps.addAll(permutations(matchUp));
-        }
+        }*/
 
         List<Game> games = new ArrayList<>();
         Game lastGame = null;
         Game firstGame = null;
-        for (List<Integer> matchUp : permListOfMatchUps
-        ) {
-            RunConfig curConfig = runConfig.copy();
-            List<PlayerHandlerFactory> playerFactories = new ArrayList<>();
+        for (List<Integer> matchUp : permListOfMatchUps) {
+            PlayerHandlerFactory[] gamePlayerFactories = new PlayerHandlerFactory[matchUp.size()];
+            int i = 0;
             for (Integer index : matchUp) {
-                playerFactories.add(runConfig.playerFactories.get(index));
+                gamePlayerFactories[i++] = playerFactories[index];
             }
-            curConfig.playerFactories = playerFactories;
-            Game curGame = new Game(curConfig.asGameConfig());
-            curGame.addCompletionListener(this::onGameCompletion);
-            if (runConfig.gui) {
-                if (lastGame != null) {
-                    lastGame.addCompletionListener(g -> {
-                        manager.schedule(curGame);
-                    });
-                } else firstGame = curGame;
-                lastGame = curGame;
-                getGames().add(curGame);
+            for (String mapName : gameMode.getMaps()) {
+                Game curGame = new Game(runConfig.asGameConfig(), gamePlayerFactories, mapName);
+                curGame.addCompletionListener(this::onGameCompletion);
+                if (runConfig.gui) {
+                    if (lastGame != null) {
+                        lastGame.addCompletionListener(g -> {
+                            manager.schedule(curGame);
+                        });
+                    } else firstGame = curGame;
+                    lastGame = curGame;
+                    getGames().add(curGame);
+                }
+                playerIndices.put(curGame, matchUp.toArray(new Integer[0]));
+                gameCount++;
+                games.add(curGame);
             }
-            playerIndices.put(curGame, matchUp.toArray(new Integer[0]));
-            gameCount++;
-            games.add(curGame);
         }
-
-        System.out.println("Running Multigame of size " + games.size());
 
         if (!runConfig.gui) {
             for (Game game : games) {
@@ -88,7 +73,6 @@ public class ParallelMultiGameRun extends Run {
         } else {
             manager.schedule(firstGame);
         }
-
     }
 
     public void onGameCompletion(Executable exec) {
@@ -102,17 +86,13 @@ public class ParallelMultiGameRun extends Run {
                 results.setPlayerInformation(index, playerInformation[i]);
                 results.setScore(index, results.getScore(index) + scores[i]);
             }
-            if ((completed*100)/gameCount < (completed*100 + 100)/gameCount)
-                System.out.printf("MultiGameRun(%d)-Completion: %d %% \n", hashCode(),(completed*100)/gameCount);
+            /*if ((completed*100)/gameCount < (completed*100 + 100)/gameCount) {
+                System.out.printf("MultiGameRun(%d)-Completion: %d %% \n", hashCode(), (completed * 100) / gameCount);
+            }*/
             completed++;
         }
-        System.out.println();
+        //System.out.println();
         if (completed == gameCount) {
-            float[] scores = results.getScores();
-            for (int j = 0; j < scores.length; j++) {
-                scores[j] /= gameCount;
-            }
-            results.setScores(scores);
             complete();
         }
     }
@@ -138,8 +118,7 @@ public class ParallelMultiGameRun extends Run {
             results.add(elemList);
         } else {
             List<List<T>> results2 = subsetK(list, subSetSize - 1);
-            for (List<T> cur :
-                    results2) {
+            for (List<T> cur : results2) {
                 cur.add(head);
                 results.add(cur);
             }

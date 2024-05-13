@@ -14,8 +14,6 @@ public final class GameConfig implements Serializable {
     public final transient AnimationLogProcessor animationLogProcessor;
     public final transient InputProcessor inputProcessor;
     public final boolean replay;
-    public final PlayerHandlerFactory[] playerFactories;
-    public final int playerCount;
 
     public GameConfig(RunConfig runConfig) {
         gameMode = runConfig.gameMode;
@@ -23,21 +21,5 @@ public final class GameConfig implements Serializable {
         animationLogProcessor = runConfig.animationLogProcessor;
         inputProcessor = runConfig.inputProcessor;
         replay = runConfig.replay;
-        playerFactories = runConfig.playerFactories.toArray(new PlayerHandlerFactory[0]);
-        playerCount = playerFactories.length;
-    }
-
-    private GameConfig(GameConfig original) {
-        gameMode = original.gameMode;
-        gui = original.gui;
-        animationLogProcessor = original.animationLogProcessor;
-        inputProcessor = original.inputProcessor;
-        replay = original.replay;
-        playerFactories = original.playerFactories;
-        playerCount = original.playerCount;
-    }
-
-    public GameConfig copy() {
-        return new GameConfig(this);
     }
 }

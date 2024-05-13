@@ -70,7 +70,7 @@ public class Hud implements Disposable {
     public TileMap tileMap;
     private SelectBox<Tower.TowerType> towerSelectBox;
     private SelectBox<String> towerSellUpgrade;
-    private SelectBox fireModeSelectBox;
+    private SelectBox<Tower.TargetOption> fireModeSelectBox;
     private final ArrayList<int[][]> towerMaps = new ArrayList<>();
     private Label player0BalanceLabel;
     private Label player1BalanceLabel;
@@ -638,8 +638,7 @@ public class Hud implements Disposable {
                     Skin skin = AssetContainer.MainMenuAssets.skin;
                     closeSelectBox();
                     fireModeSelectBox = new SelectBox<>(skin);
-                    Tower.TargetOption[] targetOption = Tower.TargetOption.values();
-                    fireModeSelectBox.setItems(targetOption);
+                    fireModeSelectBox.setItems(Tower.TargetOption.values());
                     fireModeSelectBox.setSize(comboBoxSize.x, comboBoxSize.y);
                     fireModeSelectBox.setPosition(coords.x, coords.y);
                     popupGroup.addActor(fireModeSelectBox);
