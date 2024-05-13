@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.RunConfig;
+import com.gatdsen.simulation.GameMode;
+import com.gatdsen.simulation.gamemode.PlayableGameMode;
 
 import java.util.ArrayList;
 
@@ -57,13 +59,12 @@ public class PlayerAttribute extends Attribute {
      */
     @Override
     public RunConfig getConfig(RunConfig runConfig) {
-        if (runConfig.playerFactories == null) {
-            runConfig.playerFactories = new ArrayList<>();
-        }
-        while (runConfig.playerFactories.size() <= playerIndex) {
-            runConfig.playerFactories.add(null);
-        }
-        runConfig.playerFactories.set(playerIndex, playerSelectBox.getSelected());
+        /**
+         * Der Cast sollte keine Exception werfen, da das {@link PlayerAttribute} nur in Screens angezeigt werden sollte,
+         * in denen man auch Spiele konfigurieren kann, die man auch spielen kann, also Instanzen von
+         * {@link PlayableGameMode} sind.
+         */
+        ((PlayableGameMode) runConfig.gameMode).setPlayerFactory(playerIndex, playerSelectBox.getSelected());
         return runConfig;
     }
 
@@ -74,10 +75,16 @@ public class PlayerAttribute extends Attribute {
      */
     @Override
     public void setConfig(RunConfig runConfig) {
-        if (runConfig.playerFactories == null || runConfig.playerFactories.size() <= playerIndex) {
+        /**
+         * Der Cast sollte keine Exception werfen, da das {@link PlayerAttribute} nur in Screens angezeigt werden sollte,
+         * in denen man auch Spiele konfigurieren kann, die man auch spielen kann, also Instanzen von
+         * {@link PlayableGameMode} sind.
+         */
+        PlayerHandlerFactory[] players = ((PlayableGameMode) runConfig.gameMode).getPlayerFactories();
+        if (players.length <= playerIndex) {
             playerSelectBox.setSelected(null);
             return;
         }
-        playerSelectBox.setSelected(runConfig.playerFactories.get(playerIndex));
+        playerSelectBox.setSelected(players[playerIndex]);
     }
 }

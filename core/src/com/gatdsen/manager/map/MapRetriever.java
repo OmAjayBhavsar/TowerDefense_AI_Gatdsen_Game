@@ -50,11 +50,10 @@ public final class MapRetriever {
         }
     }
 
-    public Map getMapFromGamemode(GameMode gameMode) {
-        String mapName = gameMode.getMap();
+    public Map getMapFromGameModeType(String mapName, GameMode.Type gameModeType) {
         for (Map map : maps) {
             if (map.getName().equals(mapName)) {
-                if (!map.isHidden() || gameMode.isCampaignMode() || gameMode.isExamAdmissionMode()) {
+                if (!map.isHidden() || gameModeType == GameMode.Type.CAMPAIGN || gameModeType == GameMode.Type.EXAM_ADMISSION) {
                     return map;
                 }
             }

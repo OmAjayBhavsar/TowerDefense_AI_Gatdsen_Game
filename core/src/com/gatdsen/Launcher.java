@@ -3,17 +3,16 @@ package com.gatdsen;
 import com.gatdsen.manager.player.data.BotInformation;
 import com.gatdsen.manager.player.data.PlayerInformation;
 import com.gatdsen.manager.run.Run;
-import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.manager.player.handler.ProcessPlayerHandler;
 import com.gatdsen.manager.run.RunResults;
 import com.gatdsen.simulation.GameMode;
+import com.gatdsen.simulation.gamemode.GameModeFactory;
 import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 public abstract class Launcher {
 
@@ -28,7 +27,7 @@ public abstract class Launcher {
                 .builder("m")
                 .longOpt("map")
                 .hasArg()
-                .desc("(Required for -n) String name of the map without extension").build());
+                .desc("String name of the map without extension").build());
         cliOptions.addOption(Option
                 .builder("p")
                 .longOpt("players")
@@ -38,12 +37,15 @@ public abstract class Launcher {
                 .builder("g")
                 .longOpt("gamemode")
                 .hasArg()
-                .type(Number.class)
-                .desc("GameMode to be played (Default: 0)\n" +
-                        "  0 - Normal\n" +
-                        "  1 - Exam Admission\n" +
-                        "  2 - Tournament: Phase 1\n" +
-                        "  xy - Campaign week x task y\n").build());
+                .desc(
+                        "GameModes to be played\n" +
+                                String.join(
+                                        ", ",
+                                        Arrays.stream(GameModeFactory.getInstance().getAvailableGameModes())
+                                                .map(gameMode -> gameMode.getDisplayName() + " (" + gameMode.getIdentifiers()[0] + ")")
+                                                .toArray(String[]::new)
+                                )
+                ).build());
         cliOptions.addOption(Option.builder("n")
                 .longOpt("nogui")
                 .desc("Runs the simulation without animation").build());
@@ -54,8 +56,12 @@ public abstract class Launcher {
                 .desc("When printing results, they will be encased by the given key, ensuring authenticity").build());
         cliOptions.addOption(Option
                 .builder("r")
-                .longOpt("replay")
-                .desc("Saves replay and results of the matches (WIP)").build());
+                .longOpt("record")
+                .desc("Saves replay and results of the matches").build());
+        cliOptions.addOption(Option
+                .builder("replay")
+                .hasArg()
+                .desc("Name of the replay to show").build());
     }
 
     protected static CommandLine getParamsFromArgs(String[] args) {
@@ -74,23 +80,22 @@ public abstract class Launcher {
     protected static RunConfig parseRunConfig(CommandLine params) {
         RunConfig runConfig = new RunConfig();
         runConfig.gui = !params.hasOption("n");
-        if (params.hasOption("p")) {
-            runConfig.playerFactories = new ArrayList<>(List.of(PlayerHandlerFactory.getPlayerFactories(params.getOptionValue("p").trim().split("\\s+"))));
-        }
         if (params.hasOption("r")) {
             runConfig.replay = true;
         }
-        int gameModeID = Integer.parseInt(params.getOptionValue("g", "0"));
-        GameMode gameMode = GameMode.getGameMode(gameModeID);
-        if (gameMode == null) {
-            System.err.println("Invalid game mode: " + gameModeID);
+        String gameModeIdentifier;
+        if (params.hasOption("replay")) {
+            gameModeIdentifier = "replay";
+        } else {
+            gameModeIdentifier = params.getOptionValue("g", "admission");
+        }
+        runConfig.gameMode = GameModeFactory.getInstance().getGameMode(gameModeIdentifier);
+        if (runConfig.gameMode == null) {
+            System.err.println("\"" + gameModeIdentifier + "\" is not a valid game mode.");
             printHelp();
             return null;
         }
-        runConfig.gameMode = gameMode;
-        if (params.hasOption("m")) {
-            runConfig.gameMode.setMap(params.getOptionValue("m", null));
-        }
+        runConfig.gameMode.parseFromCommandArguments(params);
         return runConfig;
     }
 
@@ -116,30 +121,30 @@ public abstract class Launcher {
         if (key != null && !key.isEmpty()) {
             builder.append("<").append(key).append(">");
         }
-        switch (run.getGameModeName()) {
-            case "CampaignMode":
+        switch (run.getResults().getConfig().gameMode.getType()) {
+            case CAMPAIGN:
                 if (scores[0] > 0) {
                     builder.append("passed");
                 } else {
                     builder.append("failed");
                 }
                 break;
-            case "ExamAdmissionMode":
+            case EXAM_ADMISSION:
                 StringBuilder scoreBuilder = new StringBuilder();
                 appendResults(scoreBuilder, playerInformation, scores);
                 System.out.println(scoreBuilder);
-                if (scores[0] >= 420) {
+                if (scores[0] >= 4) {
                     builder.append("passed");
                 } else {
                     builder.append("failed");
                 }
                 break;
-            case "ReplayMode":
+            case REPLAY:
                 if (!results.getConfig().gui) {
                     builder.append("\nStarted a replay without GUI, so only the results will be printed: \n");
                 }
-            case "NormalMode":
-            case "TournamentMode":
+            case NORMAL:
+            case TOURNAMENT_PHASE_1:
             default:
                 appendResults(builder, playerInformation, scores);
                 builder.append("\n");
@@ -160,7 +165,7 @@ public abstract class Launcher {
             } else {
                 builder.append(String.format("%-10s", playerInformation[i].getName()));
             }
-            builder.append(String.format(" :  %-6f%n", scores[i]));
+            builder.append(String.format(" :  %d wins %n", (int) scores[i]));
         }
     }
 }

@@ -88,7 +88,7 @@ public class TournamentRun extends Run {
         }
 
         private void startGames() {
-            config.playerFactories = new ArrayList<>();
+            /*config.playerFactories = new ArrayList<>();
             config.playerFactories.add(playerFactories.get(p1));
             config.playerFactories.add(playerFactories.get(p2));
             config.gameMode.setMap("lukeMap"); //ToDo make dynamic
@@ -102,7 +102,7 @@ public class TournamentRun extends Run {
             game3.addCompletionListener(this::onGameComplete);
             manager.schedule(game1);
             manager.schedule(game2);
-            manager.schedule(game3);
+            manager.schedule(game3);*/
         }
 
         void onGameComplete(Executable exec) {

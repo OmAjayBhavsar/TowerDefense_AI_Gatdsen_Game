@@ -1,22 +1,30 @@
 package com.gatdsen.simulation.gamemode;
 
-import com.gatdsen.manager.player.handler.PlayerClassReference;
-import com.gatdsen.simulation.GameMode;
+import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
 
-public class ExamAdmissionMode extends GameMode {
+public class ExamAdmissionMode extends PlayableGameMode {
+
     public ExamAdmissionMode() {
         super();
-        map = "ExamAdmission";
-        enemyBot = PlayerClassReference.EXAM_ADMISSION_BOT;
+        setMap("ExamAdmission", "ExamAdmission2", "ExamAdmission3", "ExamAdmission4");
+        setPlayerFactory(1, LocalPlayerHandlerFactory.EXAM_ADMISSION_BOT);
     }
 
     @Override
-    public void setMap(String map) {
-        throw new UnsupportedOperationException("The map of the exam admission mode can not be changed!");
+    public String getDisplayName() {
+        return "Exam Admission";
     }
 
     @Override
-    public boolean isExamAdmissionMode() {
-        return true;
+    public Type getType() {
+        return Type.EXAM_ADMISSION;
+    }
+
+    @Override
+    public String[] getIdentifiers() {
+        return new String[]{
+                String.valueOf(getType().ordinal()),
+                "exam", "exam_admission", "admission"
+        };
     }
 }

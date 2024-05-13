@@ -1,9 +1,27 @@
 package com.gatdsen.simulation.gamemode.campaign;
 
+import java.time.LocalDateTime;
+
 public class CampaignMode6_1 extends CampaignMode {
+
     public CampaignMode6_1() {
         super();
-        enemyBotHealth = 100;
-        map = "Campaign6_1";
+        setPlayerHealth(1, 100);
+        setMap("Campaign6_1");
+    }
+
+    @Override
+    protected LocalDateTime getSubmissionOpenTimestamp() {
+        return LocalDateTime.of(2024, 6, 17, 8, 0);
+    }
+
+    @Override
+    protected int getCampaignWeek() {
+        return 6;
+    }
+
+    @Override
+    protected int getCampaignTask() {
+        return 1;
     }
 }

@@ -1,6 +1,7 @@
 package com.gatdsen.simulation;
 
 import com.gatdsen.manager.map.MapRetriever;
+import com.gatdsen.simulation.gamemode.PlayableGameMode;
 
 import java.io.Serializable;
 import java.util.*;
@@ -24,7 +25,7 @@ public class GameState implements Serializable {
 
     private final PlayerState[] playerStates;
     private final MapTileType[][] map;
-    private final GameMode gameMode;
+    private final PlayableGameMode gameMode;
     private final int playerCount;
     private final transient Simulation sim;
     private int turn;
@@ -34,17 +35,28 @@ public class GameState implements Serializable {
      * Erstellt ein neues GameState-Objekt mit den angegebenen Attributen.
      *
      * @param gameMode    Spielmodus
+     * @param mapName     Name der Map
      * @param playerCount Anzahl der Spieler
      * @param sim         Simulation Instanz
      */
-    GameState(GameMode gameMode, int playerCount, Simulation sim) {
+    GameState(PlayableGameMode gameMode, String mapName, int playerCount, Simulation sim) {
         this.gameMode = gameMode;
-        this.map = MapRetriever.getInstance().getMapFromGamemode(gameMode).getTileTypes();
+        this.map = MapRetriever.getInstance().getMapFromGameModeType(mapName, gameMode.getType()).getTileTypes();
         this.playerCount = playerCount;
         this.active = true;
         this.sim = sim;
         playerStates = new PlayerState[playerCount];
-        Arrays.setAll(playerStates, index -> new PlayerState(this, index, 300, 100));
+        Arrays.setAll(
+                playerStates,
+                index -> new PlayerState(
+                        this,
+                        index,
+                        gameMode.getPlayerHealth(index),
+                        gameMode.getPlayerMoney(index),
+                        gameMode.getPlayerSpawnCoins(index)
+                )
+        );
+        this.turn = gameMode.getStartTurn();
         /*
         if (gameMode == GameMode.Christmas_Task) {
             playerStates[1] = new PlayerState(this, 1, 500, 0);
@@ -84,7 +96,7 @@ public class GameState implements Serializable {
      *
      * @return Spiel-Modus als int
      */
-    public GameMode getGameMode() {
+    public PlayableGameMode getGameMode() {
         return gameMode;
     }
 

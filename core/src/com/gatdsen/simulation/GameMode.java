@@ -1,179 +1,50 @@
 package com.gatdsen.simulation;
 
-import com.gatdsen.manager.player.handler.PlayerClassReference;
-import com.gatdsen.simulation.gamemode.ExamAdmissionMode;
-import com.gatdsen.simulation.gamemode.NormalMode;
-import com.gatdsen.simulation.gamemode.TournamentMode;
-import com.gatdsen.simulation.gamemode.campaign.*;
-import com.gatdsen.simulation.Tower.TowerType;
-import com.gatdsen.simulation.Enemy.EnemyType;
+import org.apache.commons.cli.CommandLine;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Abstrakte Klasse für die verschiedenen Spielmodi, welche die Standardwerte für die Spielmodi enthält.
  */
 public abstract class GameMode implements Serializable {
 
-    // TODO: Refactor..
-    //       Using gameMode.getClass().getSimpleName() to check the type of game mode is like using instanceof but worse
-    @SuppressWarnings("unchecked")
-    private static final Class<? extends GameMode>[][] CampaignModes = new Class[][] {
-            {CampaignMode1_1.class, CampaignMode1_2.class},
-            {CampaignMode2_1.class, CampaignMode2_2.class},
-            {CampaignMode3_1.class, CampaignMode3_2.class},
-            {CampaignMode4_1.class, CampaignMode4_2.class},
-            {CampaignMode5_1.class, CampaignMode5_2.class},
-            {CampaignMode6_1.class, CampaignMode6_2.class}
-    };
-
-    @SuppressWarnings("unchecked")
-    private static final Class<? extends GameMode>[] GameModes = new Class[] {
-            NormalMode.class, ExamAdmissionMode.class, TournamentMode.class
-    };
-
-    protected int playerHealth;
-    protected int enemyBotHealth;
-    protected int playerMoney;
-    protected int enemyBotMoney;
-    protected PlayerClassReference enemyBot;
-    protected String map;
-    protected int wave;
-    protected List<TowerType> towers;
-    protected List<EnemyType> enemies;
-
-    /**
-     * Erstellt ein neues GameMode-Objekt mit den Standardwerten
-     */
-    protected GameMode() {
-        playerHealth = 300;
-        enemyBotHealth = 300;
-        playerMoney = 100;
-        enemyBotMoney = 100;
-        enemyBot = PlayerClassReference.IDLE_BOT;
-        map = "map1";
-        wave = 1;
-        towers = new ArrayList<>();
-        towers.add(TowerType.MINIGUN_CAT);
-        towers.add(TowerType.CATANA_CAT);
-        towers.add(TowerType.MAGE_CAT);
-        enemies = new ArrayList<>();
-        enemies.add(EnemyType.EMP_ENEMY);
-        enemies.add(EnemyType.SHIELD_ENEMY);
-        enemies.add(EnemyType.ARMOR_ENEMY);
+    public enum Type {
+        /* Rückwärtskompatibilität:
+         * Diese Reihenfolge stammt von einer früheren Version des Enums und sollte nicht verändert werden, damit die
+         * numerischen IDs der GameModes gleich bleiben und über die Kommandozeile weiterhin funktionieren.
+         */
+        NORMAL,
+        CAMPAIGN,
+        EXAM_ADMISSION,
+        TOURNAMENT_PHASE_1,
+        TOURNAMENT_PHASE_2,
+        REPLAY,
+        CHRISTMAS_TASK,
     }
 
-    // ToDo: Implement validate method
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return getDisplayName();
+    }
+
+    abstract public String getDisplayName();
+
+    abstract public Type getType();
+
+    abstract public String[] getIdentifiers();
+
+    abstract public void parseFromCommandArguments(CommandLine params);
+
     /**
-     * Überprüft, ob die GameMode-Konfiguration gültig ist.
-     *
+     * Überprüft, ob die GameMode-Konfiguration gültig ist. Wenn nicht, werden die Fehlermeldungen an den übergebenen
+     * StringBuilder angehängt und false zurückgegeben.
+     * @param errorMessages Der StringBuilder, an den die Fehlermeldungen angehängt werden sollen
      * @return true, wenn die Konfiguration gültig ist, ansonsten false
      */
-    // public abstract boolean validate();
-
-    /**
-     * Gibt den Spielmodus mit der gegebenen ID zurück.
-     *
-     * @param modeID ID des Spielmodus
-     * @return Spielmodus mit der gegebenen ID
-     */
-    public static GameMode getGameMode(int modeID) {
-        if (modeID >= 0 && modeID < GameModes.length) {
-            try {
-                return GameModes[modeID].getDeclaredConstructor().newInstance();
-            } catch (NoSuchMethodException | InvocationTargetException |
-                     InstantiationException | IllegalAccessException e) {
-                return null;
-            }
-        } else {
-            try {
-                return CampaignModes[modeID / 10 - 1][modeID % 10 - 1].getDeclaredConstructor().newInstance();
-            } catch (NoSuchMethodException | InvocationTargetException |
-                     InstantiationException | IllegalAccessException e) {
-                return null;
-            }
-        }
-    }
-
-    /**
-     * @return die Startleben des Spielers
-     */
-    public int getPlayerHealth() {
-        return playerHealth;
-    }
-
-    /**
-     * @return die Startleben des Gegnerbots
-     */
-    public int getEnemyBotHealth() {
-        return enemyBotHealth;
-    }
-
-    /**
-     * @return das Startgeld des Spielers
-     */
-    public int getPlayerMoney() {
-        return playerMoney;
-    }
-
-    /**
-     * @return das Startgeld des Gegnerbots
-     */
-    public int getEnemyBotMoney() {
-        return enemyBotMoney;
-    }
-
-    /**
-     * @return die Klassenreferenz des Gegnerbots
-     */
-    public PlayerClassReference getEnemyBot() {
-        return enemyBot;
-    }
-
-    /**
-     * @return der Name der Map
-     */
-    public String getMap() {
-        return map;
-    }
-
-    public void setMap(String map) {
-        this.map = map;
-    }
-
-    /**
-     * @return die Startwelle
-     */
-    public int getWave() {
-        return wave;
-    }
-
-    /**
-     * Eine Liste der Türme welche der Spieler bauen kann.
-     *
-     * @return die Liste der Türme
-     */
-    public List<TowerType> getTowers() {
-        return towers;
-    }
-
-    /**
-     * Eine Liste, welche Listen für die verschiedenen Gegnerwellen enthält.
-     *
-     * @return die Liste der zu spawnenden Gegner
-     */
-    public List<EnemyType> getEnemies() {
-        return enemies;
-    }
-
-    public boolean isCampaignMode() {
-        return false;
-    }
-
-    public boolean isExamAdmissionMode() {
-        return false;
-    }
+    abstract public boolean validate(StringBuilder errorMessages);
 }

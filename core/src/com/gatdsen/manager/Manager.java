@@ -55,7 +55,7 @@ public class Manager {
                     executionManager.wait(5000);
                 }
             } catch (InterruptedException e) {
-                System.out.println("ExecutionManager shutting down");
+                //System.out.println("ExecutionManager shutting down");
                 break;
             }
             int threadLimit = Math.max(Runtime.getRuntime().availableProcessors() - systemReservedProcessorCount, Executable.REQUIRED_THREAD_COUNT);

@@ -132,6 +132,12 @@ public class Animator implements Screen, AnimationLogProcessor {
                         put(TowerAttackAction.class, ActionConverters::convertTowerAttackAction);
                         put(ProjectileAction.class, ActionConverters::convertProjectileAction);
                         put(TowerDestroyAction.class, ActionConverters::convertTowerDestroyAction);
+
+                        // TODO
+                        put(ErrorAction.class, ((simAction, animator) -> {
+                            System.err.println(((ErrorAction) simAction).getErrorMessage());
+                            return new ExpandedAction(new IdleAction(0, 0));
+                        }));
                     }
                 };
 
@@ -492,6 +498,8 @@ public class Animator implements Screen, AnimationLogProcessor {
             root.clear();
             root.add(playerMaps[0]);
             root.add(playerMaps[1]);
+            towers.clear();
+            enemies.clear();
 
             //ToDo: initialize based on gamestate data
         }
