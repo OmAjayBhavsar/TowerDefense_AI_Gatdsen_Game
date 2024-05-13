@@ -23,8 +23,8 @@ public class ExamAdmissionMode extends PlayableGameMode {
     @Override
     public String[] getIdentifiers() {
         return new String[]{
+                "exam_admission", "exam", "admission",
                 String.valueOf(getType().ordinal()),
-                "exam", "exam_admission", "admission"
         };
     }
 }

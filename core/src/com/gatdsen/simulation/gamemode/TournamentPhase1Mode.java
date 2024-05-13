@@ -20,8 +20,8 @@ public class TournamentPhase1Mode extends PlayableGameMode {
     @Override
     public String[] getIdentifiers() {
         return new String[]{
-                String.valueOf(getType().ordinal()),
                 "tournament_phase_1", "tournament_1",
+                String.valueOf(getType().ordinal()),
         };
     }
 }

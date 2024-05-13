@@ -23,8 +23,8 @@ public class NormalMode extends PlayableGameMode {
     @Override
     public String[] getIdentifiers() {
         return new String[]{
+                "normal", "default",
                 String.valueOf(getType().ordinal()),
-                "normal", "default"
         };
     }
 }

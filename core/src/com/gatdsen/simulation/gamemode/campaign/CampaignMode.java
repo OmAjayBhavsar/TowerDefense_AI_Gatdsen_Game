@@ -36,28 +36,29 @@ public abstract class CampaignMode extends PlayableGameMode {
     }
 
     private static final String[] WEEK_TASK_IDENTIFIERS = new String[]{
-        "Campaign_%d_%d", "Campaign %d.%d", "c_%d_%d", "c %d.%d", "%d_%d", "%d.%d"
+        "Kampagne %d.%d", "Kampagne %d %d", "Campaign_%d_%d", "Campaign %d.%d", "c_%d_%d", "c %d.%d", "%d_%d", "%d.%d"
     };
     private static final String[] WEEK_IDENTIFIERS = new String[]{
-        "Campaign %d", "c %d"
+        "Kampagne %d", "Campaign %d", "c %d"
     };
 
     public final String[] getIdentifiers() {
         List<String> identifiers = new ArrayList<>();
         int campaignWeek = getCampaignWeek();
         int campaignTask = getCampaignTask();
+        for (String identifier : WEEK_TASK_IDENTIFIERS) {
+            identifiers.add(String.format(identifier, campaignWeek, campaignTask));
+        }
         if (campaignTask == 1) {
             if (campaignWeek == 1) {
                 identifiers.add(String.valueOf(getType().ordinal()));
+                identifiers.add("Kampagne");
                 identifiers.add("Campaign");
                 identifiers.add("c");
             }
             for (String identifier : WEEK_IDENTIFIERS) {
                 identifiers.add(String.format(identifier, campaignWeek));
             }
-        }
-        for (String identifier : WEEK_TASK_IDENTIFIERS) {
-            identifiers.add(String.format(identifier, campaignWeek, campaignTask));
         }
         return identifiers.toArray(new String[0]);
     }

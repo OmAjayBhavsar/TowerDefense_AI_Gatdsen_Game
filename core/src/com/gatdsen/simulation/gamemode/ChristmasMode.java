@@ -24,8 +24,7 @@ public class ChristmasMode extends PlayableGameMode {
     @Override
     public String[] getIdentifiers() {
         return new String[]{
-                String.valueOf(getType().ordinal()),
-                "christmas", "christmas_task", "christmas_mode"
+                "Weihnachtsaufgabe", "christmas_task", "christmas", "christmas_mode", String.valueOf(getType().ordinal())
         };
     }
 }

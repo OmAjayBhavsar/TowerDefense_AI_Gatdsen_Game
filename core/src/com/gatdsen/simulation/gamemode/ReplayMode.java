@@ -27,7 +27,7 @@ public final class ReplayMode extends GameMode {
 
     @Override
     public String[] getIdentifiers() {
-        return new String[]{String.valueOf(getType().ordinal()), "Replay", "ReplayMode"};
+        return new String[]{"Replay", "ReplayMode", String.valueOf(getType().ordinal())};
     }
 
     @Override

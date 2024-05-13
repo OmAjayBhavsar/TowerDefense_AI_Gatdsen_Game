@@ -42,7 +42,7 @@ public abstract class Launcher {
                                 String.join(
                                         ", ",
                                         Arrays.stream(GameModeFactory.getInstance().getAvailableGameModes())
-                                                .map(gameMode -> gameMode.getDisplayName() + " (" + gameMode.getIdentifiers()[0] + ")")
+                                                .map(GameMode::getDisplayName)
                                                 .toArray(String[]::new)
                                 )
                 ).build());
