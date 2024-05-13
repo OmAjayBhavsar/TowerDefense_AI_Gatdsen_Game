@@ -86,17 +86,13 @@ public class ParallelMultiGameRun extends Run {
                 results.setPlayerInformation(index, playerInformation[i]);
                 results.setScore(index, results.getScore(index) + scores[i]);
             }
-            if ((completed*100)/gameCount < (completed*100 + 100)/gameCount)
-                System.out.printf("MultiGameRun(%d)-Completion: %d %% \n", hashCode(),(completed*100)/gameCount);
+            /*if ((completed*100)/gameCount < (completed*100 + 100)/gameCount) {
+                System.out.printf("MultiGameRun(%d)-Completion: %d %% \n", hashCode(), (completed * 100) / gameCount);
+            }*/
             completed++;
         }
-        System.out.println();
+        //System.out.println();
         if (completed == gameCount) {
-            float[] scores = results.getScores();
-            for (int j = 0; j < scores.length; j++) {
-                scores[j] /= gameCount;
-            }
-            results.setScores(scores);
             complete();
         }
     }

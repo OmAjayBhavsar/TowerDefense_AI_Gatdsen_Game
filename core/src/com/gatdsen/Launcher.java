@@ -121,30 +121,30 @@ public abstract class Launcher {
         if (key != null && !key.isEmpty()) {
             builder.append("<").append(key).append(">");
         }
-        switch (run.getGameModeName()) {
-            case "CampaignMode":
+        switch (run.getResults().getConfig().gameMode.getType()) {
+            case CAMPAIGN:
                 if (scores[0] > 0) {
                     builder.append("passed");
                 } else {
                     builder.append("failed");
                 }
                 break;
-            case "ExamAdmissionMode":
+            case EXAM_ADMISSION:
                 StringBuilder scoreBuilder = new StringBuilder();
                 appendResults(scoreBuilder, playerInformation, scores);
                 System.out.println(scoreBuilder);
-                if (scores[0] >= 420) {
+                if (scores[0] >= 4) {
                     builder.append("passed");
                 } else {
                     builder.append("failed");
                 }
                 break;
-            case "ReplayMode":
+            case REPLAY:
                 if (!results.getConfig().gui) {
                     builder.append("\nStarted a replay without GUI, so only the results will be printed: \n");
                 }
-            case "NormalMode":
-            case "TournamentPhase1Mode":
+            case NORMAL:
+            case TOURNAMENT_PHASE_1:
             default:
                 appendResults(builder, playerInformation, scores);
                 builder.append("\n");
@@ -165,7 +165,7 @@ public abstract class Launcher {
             } else {
                 builder.append(String.format("%-10s", playerInformation[i].getName()));
             }
-            builder.append(String.format(" :  %-6f%n", scores[i]));
+            builder.append(String.format(" :  %d wins %n", (int) scores[i]));
         }
     }
 }

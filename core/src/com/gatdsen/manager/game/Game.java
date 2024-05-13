@@ -232,7 +232,12 @@ public class Game extends Executable {
             inputGenerator.endTurn();
         }
         if (!pendingShutdown) {
-            gameResults.setScores(state.getHealth());
+            float[] health = state.getHealth();
+            float[] wins = new float[health.length];
+            for (int i = 0; i < health.length; i++) {
+                wins[i] = health[i] > 0 ? 1 : 0;
+            }
+            gameResults.setScores(wins);
             setStatus(Status.COMPLETED);
             for (CompletionHandler<Executable> completionListener : completionListeners) {
                 completionListener.onComplete(this);
@@ -248,7 +253,12 @@ public class Game extends Executable {
             simulationThread.interrupt();
         }
         if (state != null) {
-            gameResults.setScores(state.getHealth());
+            float[] health = state.getHealth();
+            float[] wins = new float[health.length];
+            for (int i = 0; i < health.length; i++) {
+                wins[i] = health[i] > 0 ? 1 : 0;
+            }
+            gameResults.setScores(wins);
             state = null;
         }
         simulation = null;

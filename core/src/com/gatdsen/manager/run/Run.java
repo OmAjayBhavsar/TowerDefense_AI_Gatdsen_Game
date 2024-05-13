@@ -69,14 +69,6 @@ public abstract class Run {
         }
     }
 
-    public String getGameModeName() {
-        String gameModeName = gameMode.getClass().getSimpleName();
-        if (gameModeName.contains("_")) {
-            gameModeName = gameModeName.substring(0, gameModeName.indexOf("_"));
-        }
-        return gameModeName;
-    }
-
     public boolean isCompleted() {
         return completed;
     }
