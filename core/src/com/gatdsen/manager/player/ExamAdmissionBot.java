@@ -32,8 +32,7 @@ public final class ExamAdmissionBot extends Bot {
         return "ExamBot";
     }
 
-    PathTile startTile;
-    PathTile tmpTile;
+    private PathTile tmpTile;
 
     /**
      * Wird vor Beginn des Spiels aufgerufen. Die erlaubte Berechnungszeit für diese Methode beträgt 1 Sekunde.
@@ -44,7 +43,7 @@ public final class ExamAdmissionBot extends Bot {
      */
     @Override
     public void init(StaticGameState state) {
-        startTile = state.getMyPlayerState().getCheeseTile();
+        PathTile startTile = state.getMyPlayerState().getCheeseTile();
         while (startTile.getPrev() != null) {
             startTile = startTile.getPrev();
         }
@@ -70,10 +69,12 @@ public final class ExamAdmissionBot extends Bot {
     @Override
     public void executeTurn(StaticGameState state, Controller controller) {
         TowerType type = TowerType.values()[counter % TowerType.values().length];
-        if (state.getMyPlayerState().getMoney() >= Tower.getTowerPrice(type)) {
+        if (state.getMyPlayerState().getMoney() >= Tower.getTowerPrice(type) && tmpTile != null) {
             IntVector2 pos = tmpTile.getPosition();
-            controller.placeTower(pos.x + 1, pos.y - 1, type);
-            ++counter;
+            if (pos.x + 1 >= 0 && pos.y - 1 >= 0 && pos.x + 1 < state.getBoardSizeX() && pos.y - 1 < state.getBoardSizeY()) {
+                controller.placeTower(pos.x + 1, pos.y - 1, type);
+                ++counter;
+            }
             tmpTile = tmpTile.getNext();
         }
     }

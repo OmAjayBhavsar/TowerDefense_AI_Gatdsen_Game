@@ -49,9 +49,9 @@ public class CatanaCat extends Tower {
     @Override
     public int getDamage() {
         switch (level) {
-            case 1: return 10;
-            case 2: return 15;
-            case 3: return 25;
+            case 1: return 12;
+            case 2: return 18;
+            case 3: return 30;
             default: return 0;
         }
     }

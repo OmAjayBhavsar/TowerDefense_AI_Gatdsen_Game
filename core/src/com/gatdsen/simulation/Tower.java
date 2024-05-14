@@ -183,9 +183,17 @@ public abstract class Tower implements Serializable {
      */
     public abstract int getRechargeTime();
 
+    /**
+     * Erhöht die RechargeTime des Towers
+     */
     public abstract void incrementRechargeTime();
 
-
+    /**
+     * Gibt den Preis des Towers zurück
+     *
+     * @param type Typ des Towers
+     * @return Preis des Towers
+     */
     public static int getTowerPrice(TowerType type) {
         switch (type) {
             case MINIGUN_CAT:
@@ -194,6 +202,25 @@ public abstract class Tower implements Serializable {
                 return 100;
             case MAGE_CAT:
                return 100;
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * Gibt die Reichweite des Towers zurück
+     *
+     * @param type Typ des Towers
+     * @return Reichweite des Towers
+     */
+    public static int getTowerRange(TowerType type) {
+        switch (type) {
+            case MINIGUN_CAT:
+                return 2;
+            case CATANA_CAT:
+                return 1;
+            case MAGE_CAT:
+                return 3;
             default:
                 return 0;
         }
