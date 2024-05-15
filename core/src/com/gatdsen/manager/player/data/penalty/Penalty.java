@@ -1,4 +1,6 @@
 package com.gatdsen.manager.player.data.penalty;
 
-public interface Penalty {
+import java.io.Serializable;
+
+public interface Penalty extends Serializable {
 }
