@@ -85,9 +85,14 @@ public final class PlayerClassReference implements Serializable {
         File botDir = new File("bots");
         if (botDir.exists()) {
             try (URLClassLoader loader = getURLClassLoader()) {
-                for (File botFile : Objects.requireNonNull(botDir.listFiles(pathname -> pathname.getName().endsWith(".class")))) {
+                // Dieser REGEX-Ausdruck matcht mit allen Dateien vom Format {ClassName}.class, solange {ClassName}
+                // kein "$" enthält.
+                // Damit filtern wir alle inneren Klassen heraus, da diese nicht direkt als Spielerklasse verwendet
+                // werden können.
+                File[] botFiles = botDir.listFiles(file -> file.getName().matches("^[^$]*\\.class$"));
+                for (File botFile : Objects.requireNonNull(botFiles)) {
                     String classFileName = botFile.getName().replace(".class", "");
-                    Class<? extends Player> playerClass = loadBotPlayerClass(loader, classFileName);
+                    Class<? extends Player> playerClass = loadBotPlayerClass(loader, botDir, classFileName);
                     references.add(new PlayerClassReference(classFileName, playerClass));
                 }
             } catch (IOException e) {
@@ -112,7 +117,7 @@ public final class PlayerClassReference implements Serializable {
             throw new RuntimeException("Couldn't find bots." + fileName + ".class");
         }
         try (URLClassLoader loader = getURLClassLoader()) {
-            return new PlayerClassReference(fileName, loadBotPlayerClass(loader, fileName));
+            return new PlayerClassReference(fileName, loadBotPlayerClass(loader, botFile.getParentFile(), fileName));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -134,27 +139,49 @@ public final class PlayerClassReference implements Serializable {
      * Versucht die Bot-Klasse mit dem gegebenen Dateinamen mithilfe des gegebenen ClassLoaders zu laden.
      * Die Bot.class Datei muss sich dabei im "bots" Package befinden relativ zum Verzeichnis, auf das der ClassLoader
      * zeigt.
+     * Das Verzeichnis wird dabei verwendet, um auch innere Klassen (die den Namen "fileName${innerClassName}.class"
+     * haben) zu laden.
      * @param loader Der ClassLoader, der die Klasse laden soll
+     * @param directory Das Verzeichnis, in dem die Bot.class Datei liegt
      * @param fileName Der Name der Bot.class Datei - ohne ".class" Endung!
      * @return Die geladene Klasse, die eine Unterklasse von {@link Bot} ist
      * @throws IllegalArgumentException Die Exception wird geworfen, falls die Klasse nicht gefunden werden konnte, die
      * Klasse von einer zu aktuellen Java-Version kompiliert wurde oder die Klasse keine Unterklasse von {@link Bot}
      * ist.
      */
-    private static Class<? extends Bot> loadBotPlayerClass(ClassLoader loader, String fileName) throws IllegalArgumentException {
-        Class<?> loadedClass;
+    private static Class<? extends Bot> loadBotPlayerClass(ClassLoader loader, File directory, String fileName) throws IllegalArgumentException {
+        Class<?> loadedClass = loadClass(loader, fileName);
+        if (loadedClass == null || !Bot.class.isAssignableFrom(loadedClass)) {
+            throw new IllegalArgumentException("Couldn't find bots." + fileName + ".class");
+        }
+        // Dieser REGEX-Ausdruck matcht mit allen Dateien, die mit fileName beginnen, dann ein "$" enthalten, gefolgt von
+        // beliebigen Zeichen und enden mit ".class".
+        File[] innerClassFiles = directory.listFiles(file -> file.getName().matches(fileName + "\\$.*\\.class"));
+        for (File innerClassFile : Objects.requireNonNull(innerClassFiles)) {
+            loadClass(loader, innerClassFile.getName().replace(".class", ""));
+        }
+        @SuppressWarnings("unchecked")
+        Class<? extends Bot> botClass = (Class<? extends Bot>) loadedClass;
+        return botClass;
+    }
+
+    /**
+     * Hilfsmethode, um eine Klasse mit dem gegebenen Dateinamen mithilfe des gegebenen ClassLoaders zu laden und die
+     * von {@link ClassLoader#loadClass(String)} geworfenen Exceptions zu kapseln.
+     * Die Klasse muss sich dabei im "bots" Package befinden relativ zum Verzeichnis, auf das der ClassLoader zeigt.
+     * @param loader Der ClassLoader, der die Klasse laden soll
+     * @param fileName Der Name der Klasse - ohne ".class" Endung!
+     * @return Die Referenz auf die geladene Klasse
+     * @throws IllegalArgumentException Die Exception wird geworfen, falls die Klasse nicht gefunden werden konnte oder
+     * die Klasse von einer zu aktuellen Java-Version kompiliert wurde.
+     */
+    private static Class<?> loadClass(ClassLoader loader, String fileName) throws IllegalArgumentException {
         try {
-            loadedClass = loader.loadClass("bots." + fileName);
+            return loader.loadClass("bots." + fileName);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Could not find class for " + fileName + ".class", e);
         } catch (UnsupportedClassVersionError e) {
             throw new IllegalArgumentException("Class " + fileName + ".class is compiled for a newer Java version than the current one.", e);
         }
-        if (loadedClass == null || !Bot.class.isAssignableFrom(loadedClass)) {
-            throw new IllegalArgumentException("Couldn't find bots." + fileName + ".class");
-        }
-        @SuppressWarnings("unchecked")
-        Class<? extends Bot> botClass = (Class<? extends Bot>) loadedClass;
-        return botClass;
     }
 }
