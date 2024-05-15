@@ -1,21 +1,11 @@
 package com.gatdsen.ui.menu;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Align;
-import com.gatdsen.manager.map.MapRetriever;
-import com.gatdsen.simulation.GameMode;
-import com.gatdsen.simulation.gamemode.GameModeFactory;
-import com.gatdsen.simulation.gamemode.campaign.*;
 import com.gatdsen.ui.GADS;
 import com.gatdsen.ui.menu.attributes.Attribute;
-import com.gatdsen.ui.menu.attributes.MapAttribute;
+import com.gatdsen.ui.menu.attributes.CampaignAttribute;
 import com.gatdsen.ui.menu.attributes.PlayerAttribute;
 
-import java.util.Arrays;
-
-public class CampaignBaseMenuScreen extends BaseMenuScreen {
+public class CampaignBaseMenuScreen extends AttributeScreen {
     /**
      * Konstruktor für die Klasse AttributeScreen
      *
@@ -26,33 +16,16 @@ public class CampaignBaseMenuScreen extends BaseMenuScreen {
     }
 
     @Override
-    String getTitelString() {
-        return "Kampagne";
+    protected Attribute[] getAttributes() {
+        return new Attribute[]{
+                new CampaignAttribute(), // Reihenfolge ist wichtig! Erst die Kampagne setzen, dann den Spieler hinzufügen
+                new PlayerAttribute(0),
+        };
     }
 
     @Override
-    Actor getContent(Skin skin) {
-        Table CampaignMenuTable = new Table(skin);
-        SelectBox<GameMode> campaignSelectBox;
-        CampaignMenuTable.setFillParent(false);
-        CampaignMenuTable.center();
-
-        Label textLabelCampaign = new Label("Kampagne: ", skin);
-        textLabelCampaign.setAlignment(Align.right);
-        campaignSelectBox = new SelectBox<>(skin);
-        campaignSelectBox.setItems(GameModeFactory.getInstance().getAvailableCampaigns());
-        CampaignMenuTable.columnDefaults(0).width(200);
-        CampaignMenuTable.columnDefaults(1).width(200);
-        CampaignMenuTable.add(textLabelCampaign).colspan(4).pad(10).center();
-        CampaignMenuTable.add(campaignSelectBox).colspan(4).pad(10).width(200).row();
-
-        campaignSelectBox.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                runConfig.gameMode = campaignSelectBox.getSelected();
-            }
-        });
-        return CampaignMenuTable;
+    String getTitelString() {
+        return "Kampagne";
     }
 
     @Override

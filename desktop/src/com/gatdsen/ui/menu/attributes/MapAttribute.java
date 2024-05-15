@@ -61,7 +61,7 @@ public class MapAttribute extends Attribute {
         String mapName = null;
         PlayableGameMode gameMode = (PlayableGameMode) runConfig.gameMode;
         if (!gameMode.getMaps().isEmpty()) {
-            mapName = gameMode.getMaps().get(0);
+            mapName = gameMode.getMaps().getFirst();
         }
         mapSelectBox.setSelected(mapName);
     }
