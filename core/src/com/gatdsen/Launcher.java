@@ -121,12 +121,13 @@ public abstract class Launcher {
         if (key != null && !key.isEmpty()) {
             builder.append("<").append(key).append(">");
         }
-        switch (run.getResults().getConfig().gameMode.getType()) {
+        GameMode gameMode = run.getResults().getConfig().gameMode;
+        switch (gameMode.getType()) {
             case CAMPAIGN:
                 if (scores[0] > 0) {
-                    builder.append("passed");
+                    builder.append("\nDu hast die ").append(gameMode.getDisplayName()).append(" erfolgreich bestanden!\n");
                 } else {
-                    builder.append("failed");
+                    builder.append("\nDu hast die ").append(gameMode.getDisplayName()).append(" nicht bestanden!\n");
                 }
                 break;
             case EXAM_ADMISSION:
@@ -134,9 +135,9 @@ public abstract class Launcher {
                 appendResults(scoreBuilder, playerInformation, scores);
                 System.out.println(scoreBuilder);
                 if (scores[0] >= 4) {
-                    builder.append("passed");
+                    builder.append("\nDu hast die ").append(gameMode.getDisplayName()).append(" erfolgreich bestanden!\n");
                 } else {
-                    builder.append("failed");
+                    builder.append("\nDu hast die ").append(gameMode.getDisplayName()).append(" nicht bestanden!\n");
                 }
                 break;
             case REPLAY:
