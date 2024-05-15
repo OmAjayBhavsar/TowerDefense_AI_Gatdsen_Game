@@ -14,9 +14,12 @@ import com.gatdsen.simulation.gamemode.PlayableGameMode;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.Queue;
+import java.util.Stack;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 public class Game extends Executable {
 
@@ -102,12 +105,24 @@ public class Game extends Executable {
             futures[playerIndex] = playerHandlers[playerIndex].init(state, seed);
         }
         try {
-            awaitFutures(futures);
+            for (Future<?> future : futures) {
+                if (future != null) {
+                    future.get();
+                }
+            }
         } catch (InterruptedException e) {
             if (pendingShutdown) {
                 return;
             }
             throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } finally {
+            for (Future<?> future : futures) {
+                if (future != null && !future.isDone()) {
+                    future.cancel(true);
+                }
+            }
         }
         gameResults.setPlayerInformation(
                 Arrays.stream(playerHandlers).map(PlayerHandler::getPlayerInformation).toArray(PlayerInformation[]::new)
@@ -159,8 +174,8 @@ public class Game extends Executable {
             }
 
             PlayerState[] playerStates = state.getPlayerStates();
-            Future<?>[] futures = new Future[playerHandlers.length];
-            Object commandHandlerLock = new Object();
+            CompletableFuture<?>[] futures = new CompletableFuture[playerHandlers.length];
+            BlockingQueue<Supplier<ActionLog>> commandQueue = new LinkedBlockingQueue<>();
             for (int playerIndex = 0; playerIndex < playerHandlers.length; playerIndex++) {
                 // Wenn der PlayerState des Spielers deaktiviert ist, da er bspw. keine Leben mehr hat oder
                 // disqualifiziert wurde, wird der Spieler übersprungen und dessen executeTurn() nicht aufgerufen.
@@ -179,22 +194,8 @@ public class Game extends Executable {
                 futures[playerIndex] = playerHandler.executeTurn(
                         state,
                         (List<Command> commands) -> {
-                            synchronized (commandHandlerLock) {
-                                for (Command command : commands) {
-                                    // Contains action produced by the commands execution
-                                    ActionLog log = command.run(playerHandler);
-                                    if (log == null) {
-                                        continue;
-                                    }
-                                    if (saveReplay) {
-                                        gameResults.addActionLog(log);
-                                    }
-                                    if (gui) {
-                                        animationLogProcessor.animate(log);
-                                        // ToDo: discuss synchronisation for human players
-                                        // animationLogProcessor.awaitNotification();
-                                    }
-                                }
+                            for (Command command : commands) {
+                                commandQueue.add(() -> command.run(playerHandler));
                             }
                         }
                 );
@@ -208,7 +209,7 @@ public class Game extends Executable {
                 }
             }
             try {
-                awaitFutures(futures);
+                awaitFutures(futures, commandQueue);
             } catch (InterruptedException e) {
                 if (pendingShutdown) {
                     break;
@@ -280,25 +281,52 @@ public class Game extends Executable {
      * @throws InterruptedException Wenn das Warten auf das Beenden der {@link Future} Objekte unterbrochen wird. 
      *                              In diesem Fall werden alle Objekte mit {@link Future#cancel(boolean)} abgebrochen.
      */
-    private static void awaitFutures(Future<?>[] futures) throws InterruptedException {
+    private void awaitFutures(CompletableFuture<?>[] futures, BlockingQueue<Supplier<ActionLog>> queue) throws InterruptedException {
         try {
-            for (Future<?> future : futures) {
-                if (future == null) {
-                    continue;
-                }
-                try {
-                    future.get();
-                } catch (ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        } catch (InterruptedException e) {
-            for (Future<?> future : futures) {
-                if (future != null) {
+            awaitFuturesHelper(futures, queue);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } finally {
+            for (CompletableFuture<?> future : futures) {
+                if (future != null && !future.isDone()) {
                     future.cancel(true);
                 }
             }
-            throw e;
+        }
+    }
+
+    private void awaitFuturesHelper(CompletableFuture<?>[] futures, BlockingQueue<Supplier<ActionLog>> queue) throws InterruptedException, ExecutionException {
+        for (CompletableFuture<?> future : futures) {
+            if (future == null) {
+                continue;
+            }
+            future.whenComplete((result, error) -> {
+                queue.add(() -> null); // Damit der queue.take() Aufruf unterbrochen wird
+            });
+            while (!future.isDone()) {
+                handleActionLogSupplier(queue.take());
+            }
+        }
+        if (!queue.isEmpty()) {
+            for (Supplier<ActionLog> supplier : queue) {
+                handleActionLogSupplier(supplier);
+            }
+        }
+        for (CompletableFuture<?> future : futures) {
+            future.get();
+        }
+    }
+
+    private void handleActionLogSupplier(Supplier<ActionLog> supplier) {
+        ActionLog log = supplier.get();
+        if (log == null) {
+            return;
+        }
+        if (saveReplay) {
+            gameResults.addActionLog(log);
+        }
+        if (gui) {
+            animationLogProcessor.animate(log);
         }
     }
 

@@ -36,7 +36,7 @@ public class RemotePlayerHandler extends PlayerHandler {
     }
 
     @Override
-    public Future<Long> create(boolean isDebug, int gameId) {
+    public CompletableFuture<Long> create(boolean isDebug, int gameId) {
         assert !createFuture.isDone() : "PlayerHandler.create() should only be called once";
         communicator.setMessageHandler(message -> {
             if (message.getType() != Message.Type.GameCreateResponse) {
@@ -52,7 +52,7 @@ public class RemotePlayerHandler extends PlayerHandler {
     }
 
     @Override
-    public Future<?> init(GameState gameState, long seed) {
+    public CompletableFuture<?> init(GameState gameState, long seed) {
         assert createFuture.isDone() : "PlayerHandler.init() should only be called after PlayerHandler.create() has completed";
         assert !initFuture.isDone() : "PlayerHandler.init() should only be called once";
         communicator.setMessageHandler(message -> {
@@ -68,7 +68,7 @@ public class RemotePlayerHandler extends PlayerHandler {
     }
 
     @Override
-    protected Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler) {
+    protected CompletableFuture<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler) {
         assert initFuture.isDone() : "PlayerHandler.executeTurn() should only be called after PlayerHandler.init() has completed";
         assert executeTurnFuture == null || executeTurnFuture.isDone() : "PlayerHandler.executeTurn() should only be called once the previously returned Future is done";
         executeTurnFuture = new CompletableFuture<>();

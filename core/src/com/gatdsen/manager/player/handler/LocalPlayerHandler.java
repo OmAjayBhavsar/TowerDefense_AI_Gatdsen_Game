@@ -24,14 +24,14 @@ public final class LocalPlayerHandler extends PlayerHandler {
     }
 
     @Override
-    public Future<Long> create(boolean isDebug, int gameId) {
+    public CompletableFuture<Long> create(boolean isDebug, int gameId) {
         playerExecutor = new PlayerExecutor(isDebug, playerIndex, playerClassReference.getPlayerClass(), inputGenerator);
         playerInformation = playerExecutor.getPlayerInformation();
         return CompletableFuture.completedFuture(playerExecutor.getPlayerClassAnalyzer().getSeedModifier());
     }
 
     @Override
-    public Future<?> init(GameState gameState, long seed) {
+    public CompletableFuture<?> init(GameState gameState, long seed) {
         Penalty penalty = playerExecutor.init(gameState, seed);
         if (penalty != null) {
             penalize(penalty);
@@ -40,7 +40,7 @@ public final class LocalPlayerHandler extends PlayerHandler {
     }
 
     @Override
-    protected Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler) {
+    protected CompletableFuture<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler) {
         return playerExecutor.executeTurn(gameState, commandHandler).thenAccept(this::penalize);
     }
 

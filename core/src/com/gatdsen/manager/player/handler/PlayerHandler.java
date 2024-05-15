@@ -49,11 +49,11 @@ public abstract class PlayerHandler {
         return turnsToMiss < 0;
     }
 
-    public abstract Future<Long> create(boolean isDebug, int gameId);
+    public abstract CompletableFuture<Long> create(boolean isDebug, int gameId);
 
-    public abstract Future<?> init(GameState gameState, long seed);
+    public abstract CompletableFuture<?> init(GameState gameState, long seed);
 
-    public final Future<?> executeTurn(GameState gameState, Command.CommandHandler commandHandler) {
+    public final CompletableFuture<?> executeTurn(GameState gameState, Command.CommandHandler commandHandler) {
         if (turnsToMiss > 0) {
             turnsToMiss--;
             return CompletableFuture.completedFuture(null);
@@ -61,7 +61,7 @@ public abstract class PlayerHandler {
         return onExecuteTurn(gameState, commandHandler);
     }
 
-    protected abstract Future<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler);
+    protected abstract CompletableFuture<?> onExecuteTurn(GameState gameState, Command.CommandHandler commandHandler);
 
     /**
      * Beendet diesen PlayerHandler und wird genutzt, um bspw. die Ressourcen freizugeben, die zur Ausführung des
