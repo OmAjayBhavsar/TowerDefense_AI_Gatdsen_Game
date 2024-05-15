@@ -67,7 +67,7 @@ public class MyBot extends Bot {
         controller.placeTower(
                 random.nextInt(0, state.getBoardSizeX()),
                 random.nextInt(0, state.getBoardSizeY()),
-                Tower.TowerType.BASIC_TOWER
+                Tower.TowerType.MINIGUN_CAT
         );
     }
 }
