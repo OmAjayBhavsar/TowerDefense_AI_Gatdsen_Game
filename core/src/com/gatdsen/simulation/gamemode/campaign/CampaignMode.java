@@ -17,6 +17,7 @@ public abstract class CampaignMode extends PlayableGameMode {
         LocalDateTime now = LocalDateTime.now(timeZone);
         ZonedDateTime submissionOpen = ZonedDateTime.of(getSubmissionOpenTimestamp(), timeZone);
         return now.isAfter(ChronoLocalDateTime.from(submissionOpen));
+        // return true;
     }
 
     abstract protected LocalDateTime getSubmissionOpenTimestamp();
@@ -26,9 +27,9 @@ public abstract class CampaignMode extends PlayableGameMode {
         return "Kampagne " + getCampaignWeek() + "." + getCampaignTask();
     }
 
-    abstract protected int getCampaignWeek();
+    public abstract int getCampaignWeek();
 
-    abstract protected int getCampaignTask();
+    public abstract int getCampaignTask();
 
     @Override
     public final Type getType() {

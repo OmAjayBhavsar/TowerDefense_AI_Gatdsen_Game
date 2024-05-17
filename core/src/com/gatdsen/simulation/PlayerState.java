@@ -6,6 +6,7 @@ import com.gatdsen.simulation.enemy.BasicEnemy;
 import com.gatdsen.simulation.enemy.EmpEnemy;
 import com.gatdsen.simulation.enemy.ShieldEnemy;
 import com.gatdsen.simulation.gamemode.PlayableGameMode;
+import com.gatdsen.simulation.gamemode.campaign.CampaignMode;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,10 +28,9 @@ public class PlayerState implements Serializable {
     private boolean enemySpawn;
     private PathTile spawnTile;
     private PathTile endTile;
+    private int gameModeIndex;
+    private final Stack<Enemy> spawnEnemies = new Stack<>();
 
-    private final Stack<Enemy> spawnEnemies = new Stack<Enemy>();
-
-    private final int enemyTypeCount = 1;
     private boolean disqualified;
     private boolean deactivated;
 
@@ -44,6 +44,12 @@ public class PlayerState implements Serializable {
      */
     PlayerState(GameState gameState, int index, int health, int money, int spawnCoins) {
         gameMode = gameState.getGameMode();
+
+        if (gameMode instanceof CampaignMode) {
+            gameModeIndex = ((CampaignMode) gameMode).getCampaignWeek() * 10
+                    + ((CampaignMode) gameMode).getCampaignTask();
+        }
+
         this.index = index;
         int width = gameState.getBoardSizeX();
         int height = gameState.getBoardSizeY();
@@ -194,18 +200,22 @@ public class PlayerState implements Serializable {
 
     /**
      * Gibt das Spielfeld des Spielers zurück
+     *
      * @return Spielfeld
      */
     public Tile[][] getBoard() {
         return board;
     }
+
     /**
      * Gibt das Ende des Pfades zurück
+     *
      * @return Ende des Pfades
      */
-    public PathTile getCheese(){
+    public PathTile getCheese() {
         return endTile;
     }
+
     /**
      * Gibt den Index des Spielers zurück
      *
@@ -235,6 +245,7 @@ public class PlayerState implements Serializable {
 
     /**
      * Gibt die aktuellen SpawnCoins des Spielers zurück
+     *
      * @return SpawnCoins
      */
     public int getSpawnCoins() {
@@ -258,7 +269,7 @@ public class PlayerState implements Serializable {
             return head;
         }
 
-        if (x >= board.length || y >= board[0].length || x < 0 || y < 0){
+        if (x >= board.length || y >= board[0].length || x < 0 || y < 0) {
             head.addChild(new ErrorAction("Position (" + x + ", " + y + ") is out of bounds"));
         } else if (board[x][y] != null) {
             head.addChild(new ErrorAction("(" + x + ", " + y + ") is already occupied"));
@@ -403,21 +414,17 @@ public class PlayerState implements Serializable {
 
     /**
      * Fügt den Gegner des aktuellen Zuges zur Spawnliste hinzu, falls kein Gegner vom Gegenspieler gespawned wurde
+     *
      * @param wave Die aktuelle Welle
      */
     void spawnEnemy(int wave) {
-        if (enemySpawn){
-             enemySpawn = false;
-        }else{
+        if (enemySpawn) {
+            enemySpawn = false;
+        } else {
             int actWave = wave - spawnDelay;
-            if (actWave % 10 == 0) enemyLevel = actWave / 2;
-            else if (actWave % 5 == 0) enemyLevel = actWave / 5 + 1;
-            else enemyLevel = 1 + actWave / 20;
-
-            spawnEnemies.push(new BasicEnemy(this, enemyLevel, spawnTile));
-            enemyLevel = 1 + actWave/20;
+            int spawnLevel = SpawnAlgorithms.getSpawnLevel(actWave, gameModeIndex);
+            spawnEnemies.push(new BasicEnemy(this, spawnLevel, spawnTile));
         }
-
     }
 
     /**
