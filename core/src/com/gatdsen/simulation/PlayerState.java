@@ -423,6 +423,7 @@ public class PlayerState implements Serializable {
         } else {
             int actWave = wave - spawnDelay;
             int spawnLevel = SpawnAlgorithms.getSpawnLevel(actWave, gameModeIndex);
+            enemyLevel = 1 + actWave / 20;
             spawnEnemies.push(new BasicEnemy(this, spawnLevel, spawnTile));
         }
     }
