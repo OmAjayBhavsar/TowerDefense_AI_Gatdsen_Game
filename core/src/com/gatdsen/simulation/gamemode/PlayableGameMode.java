@@ -2,10 +2,7 @@ package com.gatdsen.simulation.gamemode;
 
 import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
 import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
-import com.gatdsen.simulation.Enemy;
-import com.gatdsen.simulation.GameMode;
-import com.gatdsen.simulation.PlayerState;
-import com.gatdsen.simulation.Tower;
+import com.gatdsen.simulation.*;
 import org.apache.commons.cli.CommandLine;
 
 import java.util.ArrayList;
@@ -143,6 +140,15 @@ public abstract class PlayableGameMode extends GameMode {
 
     public int calculateSpawnCoinsForRound(PlayerState playerState) {
         return 1;
+    }
+
+    public int calculateEnemyLevelForWave(int wave) {
+        if (wave % 10 == 0) {
+            return wave / 2;
+        } else if (wave % 5 == 0) {
+            return wave / 5 + 1;
+        }
+        return 1 + wave / 20;
     }
 
     @Override

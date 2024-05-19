@@ -47,13 +47,17 @@ public class MinigunCat extends Tower {
      */
     @Override
     public int getDamage() {
-        int nerf = basicTowerInRange() ? 17 : 0;
+       int damage;
         switch (level) {
-            case 1: return 35 - nerf;
-            case 2: return 60 - nerf;
-            case 3: return 90 - nerf;
-            default: return 0;
+            case 1: damage = 35;
+            break;
+            case 2: damage =  60;
+            break;
+            case 3: damage =  90;
+            break;
+            default: damage =  0;
         }
+        return basicTowerInRange() ? damage/2 : damage;
     }
 
     /**

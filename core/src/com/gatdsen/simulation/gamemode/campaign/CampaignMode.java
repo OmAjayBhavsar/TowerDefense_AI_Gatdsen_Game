@@ -26,9 +26,9 @@ public abstract class CampaignMode extends PlayableGameMode {
         return "Kampagne " + getCampaignWeek() + "." + getCampaignTask();
     }
 
-    abstract protected int getCampaignWeek();
+    protected abstract int getCampaignWeek();
 
-    abstract protected int getCampaignTask();
+    protected abstract int getCampaignTask();
 
     @Override
     public final Type getType() {

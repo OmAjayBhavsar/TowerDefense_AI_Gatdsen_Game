@@ -1,5 +1,7 @@
 package com.gatdsen.simulation.gamemode.campaign;
 
+import com.gatdsen.simulation.Enemy;
+
 import java.time.LocalDateTime;
 
 public class CampaignMode3_1 extends CampaignMode {
@@ -8,6 +10,8 @@ public class CampaignMode3_1 extends CampaignMode {
         super();
         setPlayerHealth(1, 100);
         setMap("Campaign3_1");
+        enemies.remove(Enemy.EnemyType.EMP_ENEMY);
+        enemies.remove(Enemy.EnemyType.ARMOR_ENEMY);
     }
 
     @Override

@@ -34,4 +34,12 @@ public class CampaignMode1_1 extends CampaignMode {
     public int calculateSpawnCoinsForRound(PlayerState playerState) {
         return 0;
     }
+
+    @Override
+    public int calculateEnemyLevelForWave(int wave) {
+        if (wave % 10 == 0) {
+            return wave / 10 + 1;
+        }
+        return 1 + wave / 20;
+    }
 }

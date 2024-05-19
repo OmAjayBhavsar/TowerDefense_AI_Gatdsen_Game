@@ -6,15 +6,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
-import com.gatdsen.manager.player.handler.PlayerHandlerFactory;
 import com.gatdsen.manager.run.RunConfig;
 import com.gatdsen.simulation.GameMode;
 import com.gatdsen.simulation.gamemode.GameModeFactory;
-import com.gatdsen.simulation.gamemode.PlayableGameMode;
+
+import java.util.Arrays;
 
 public final class CampaignAttribute extends Attribute {
 
+    private final GameMode[] campaigns;
     private SelectBox<GameMode> selectBox;
+
+    public CampaignAttribute() {
+        campaigns = GameModeFactory.getInstance().getAvailableCampaigns();
+        Arrays.sort(
+                campaigns,
+                // Sortierung der Kampagnen in umgekehrter lexikografischer Reihenfolge, damit die neueren Kampagnen
+                // immer zuerst kommen
+                (GameMode campaign1, GameMode campaign2) ->
+                        campaign2.getDisplayName().compareTo(campaign1.getDisplayName())
+        );
+    }
 
     @Override
     public Actor getContent(Skin skin) {
@@ -22,7 +34,7 @@ public final class CampaignAttribute extends Attribute {
         textLabel.setAlignment(Align.right);
 
         selectBox = new SelectBox<>(skin);
-        selectBox.setItems(GameModeFactory.getInstance().getAvailableCampaigns());
+        selectBox.setItems(campaigns);
 
         Table table = new Table();
         table.columnDefaults(0).width(200);
@@ -51,11 +63,15 @@ public final class CampaignAttribute extends Attribute {
      */
     @Override
     public void setConfig(RunConfig runConfig) {
-        GameMode campaign = null;
-        GameMode[] campaigns = GameModeFactory.getInstance().getAvailableCampaigns();
+        GameMode selectedCampaign = null;
         if (campaigns.length > 0) {
-            campaign = campaigns[0];
+            // Dieser Code funktioniert nur gut, wenn die Liste in umgekehrter lexikografischer Reihenfolge sortiert
+            // wurde und es pro Woche nur zwei neue Kampagnenlevel gibt
+            // Hier wird nämlich das zweite Element im Array ausgewählt, bei einem Array der Struktur
+            // ["Campaign 2.2", "Campaign 2.1", "Campaign 1.2", "Campaign 1.1"] also "Campaign 2.1", da dies das erste
+            // Kampagnenlevel der aktuellen Woche ist
+            selectedCampaign = campaigns[Math.min(1, campaigns.length - 1)];
         }
-        selectBox.setSelected(campaign);
+        selectBox.setSelected(selectedCampaign);
     }
 }
