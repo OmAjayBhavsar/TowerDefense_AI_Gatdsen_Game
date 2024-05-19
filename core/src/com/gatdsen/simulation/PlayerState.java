@@ -28,7 +28,6 @@ public class PlayerState implements Serializable {
     private boolean enemySpawn;
     private PathTile spawnTile;
     private PathTile endTile;
-    private int gameModeIndex;
     private final Stack<Enemy> spawnEnemies = new Stack<>();
 
     private boolean disqualified;
@@ -44,12 +43,6 @@ public class PlayerState implements Serializable {
      */
     PlayerState(GameState gameState, int index, int health, int money, int spawnCoins) {
         gameMode = gameState.getGameMode();
-
-        if (gameMode instanceof CampaignMode) {
-            gameModeIndex = ((CampaignMode) gameMode).getCampaignWeek() * 10
-                    + ((CampaignMode) gameMode).getCampaignTask();
-        }
-
         this.index = index;
         int width = gameState.getBoardSizeX();
         int height = gameState.getBoardSizeY();
@@ -422,9 +415,8 @@ public class PlayerState implements Serializable {
             enemySpawn = false;
         } else {
             int actWave = wave - spawnDelay;
-            int spawnLevel = SpawnAlgorithms.getSpawnLevel(actWave, gameModeIndex);
+            spawnEnemies.push(new BasicEnemy(this, gameMode.calculateEnemyLevelForWave(actWave), spawnTile));
             enemyLevel = 1 + actWave / 20;
-            spawnEnemies.push(new BasicEnemy(this, spawnLevel, spawnTile));
         }
     }
 

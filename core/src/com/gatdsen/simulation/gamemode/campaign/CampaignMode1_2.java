@@ -21,17 +21,25 @@ public class CampaignMode1_2 extends CampaignMode {
     }
 
     @Override
-    public int getCampaignWeek() {
+    protected int getCampaignWeek() {
         return 1;
     }
 
     @Override
-    public int getCampaignTask() {
+    protected int getCampaignTask() {
         return 2;
     }
 
     @Override
     public int calculateSpawnCoinsForRound(PlayerState playerState) {
         return 0;
+    }
+
+    @Override
+    public int calculateEnemyLevelForWave(int wave) {
+        if (wave % 10 == 0) {
+            return wave / 10 + 1;
+        }
+        return 1 + wave / 20;
     }
 }

@@ -19,12 +19,12 @@ public class CampaignMode2_2 extends CampaignMode {
     }
 
     @Override
-    public int getCampaignWeek() {
+    protected int getCampaignWeek() {
         return 2;
     }
 
     @Override
-    public int getCampaignTask() {
+    protected int getCampaignTask() {
         return 2;
     }
 }
