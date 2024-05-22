@@ -373,7 +373,7 @@ public class PlayerState implements Serializable {
             return head;
         }
         enemyLevel = enemyLevel == 0 ? 1 : enemyLevel;
-        if (spawnCoins >= Enemy.getEnemyTypePrice(type, enemyLevel)) {
+        if (spawnCoins >= Enemy.getEnemyTypePrice(type, enemyLevel) && cooldown == 0) {
             PlayerState playerState = gameState.getPlayerStates()[(index + 1) % 2];
             playerState.spawnEnemy(type);
             spawnCoins -= Enemy.getEnemyTypePrice(type, enemyLevel);
@@ -383,6 +383,7 @@ public class PlayerState implements Serializable {
     }
 
     int wave;
+    int cooldown;
 
     /**
      * Spawnt die Gegner
@@ -392,6 +393,9 @@ public class PlayerState implements Serializable {
      * @return der Action Head
      */
     Action spawnEnemies(Action head, int wave) {
+        if (cooldown > 0) {
+            --cooldown;
+        }
         this.wave = wave + 1;
         int level = spawnEnemy();
 
@@ -405,7 +409,6 @@ public class PlayerState implements Serializable {
 
         return head;
     }
-
     /**
      * Initialisiert die Gegner, die gespawnt werden sollen
      *
@@ -422,6 +425,7 @@ public class PlayerState implements Serializable {
             case ARMOR_ENEMY:
                 spawnEnemies.add(new ArmorEnemy(this, enemyLevel, spawnTile));
         }
+        cooldown = 3;
     }
 
     /**
