@@ -10,6 +10,7 @@ public class CampaignMode3_1 extends CampaignMode {
     public CampaignMode3_1() {
         super();
         setPlayerHealth(1, 100);
+        setPlayerHealth(0, 1000000);
         setPlayerMoney(1, 1000);
         setMap("Campaign3_1");
         enemies.remove(Enemy.EnemyType.EMP_ENEMY);

@@ -24,14 +24,13 @@ public final class Campaign3_1Bot extends Bot {
 
     @Override
     public int getMatrikel() {
-        return 13337;
+        return 1337;
     }
 
     @Override
     public String getName() {
-        return "Campaign32Bot";
+        return "Campaign31Bot";
     }
-
 
     /**
      * Wird vor Beginn des Spiels aufgerufen. Die erlaubte Berechnungszeit für diese Methode beträgt 1 Sekunde.
@@ -63,15 +62,16 @@ public final class Campaign3_1Bot extends Bot {
      */
     @Override
     public void executeTurn(StaticGameState state, Controller controller) {
-        if (counter==0){
-            controller.placeTower(5,3, TowerType.MAGE_CAT);
-            controller.placeTower(3, 7, TowerType.CATANA_CAT);
-            controller.placeTower(7, 9, TowerType.CATANA_CAT);
-            controller.placeTower(5, 9, TowerType.MAGE_CAT);
-            controller.upgradeTower(3,7);
-            controller.upgradeTower(7,9);
-            controller.upgradeTower(5,9);
-            controller.setTowerTarget(5,9, Tower.TargetOption.STRONGEST);
+        if (counter == 0) {
+            controller.placeTower(6, 8, TowerType.MINIGUN_CAT);
+            controller.upgradeTower(6, 8);
+
+            controller.placeTower(4, 6, TowerType.CATANA_CAT);
+            controller.upgradeTower(4, 6);
+
+            controller.placeTower(8, 3, TowerType.MAGE_CAT);
+            controller.upgradeTower(8, 3);
+            controller.setTowerTarget(8, 3, Tower.TargetOption.STRONGEST);
             counter++;
         }
     }

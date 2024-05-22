@@ -24,7 +24,7 @@ public final class Campaign3_2Bot extends Bot {
 
     @Override
     public int getMatrikel() {
-        return 13337;
+        return 1337;
     }
 
     @Override
