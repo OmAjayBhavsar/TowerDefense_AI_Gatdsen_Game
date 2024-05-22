@@ -22,8 +22,6 @@ public class PlayerState implements Serializable {
     private int wave;
     private int enemyLevel;
     private final int index;
-    private int spawnDelay;
-    private boolean enemySpawn;
     private PathTile spawnTile;
     private PathTile endTile;
     private final Queue<Enemy> spawnEnemies = new LinkedList<>();

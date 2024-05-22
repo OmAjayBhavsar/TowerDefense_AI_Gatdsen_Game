@@ -38,7 +38,7 @@ public class CampaignMode1_2 extends CampaignMode {
     @Override
     public int calculateEnemyLevelForWave(int wave) {
         if (wave % 10 == 0) {
-            return wave / 10 + 1;
+            return -(wave / 10 + 1);
         }
         return 1 + wave / 20;
     }

@@ -13,6 +13,7 @@ public final class LocalPlayerHandlerFactory extends PlayerHandlerFactory {
     public static final LocalPlayerHandlerFactory HUMAN_PLAYER = new LocalPlayerHandlerFactory(PlayerClassReference.HUMAN_PLAYER);
     public static final LocalPlayerHandlerFactory IDLE_BOT = new LocalPlayerHandlerFactory(PlayerClassReference.IDLE_BOT);
     public static final LocalPlayerHandlerFactory CAMPAIGN_22_BOT = new LocalPlayerHandlerFactory(PlayerClassReference.CAMPAIGN_22_BOT);
+    public static final LocalPlayerHandlerFactory CAMPAIGN_31_BOT = new LocalPlayerHandlerFactory(PlayerClassReference.CAMPAIGN_31_BOT);
     public static final LocalPlayerHandlerFactory CAMPAIGN_32_BOT = new LocalPlayerHandlerFactory(PlayerClassReference.CAMPAIGN_32_BOT);
     public static final LocalPlayerHandlerFactory EXAM_ADMISSION_BOT = new LocalPlayerHandlerFactory(PlayerClassReference.EXAM_ADMISSION_BOT);
 

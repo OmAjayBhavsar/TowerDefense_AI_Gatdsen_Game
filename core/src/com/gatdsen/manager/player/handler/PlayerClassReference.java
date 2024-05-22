@@ -26,18 +26,30 @@ public final class PlayerClassReference implements Serializable {
 
     /** Die Referenz auf den {@link HumanPlayer} */
     public static final PlayerClassReference HUMAN_PLAYER = new PlayerClassReference("HumanPlayer", HumanPlayer.class);
+
     /** Die Referenz auf den {@link IdleBot} */
     public static final PlayerClassReference IDLE_BOT = new PlayerClassReference("IdleBot", IdleBot.class);
 
+    /** Die Referenz auf den {@link ExamAdmissionBot} */
+    public static final PlayerClassReference EXAM_ADMISSION_BOT = new PlayerClassReference("ExamAdmissionBot", ExamAdmissionBot.class);
+
+    /* ----------------------------- Die Referenz auf die CampaignBots ----------------------------- */
     public static final PlayerClassReference CAMPAIGN_22_BOT = new PlayerClassReference("Campaign_22_Bot", Campaign2_2Bot.class);
 
-    //public static final PlayerClassReference CAMPAIGN_31_BOT = new PlayerClassReference("Campaign_31_Bot", Campaign3_1Bot.class);
-    public static final PlayerClassReference CAMPAIGN_32_BOT = new PlayerClassReference("Campaign_32_Bot", Campaign3_2Bot.class);
+    public static final PlayerClassReference CAMPAIGN_31_BOT = new PlayerClassReference("Campaign_31_Bot", Campaign3_1Bot.class);
 
-    /** Die Referenz auf den {@link IdleBot} */
-    public static final PlayerClassReference EXAM_ADMISSION_BOT = new PlayerClassReference("ExamAdmissionBot", ExamAdmissionBot.class);
+    public static final PlayerClassReference CAMPAIGN_32_BOT = new PlayerClassReference("Campaign_32_Bot", Campaign3_2Bot.class);
+    /* --------------------------------------------------------------------------------------------- */
+
     /** Alle Referenzen auf die intern existierenden Spielerklassen */
-    public static final Map<String, PlayerClassReference> INTERNAL_PLAYER_CLASS_REFERENCES = Map.of(HUMAN_PLAYER.fileName, HUMAN_PLAYER, IDLE_BOT.fileName, IDLE_BOT, CAMPAIGN_22_BOT.fileName, CAMPAIGN_22_BOT, CAMPAIGN_32_BOT.fileName, CAMPAIGN_32_BOT,EXAM_ADMISSION_BOT.fileName, EXAM_ADMISSION_BOT);
+    public static final Map<String, PlayerClassReference> INTERNAL_PLAYER_CLASS_REFERENCES = Map.of(
+            HUMAN_PLAYER.fileName, HUMAN_PLAYER,
+            IDLE_BOT.fileName, IDLE_BOT,
+            CAMPAIGN_22_BOT.fileName, CAMPAIGN_22_BOT,
+            CAMPAIGN_31_BOT.fileName, CAMPAIGN_31_BOT,
+            CAMPAIGN_32_BOT.fileName, CAMPAIGN_32_BOT,
+            EXAM_ADMISSION_BOT.fileName, EXAM_ADMISSION_BOT
+    );
 
     /** Der Dateiname der Klasse - ohne Angabe des Dateipfades oder ".class" Endung */
     private final String fileName;
