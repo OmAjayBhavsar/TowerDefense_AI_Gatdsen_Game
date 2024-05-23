@@ -5,9 +5,6 @@ import com.gatdsen.simulation.PathTile;
 import com.gatdsen.simulation.PlayerState;
 
 public class ShieldEnemy extends Enemy {
-
-    boolean isShielded = true;
-
     /**
      * Erstellt einen neuen Shield-Gegner.
      *
@@ -25,18 +22,6 @@ public class ShieldEnemy extends Enemy {
     @Override
     protected Enemy copy(PathTile posTile) {
         return new ShieldEnemy(playerState, level, posTile);
-    }
-
-    public void setShielded(boolean shielded) {
-        isShielded = shielded;
-    }
-
-    /**
-     * Gibt zurück, ob der Gegner geschützt ist.
-     * @return Ob der Gegner geschützt ist.
-     */
-    public boolean isShielded() {
-        return isShielded;
     }
 
     /**

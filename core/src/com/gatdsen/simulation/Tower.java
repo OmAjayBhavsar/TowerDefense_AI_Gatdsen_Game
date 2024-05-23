@@ -151,8 +151,6 @@ public abstract class Tower implements Serializable {
         return id;
     }
 
-
-
     /**
      * Gibt den Level des Towers zurück
      *
@@ -188,6 +186,13 @@ public abstract class Tower implements Serializable {
      */
     public abstract void incrementCooldown();
 
+    /**
+     * Führt einen Angriff aus, wenn möglich.
+     *
+     * @param head Kopf der Action-Liste
+     * @return neuer Kopf der Action-Liste
+     */
+    protected abstract Action attack(Action head);
 
     public int getCooldown() {
         return cooldown;
@@ -331,37 +336,6 @@ public abstract class Tower implements Serializable {
 
     protected Action updateEnemyHealth(Enemy enemy, Action head) {
         return enemy.updateHealth(getDamage(), head);
-    }
-
-    /**
-     * Führt einen Angriff aus, wenn möglich.
-     *
-     * @param head Kopf der Action-Liste
-     * @return neuer Kopf der Action-Liste
-     */
-    protected Action attack(Action head) {
-        if (pathInRange.isEmpty()) {
-            return head;
-        }
-
-        if (getCooldown() > 0) {
-            --cooldown;
-            return head;
-        }
-
-        Enemy target = getTarget();
-
-        if (target != null) {
-            head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex(), id));
-            if (type == TowerType.MAGE_CAT) {
-                Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 0.1f);
-                path.setDuration(0.5f);
-                head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));
-            }
-            head = updateEnemyHealth(target, head);
-            cooldown = getRechargeTime();
-        }
-        return head;
     }
 
     public void setTargetOption(TargetOption targetOption) {

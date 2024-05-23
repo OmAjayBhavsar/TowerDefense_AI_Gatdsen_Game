@@ -1,9 +1,9 @@
 package com.gatdsen.simulation.tower;
 
-import com.gatdsen.simulation.PlayerState;
-import com.gatdsen.simulation.Tile;
-import com.gatdsen.simulation.Tower;
-import com.gatdsen.simulation.TowerTile;
+import com.gatdsen.simulation.*;
+import com.gatdsen.simulation.action.Action;
+import com.gatdsen.simulation.action.ProjectileAction;
+import com.gatdsen.simulation.action.TowerAttackAction;
 
 import java.util.List;
 
@@ -110,5 +110,34 @@ public class MinigunCat extends Tower {
             case 3: return 120;
             default: return 0;
         }
+    }
+
+    /**
+     * Führt einen Angriff aus, wenn möglich.
+     *
+     * @param head Kopf der Action-Liste
+     * @return neuer Kopf der Action-Liste
+     */
+    protected Action attack(Action head) {
+        if (pathInRange.isEmpty()) {
+            return head;
+        }
+
+        if (getCooldown() > 0) {
+            --cooldown;
+            return head;
+        }
+
+        Enemy target = getTarget();
+
+        if (target != null) {
+            head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex(), id));
+            Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 1);
+            path.setDuration(0);
+            head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));
+            head = updateEnemyHealth(target, head);
+            cooldown = getRechargeTime();
+        }
+        return head;
     }
 }

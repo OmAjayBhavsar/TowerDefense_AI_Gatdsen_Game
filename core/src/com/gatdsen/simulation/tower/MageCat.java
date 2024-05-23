@@ -1,8 +1,9 @@
 package com.gatdsen.simulation.tower;
 
-import com.gatdsen.simulation.PlayerState;
-import com.gatdsen.simulation.Tile;
-import com.gatdsen.simulation.Tower;
+import com.gatdsen.simulation.*;
+import com.gatdsen.simulation.action.Action;
+import com.gatdsen.simulation.action.ProjectileAction;
+import com.gatdsen.simulation.action.TowerAttackAction;
 
 /**
  * Speichert einen MageCat.
@@ -35,8 +36,8 @@ public class MageCat extends Tower {
      * @return eine Kopie des MageCat
      */
     @Override
-    protected Tower copy(PlayerState NewPlayerState) {
-        return new MageCat(this, NewPlayerState);
+    protected Tower copy(PlayerState newPlayerState) {
+        return new MageCat(this, newPlayerState);
     }
 
     /**
@@ -84,6 +85,38 @@ public class MageCat extends Tower {
             case 3: return 250;
             default: return 0;
         }
+    }
+
+    /**
+     * Führt einen Angriff aus, wenn möglich.
+     *
+     * @param head Kopf der Action-Liste
+     * @return neuer Kopf der Action-Liste
+     */
+    @Override
+    protected Action attack(Action head) {
+        if (pathInRange.isEmpty()) {
+            return head;
+        }
+
+        if (getCooldown() > 0) {
+            --cooldown;
+            return head;
+        }
+
+        Enemy target = getTarget();
+
+        if (target != null) {
+            head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex(), id));
+            Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 0.1f);
+            path.setDuration(0.5f);
+            head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));
+            if (target.getEnemyType() != Enemy.EnemyType.SHIELD_ENEMY) {
+                head = updateEnemyHealth(target, head);
+            }
+            cooldown = getRechargeTime();
+        }
+        return head;
     }
 }
 
