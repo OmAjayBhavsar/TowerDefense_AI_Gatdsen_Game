@@ -168,8 +168,9 @@ public class Hud implements Disposable {
         playerSelectBox.setItems("Spieler 1", "Spieler 2");
         playerSelectBox.setSize(140, 20);
 
-        SelectBox<String> enemySelectBox = new SelectBox<>(skin);
-        enemySelectBox.setItems("Schild-Maus", "EMP-Maus", "Rüstungs-Maus"); // Beispielwerte, bitte anpassen
+        SelectBox<Enemy.EnemyType> enemySelectBox = new SelectBox<>(skin);
+        ArrayList<Enemy.EnemyType> enemyArray = new ArrayList<>(gameState.getGameMode().getEnemies());
+        enemySelectBox.setItems(enemyArray.toArray(new Enemy.EnemyType[0]));
         enemySelectBox.setSize(140, 20);
 
         TextButton buyButton = new TextButton("Kaufen", skin);
@@ -204,36 +205,16 @@ public class Hud implements Disposable {
             public void changed(ChangeEvent event, Actor actor) {
                 closeSelectBox();
                 String selectedPlayer = playerSelectBox.getSelected();
-                String selectedEnemy = enemySelectBox.getSelected();
                 int selectedPlayerInt;
-                Enemy.EnemyType enemyType;
 
                 switch (selectedPlayer) {
-                    case "Spieler 1":
-                        selectedPlayerInt = 0;
-                        break;
                     case "Spieler 2":
                         selectedPlayerInt = 1;
                         break;
                     default:
                         selectedPlayerInt = 0;
                 }
-
-                switch (selectedEnemy) {
-                    case "Schild-Maus":
-                        enemyType = Enemy.EnemyType.SHIELD_ENEMY;
-                        break;
-                    case "EMP-Maus":
-                        enemyType = Enemy.EnemyType.EMP_ENEMY;
-                        break;
-                    case "Rüstungs-Maus":
-                        enemyType = Enemy.EnemyType.ARMOR_ENEMY;
-                        break;
-                    default:
-                        enemyType = Enemy.EnemyType.SHIELD_ENEMY;
-                }
-
-                inputHandler.playerBuyedEnemy(selectedPlayerInt, enemyType);
+                inputHandler.playerBuyedEnemy(selectedPlayerInt, enemySelectBox.getSelected());
             }
         });
 
@@ -646,7 +627,7 @@ public class Hud implements Disposable {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
                             Tower.TargetOption targetOption;
-                            targetOption = (Tower.TargetOption) fireModeSelectBox.getSelected();
+                            targetOption = fireModeSelectBox.getSelected();
                             inputHandler.playerFieldLeftClicked(team, posX, posY, null, targetOption);
                             closeSelectBox();
                         }
