@@ -63,15 +63,14 @@ public final class Campaign3_1Bot extends Bot {
     @Override
     public void executeTurn(StaticGameState state, Controller controller) {
         if (counter == 0) {
-            controller.placeTower(6, 8, TowerType.MINIGUN_CAT);
-            controller.upgradeTower(6, 8);
+            controller.placeTower(7, 6, TowerType.MINIGUN_CAT);
+            controller.upgradeTower(7, 6);
 
             controller.placeTower(4, 6, TowerType.CATANA_CAT);
             controller.upgradeTower(4, 6);
 
-            controller.placeTower(8, 3, TowerType.MAGE_CAT);
-            controller.upgradeTower(8, 3);
-            controller.setTowerTarget(8, 3, Tower.TargetOption.STRONGEST);
+            controller.placeTower(2, 9, TowerType.MAGE_CAT);
+            controller.upgradeTower(2, 9);
             counter++;
         }
     }
