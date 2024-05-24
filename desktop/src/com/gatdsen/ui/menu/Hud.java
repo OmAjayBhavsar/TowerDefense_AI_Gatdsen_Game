@@ -29,13 +29,9 @@ import com.gatdsen.ui.GADS;
 import com.gatdsen.ui.assets.AssetContainer;
 import com.gatdsen.ui.hud.*;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
-/**
- * Class for taking care of the User Interface.
- * Input Handling during the game.
- * Displaying health, inventory
- */
 public class Hud implements Disposable {
 
     private final Stage stage;
@@ -168,8 +164,9 @@ public class Hud implements Disposable {
         playerSelectBox.setItems("Spieler 1", "Spieler 2");
         playerSelectBox.setSize(140, 20);
 
-        SelectBox<String> enemySelectBox = new SelectBox<>(skin);
-        enemySelectBox.setItems("Schild-Maus", "EMP-Maus", "Rüstungs-Maus"); // Beispielwerte, bitte anpassen
+        SelectBox<Enemy.EnemyType> enemySelectBox = new SelectBox<>(skin);
+        ArrayList<Enemy.EnemyType> enemyArray = new ArrayList<>(gameState.getGameMode().getEnemies());
+        enemySelectBox.setItems(enemyArray.toArray(new Enemy.EnemyType[0]));
         enemySelectBox.setSize(140, 20);
 
         TextButton buyButton = new TextButton("Kaufen", skin);
@@ -204,36 +201,16 @@ public class Hud implements Disposable {
             public void changed(ChangeEvent event, Actor actor) {
                 closeSelectBox();
                 String selectedPlayer = playerSelectBox.getSelected();
-                String selectedEnemy = enemySelectBox.getSelected();
                 int selectedPlayerInt;
-                Enemy.EnemyType enemyType;
 
                 switch (selectedPlayer) {
-                    case "Spieler 1":
-                        selectedPlayerInt = 0;
-                        break;
                     case "Spieler 2":
                         selectedPlayerInt = 1;
                         break;
                     default:
                         selectedPlayerInt = 0;
                 }
-
-                switch (selectedEnemy) {
-                    case "Schild-Maus":
-                        enemyType = Enemy.EnemyType.SHIELD_ENEMY;
-                        break;
-                    case "EMP-Maus":
-                        enemyType = Enemy.EnemyType.EMP_ENEMY;
-                        break;
-                    case "Rüstungs-Maus":
-                        enemyType = Enemy.EnemyType.ARMOR_ENEMY;
-                        break;
-                    default:
-                        enemyType = Enemy.EnemyType.SHIELD_ENEMY;
-                }
-
-                inputHandler.playerBuyedEnemy(selectedPlayerInt, enemyType);
+                inputHandler.playerBuyedEnemy(selectedPlayerInt, enemySelectBox.getSelected());
             }
         });
 
@@ -504,10 +481,17 @@ public class Hud implements Disposable {
         stage.dispose();
     }
 
+    /**
+     * Bereinigt die Bühne und alle Gruppen, indem alle Elemente entfernt werden
+     *
+     * Diese Methode löscht alle Elemente von der Bühne, der Haupt-Vertikalgruppe und der Ingame-Gruppe.
+     * Sie entfernt außerdem alle TextButtons aus der Ingame-Gruppe
+     */
     public void clear() {
         stage.clear();
         mainVerticalGroup.clear();
         ingameGroup.clear(); // Entferne alle Elemente aus der Hud-Gruppe
+
         for (Actor actor : ingameGroup.getChildren()) {
             if (actor instanceof TextButton) {
                 actor.remove(); // Entferne jeden TextButton aus der Hud-Gruppe
@@ -558,13 +542,32 @@ public class Hud implements Disposable {
         }
     }
 
+    /**
+     * Setzt die Nachricht für das Ergebnis nach dem Spiel für ein bestimmtes Team.
+     *
+     * Diese Methode legt fest, welche Grafik für die Nachricht nach dem Spiel eines Teams
+     * angezeigt wird, indem sie eine Textur für das jeweilige Team festlegt
+     *
+     * @param team Das Team, für das die Nachricht gesetzt werden soll
+     * @param endScreenTextureRegion Die Textur, die als Nachricht angezeigt werden soll
+     */
     void setEndGameMessages(int team, TextureRegion endScreenTextureRegion) {
         endGameMessages[team].setDrawable(new TextureRegionDrawable(endScreenTextureRegion));
     }
 
+    /**
+     * Markiert einen Spieler als disqualifiziert und aktualisiert die Nachrichten
+     *
+     * Diese Methode setzt die Endspiel-Nachrichten für alle Teams. Das disqualifizierte Team
+     * erhält die Verlustanzeige, während die anderen Teams die Siegesanzeige erhalten
+     *
+     * @param team Das Team, das disqualifiziert wurde
+     * @param message Die Nachricht, die angezeigt werden soll
+     */
     public void playerDisqualified(int team, String message) {
         for (int i = 0; i < endGameMessages.length; i++) {
             setEndGameMessages(i, i == team ? AssetContainer.IngameAssets.lossDisplay : AssetContainer.IngameAssets.victoryDisplay);
+            JOptionPane.showMessageDialog(null,message, "Spieler Disqualifiziert", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -576,6 +579,16 @@ public class Hud implements Disposable {
             turnPopupContainer.getActor().remove();
     }
 
+    /**
+     * Konvertiert Ingame-Koordinaten in HUD-Koordinaten.
+     *
+     * Diese Methode nimmt die Ingame-Koordinaten (x, y) und wandelt sie zuerst in
+     * Bildschirmkoordinaten und dann in HUD-Koordinaten um.
+     *
+     * @param x Die x-Koordinate im Ingame-Bereich.
+     * @param y Die y-Koordinate im Ingame-Bereich.
+     * @return Ein Vector2-Objekt, das die umgewandelten HUD-Koordinaten enthält.
+     */
     private Vector2 ingameToHudCoordinates(float x, float y) {
         return stage.screenToStageCoordinates(ingameStage.stageToScreenCoordinates(new Vector2(x, y)));
     }
@@ -646,7 +659,7 @@ public class Hud implements Disposable {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
                             Tower.TargetOption targetOption;
-                            targetOption = (Tower.TargetOption) fireModeSelectBox.getSelected();
+                            targetOption = fireModeSelectBox.getSelected();
                             inputHandler.playerFieldLeftClicked(team, posX, posY, null, targetOption);
                             closeSelectBox();
                         }
@@ -711,6 +724,11 @@ public class Hud implements Disposable {
         Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
+    /**
+     * Schließt und entfernt alle Auswahlboxen (Select Boxes), die aktuell angezeigt werden
+     * Dies umfasst die Tower-Auswahlbox, die Verkauf-/Upgrade-Auswahlbox und die Feuermodus-Auswahlbox,
+     * falls diese vorhanden sind
+     */
     private void closeSelectBox() {
         if (towerSelectBox != null) {
             towerSelectBox.remove();
@@ -758,7 +776,9 @@ public class Hud implements Disposable {
     }
 
     /**
+     * Initialisiert die Spawn-Münzen für einen bestimmten Spieler
      *
+     * @param playerID Die ID des Spielers, dessen Spawn-Münzen initialisiert werden sollen
      */
     public void initSpawnCoins(int playerID) {
         PlayerState[] playerStates = gameState.getPlayerStates();
@@ -772,6 +792,12 @@ public class Hud implements Disposable {
         updateUIElements();
     }
 
+    /**
+     * Setzt die Anzahl der Spawn-Münzen für einen bestimmten Spieler
+     *
+     * @param playerID Die ID des Spielers, dessen Spawn-Münzen gesetzt werden sollen
+     * @param coins Die Anzahl der Spawn-Münzen, die für den Spieler gesetzt werden sollen
+     */
     public void setSpawnCoins(int playerID, int coins) {
         if (playerID == 0) {
             player0SpawnCoins = coins;
