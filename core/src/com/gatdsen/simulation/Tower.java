@@ -194,6 +194,9 @@ public abstract class Tower implements Serializable {
      */
     protected abstract Action attack(Action head);
 
+    /**
+     * @return Cooldown des Towers
+     */
     public int getCooldown() {
         return cooldown;
     }
@@ -211,7 +214,7 @@ public abstract class Tower implements Serializable {
             case CATANA_CAT:
                 return 100;
             case MAGE_CAT:
-               return 100;
+                return 100;
             default:
                 return 0;
         }
@@ -238,6 +241,7 @@ public abstract class Tower implements Serializable {
 
     /**
      * Gibt den Preis des Towers zurück
+     *
      * @return Preis des Towers
      */
     public abstract int getUpgradePrice();
@@ -338,8 +342,28 @@ public abstract class Tower implements Serializable {
         return enemy.updateHealth(getDamage(), head);
     }
 
+    /**
+     * Setzt das bevorzugte Ziel des Towers
+     *
+     * @param targetOption bevorzugtes Ziel
+     */
     public void setTargetOption(TargetOption targetOption) {
         this.targetOption = targetOption;
+    }
+
+    /**
+     * Gibt die Anzahl der Türme in Reichweite zurück
+     *
+     * @param cap maximale Anzahl der zu berückstichtigenden Türme
+     * @return Anzahl der Tümrme in Reichweite
+     */
+    protected int catsInRange(int cap) {
+        return (int) getNeighbours(getRange(), playerState.getBoard()).stream()
+                .filter(tile -> tile instanceof TowerTile)
+                .map(tile -> (TowerTile) tile)
+                .filter(towerTile -> towerTile.getTower().getType() == type)
+                .limit(cap)
+                .count();
     }
 
     /**

@@ -45,12 +45,30 @@ public class MageCat extends Tower {
      */
     @Override
     public int getDamage() {
+        int damage;
         switch (level) {
-            case 1: return 150; // One shot one kill
-            case 2: return 250;
-            case 3: return 350;
-            default: return 0;
+            case 1:
+                damage = 150;
+                break;
+            case 2:
+                damage = 250;
+                break;
+            case 3:
+                damage = 350;
+                break;
+            default:
+                damage = 0;
         }
+        return (int) (damage * (1 - (float) mageCatsInRange() / 10));
+    }
+
+    /**
+     * Prüft, wie viele MageCats in Reichweite sind.
+     *
+     * @return Anzahl der MageCats in Reichweite
+     */
+    private int mageCatsInRange() {
+        return catsInRange(5);
     }
 
     /**
@@ -80,10 +98,14 @@ public class MageCat extends Tower {
     @Override
     public int getUpgradePrice() {
         switch (level) {
-            case 1: return 100;
-            case 2: return 150;
-            case 3: return 250;
-            default: return 0;
+            case 1:
+                return 100;
+            case 2:
+                return 150;
+            case 3:
+                return 250;
+            default:
+                return 0;
         }
     }
 
