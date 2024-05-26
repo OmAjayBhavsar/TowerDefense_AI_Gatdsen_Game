@@ -166,14 +166,19 @@ public class Manager {
     }
 
     private Manager() {
-        //Runtime.getRuntime().addShutdownHook(new Thread(this::dispose));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::dispose));
         executionManager = new Thread(this::executionManager);
         executionManager.start();
     }
 
     public void dispose() {
         //Shutdown all running threads
-        pendingShutdown = true;
+        synchronized (this) {
+            if (pendingShutdown) {
+                return;
+            }
+            pendingShutdown = true;
+        }
         synchronized (games) {
             for (Executable game : games) {
                 game.dispose();

@@ -11,11 +11,15 @@ import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class PlayerProcessCommunicator implements ProcessCommunicator {
 
     private final RMIRegistry registry;
     private final String localReferenceName;
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private ProcessCommunicator remoteCommunicatorStub = null;
 
     private PlayerExecutor playerExecutor = null;
@@ -25,6 +29,18 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
     public PlayerProcessCommunicator(RMIRegistry registry, String localReferenceName) {
         this.registry = registry;
         this.localReferenceName = localReferenceName;
+        ProcessHandle parentProcess = ProcessHandle.current().parent().orElse(null);
+        executor.scheduleAtFixedRate(
+            () -> {
+                if (parentProcess != null && parentProcess.isAlive()) {
+                    return;
+                }
+                dispose();
+            },
+                0,
+                500,
+                TimeUnit.MILLISECONDS
+        );
         Runtime.getRuntime().addShutdownHook(new Thread(this::dispose));
     }
 
@@ -82,13 +98,14 @@ public class PlayerProcessCommunicator implements ProcessCommunicator {
         }
     }
 
-    private void dispose() {
+    public void dispose() {
         synchronized (this) {
             if (isDisposed) {
                 return;
             }
             isDisposed = true;
         }
+        executor.shutdownNow();
         try {
             UnicastRemoteObject.unexportObject(this, true);
         } catch (NoSuchObjectException ignored) {

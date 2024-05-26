@@ -46,9 +46,16 @@ public final class ProcessExecutor extends Resource {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+        // -Djava.rmi.server.logCalls=true
+        String logCalls = System.getProperty("java.rmi.server.logCalls");
+        if (logCalls != null) {
+            builder.environment().put("java.rmi.server.logCalls", logCalls);
+        }
         builder.command(
                 // Starten der JVM in der main() vom BotProcessLauncher
-                "java", "-cp", currentJar.getPath(), BotProcessLauncher.class.getName(),
+                "java",
+                //"-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005",
+                "-cp", currentJar.getPath(), BotProcessLauncher.class.getName(),
                 // Angabe des Hosts der Remote Object Registry
                 "-host", registryHost,
                 // Angabe des Ports der Remote Object Registry

@@ -78,8 +78,8 @@ public class RemotePlayerHandler extends PlayerHandler {
                 return;
             } else if (message.getType() == Message.Type.PlayerExecuteTurnResponse) {
                 penalize(((PlayerExecuteTurnResponse) message).penalty);
-                executeTurnFuture.complete(null);
                 communicator.setMessageHandler(null);
+                executeTurnFuture.complete(null);
                 return;
             }
             throw new UnexpectedMessageException(message, Message.Type.PlayerCommandResponse, Message.Type.PlayerExecuteTurnResponse);

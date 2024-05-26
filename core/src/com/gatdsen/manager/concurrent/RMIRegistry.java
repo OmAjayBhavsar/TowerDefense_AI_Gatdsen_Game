@@ -1,11 +1,9 @@
 package com.gatdsen.manager.concurrent;
 
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
-import java.rmi.Remote;
-import java.rmi.RemoteException;
+import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 /**
  * Diese Klasse repräsentiert eine Verbindung zu einem bestimmten RMI-Registry an einem bestimmten Host und Port.
@@ -19,7 +17,8 @@ public final class RMIRegistry extends Resource {
 
     public final String host;
     public final int port;
-    private final Registry registry;
+    private Registry registry;
+    private boolean createdRegistry;
 
     /**
      * Erstellt eine Verbindung zu einem RMI-Registry an dem Standard-Host und dem Standard-Port.
@@ -29,29 +28,32 @@ public final class RMIRegistry extends Resource {
     public RMIRegistry(String host, Integer port) {
         this.host = host == null ? defaultRegistryHost : host;
         this.port = port == null ? defaultRegistryPort : port;
-        registry = getRegistry(this.host, this.port);
+        getRegistry(this.host, this.port);
     }
 
     /**
      * Erstellt eine Verbindung zu einem RMI-Registry an einem bestimmten Host und Port.
      * Wenn der Host nicht angegeben oder der Standard-Host ist, wird versucht an dem Port ein RMI-Registry zu
      * erstellen.
+     *
      * @param host Der Host des RMI-Registries
      * @param port Der Port des RMI-Registries
-     * @return Das Registry-Objekt
      */
-    private static Registry getRegistry(String host, int port) {
+    private void getRegistry(String host, int port) {
         // Wenn kein Host angegeben ist oder der Host der Default-Host ist, wird versucht, eine Registry an dem Port zu erstellen
         if (host == null || host.equals(defaultRegistryHost)) {
             try {
                 // createRegistry() wirft eine RemoteException, wenn an dem Port bereits ein Registry-Objekt existiert
-                return LocateRegistry.createRegistry(port);
+                registry = LocateRegistry.createRegistry(port);
+                createdRegistry = true;
+                return;
             } catch (RemoteException ignored) {
             }
         }
         // In diesem Fall wird die bereits existierende Registry verwendet
         try {
-            return LocateRegistry.getRegistry(host, port);
+            registry = LocateRegistry.getRegistry(host, port);
+            createdRegistry = false;
         } catch (RemoteException ex) {
             throw new RuntimeException(ex);
         }
@@ -157,6 +159,16 @@ public final class RMIRegistry extends Resource {
      * Beendet die Verbindung zu dem RMI-Registry.
      */
     public void dispose() {
+        if (isDisposed()) {
+            return;
+        }
         setDisposed();
+        if (!createdRegistry) {
+            return;
+        }
+        try {
+            UnicastRemoteObject.unexportObject(registry, true);
+        } catch (NoSuchObjectException ignored) {
+        }
     }
 }
