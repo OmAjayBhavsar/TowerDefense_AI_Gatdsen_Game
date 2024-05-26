@@ -69,11 +69,7 @@ public abstract class Enemy implements Serializable {
         if (enemyType == EnemyType.ARMOR_ENEMY) {
             damage = (int) (damage * 0.5);
         }
-        if (enemyType == EnemyType.SHIELD_ENEMY && ((ShieldEnemy) this).isShielded()) {
-            ((ShieldEnemy) this).setShielded(false);
-            head.addChild(new EnemyDestroyShieldAction(0, posTile.getPosition(), level, team, enemyType, id));
-            return head;
-        } else if (health - damage <= 0) {
+        if (health - damage <= 0) {
             health = 0;
             posTile.getEnemies().remove(this);
 
@@ -167,5 +163,9 @@ public abstract class Enemy implements Serializable {
      */
     protected List<Tile> getNeighbours(int range, Tile[][] board) {
         return Tile.getNeighbours(range, posTile.getPosition(), board);
+    }
+
+    public EnemyType getEnemyType() {
+        return enemyType;
     }
 }

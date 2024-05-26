@@ -73,7 +73,7 @@ public class CatanaCat extends Tower {
     }
 
     @Override
-    public void incrementRechargeTime() {
+    public void incrementCooldown() {
         cooldown += 1;
     }
 
@@ -112,7 +112,7 @@ public class CatanaCat extends Tower {
             return head;
         }
 
-        if (getRechargeTime() > 0) {
+        if (getCooldown() > 0) {
             --cooldown;
             return head;
         }

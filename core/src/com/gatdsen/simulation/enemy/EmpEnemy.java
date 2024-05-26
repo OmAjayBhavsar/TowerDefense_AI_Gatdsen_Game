@@ -37,7 +37,7 @@ public class EmpEnemy extends Enemy {
             for (Tile tile : inRange) {
                 if (tile instanceof TowerTile) {
                     TowerTile towerTile = (TowerTile) tile;
-                    towerTile.getTower().incrementRechargeTime();
+                    towerTile.getTower().incrementCooldown();
                 }
             }
             cooldown = 3;

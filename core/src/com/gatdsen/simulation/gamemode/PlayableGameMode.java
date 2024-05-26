@@ -144,9 +144,9 @@ public abstract class PlayableGameMode extends GameMode {
 
     public int calculateEnemyLevelForWave(int wave) {
         if (wave % 10 == 0) {
-            return wave / 2;
+            return -(wave / 2);
         } else if (wave % 5 == 0) {
-            return wave / 5 + 1;
+            return -(wave / 5 + 1);
         }
         return 1 + wave / 20;
     }

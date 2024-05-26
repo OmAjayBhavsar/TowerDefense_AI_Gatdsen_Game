@@ -6,12 +6,9 @@ import com.gatdsen.simulation.enemy.BasicEnemy;
 import com.gatdsen.simulation.enemy.EmpEnemy;
 import com.gatdsen.simulation.enemy.ShieldEnemy;
 import com.gatdsen.simulation.gamemode.PlayableGameMode;
-import com.gatdsen.simulation.gamemode.campaign.CampaignMode;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Speichert den Zustand eines Spielers.
@@ -22,13 +19,12 @@ public class PlayerState implements Serializable {
     private int health;
     private int money;
     private int spawnCoins;
+    private int wave;
     private int enemyLevel;
     private final int index;
-    private int spawnDelay;
-    private boolean enemySpawn;
     private PathTile spawnTile;
     private PathTile endTile;
-    private final Stack<Enemy> spawnEnemies = new Stack<>();
+    private final Queue<Enemy> spawnEnemies = new LinkedList<>();
 
     private boolean disqualified;
     private boolean deactivated;
@@ -385,40 +381,7 @@ public class PlayerState implements Serializable {
         return head;
     }
 
-    /**
-     * Initialisiert die Gegner, die gespawnt werden sollen
-     *
-     * @param type Typ des Gegners
-     */
-    void spawnEnemy(Enemy.EnemyType type) {
-        enemySpawn = true;
-        spawnDelay++;
-        switch (type) {
-            case EMP_ENEMY:
-                spawnEnemies.push(new EmpEnemy(this, enemyLevel, spawnTile));
-                break;
-            case SHIELD_ENEMY:
-                spawnEnemies.push(new ShieldEnemy(this, enemyLevel, spawnTile));
-                break;
-            case ARMOR_ENEMY:
-                spawnEnemies.push(new ArmorEnemy(this, enemyLevel, spawnTile));
-        }
-    }
 
-    /**
-     * Fügt den Gegner des aktuellen Zuges zur Spawnliste hinzu, falls kein Gegner vom Gegenspieler gespawned wurde
-     *
-     * @param wave Die aktuelle Welle
-     */
-    void spawnEnemy(int wave) {
-        if (enemySpawn) {
-            enemySpawn = false;
-        } else {
-            int actWave = wave - spawnDelay;
-            spawnEnemies.push(new BasicEnemy(this, gameMode.calculateEnemyLevelForWave(actWave), spawnTile));
-            enemyLevel = 1 + actWave / 20;
-        }
-    }
 
     /**
      * Spawnt die Gegner
@@ -428,13 +391,46 @@ public class PlayerState implements Serializable {
      * @return der Action Head
      */
     Action spawnEnemies(Action head, int wave) {
-        spawnEnemy(wave + 1);
-        while (!spawnEnemies.isEmpty()) {
-            Enemy enemy = spawnEnemies.pop();
-            spawnTile.getEnemies().add(enemy);
-            head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemy.getLevel(), enemy.getHealth(), index, enemy.enemyType, enemy.getId()));
+        this.wave = wave + 1;
+        int level = spawnEnemy();
+
+        Enemy enemy = spawnEnemies.remove();
+        if (level > 0 && !spawnEnemies.isEmpty()) {
+            spawnEnemies.remove();
         }
+        spawnTile.getEnemies().add(enemy);
+        head.addChild(new EnemySpawnAction(0, spawnTile.getPosition(), enemy.getLevel(), enemy.getHealth(), index, enemy.enemyType, enemy.getId()));
+
         return head;
+    }
+    /**
+     * Initialisiert die Gegner, die gespawnt werden sollen
+     *
+     * @param type Typ des Gegners
+     */
+    void spawnEnemy(Enemy.EnemyType type) {
+        switch (type) {
+            case EMP_ENEMY:
+                spawnEnemies.add(new EmpEnemy(this, enemyLevel * 2, spawnTile));
+                break;
+            case SHIELD_ENEMY:
+                spawnEnemies.add(new ShieldEnemy(this, enemyLevel * 2, spawnTile));
+                break;
+            case ARMOR_ENEMY:
+                spawnEnemies.add(new ArmorEnemy(this, enemyLevel * 2, spawnTile));
+        }
+    }
+
+    /**
+     * Fügt den Gegner des aktuellen Zuges zur Spawnliste hinzu, falls kein Gegner vom Gegenspieler gespawned wurde
+     *
+     * @return Level des Gegners
+     */
+    int spawnEnemy() {
+        int level = gameMode.calculateEnemyLevelForWave(wave);
+        spawnEnemies.add(new BasicEnemy(this, Math.abs(level), spawnTile));
+        enemyLevel = 1 + wave / 20;
+        return level;
     }
 
     /**

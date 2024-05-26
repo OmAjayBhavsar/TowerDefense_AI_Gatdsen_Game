@@ -151,8 +151,6 @@ public abstract class Tower implements Serializable {
         return id;
     }
 
-
-
     /**
      * Gibt den Level des Towers zurück
      *
@@ -186,7 +184,22 @@ public abstract class Tower implements Serializable {
     /**
      * Erhöht die RechargeTime des Towers
      */
-    public abstract void incrementRechargeTime();
+    public abstract void incrementCooldown();
+
+    /**
+     * Führt einen Angriff aus, wenn möglich.
+     *
+     * @param head Kopf der Action-Liste
+     * @return neuer Kopf der Action-Liste
+     */
+    protected abstract Action attack(Action head);
+
+    /**
+     * @return Cooldown des Towers
+     */
+    public int getCooldown() {
+        return cooldown;
+    }
 
     /**
      * Gibt den Preis des Towers zurück
@@ -201,7 +214,7 @@ public abstract class Tower implements Serializable {
             case CATANA_CAT:
                 return 100;
             case MAGE_CAT:
-               return 100;
+                return 100;
             default:
                 return 0;
         }
@@ -228,6 +241,7 @@ public abstract class Tower implements Serializable {
 
     /**
      * Gibt den Preis des Towers zurück
+     *
      * @return Preis des Towers
      */
     public abstract int getUpgradePrice();
@@ -329,38 +343,27 @@ public abstract class Tower implements Serializable {
     }
 
     /**
-     * Führt einen Angriff aus, wenn möglich.
+     * Setzt das bevorzugte Ziel des Towers
      *
-     * @param head Kopf der Action-Liste
-     * @return neuer Kopf der Action-Liste
+     * @param targetOption bevorzugtes Ziel
      */
-    protected Action attack(Action head) {
-        if (pathInRange.isEmpty()) {
-            return head;
-        }
-
-        if (cooldown > 0) {
-            --cooldown;
-            return head;
-        }
-
-        Enemy target = getTarget();
-
-        if (target != null) {
-            head.addChild(new TowerAttackAction(0, pos, target.getPosition(), type.ordinal(), playerState.getIndex(), id));
-            if (type == TowerType.MAGE_CAT) {
-                Path path = new LinearPath(pos.toFloat(), target.getPosition().toFloat(), 0.1f);
-                path.setDuration(0.5f);
-                head.addChild(new ProjectileAction(0, ProjectileAction.ProjectileType.STANDARD_TYPE, path, playerState.getIndex()));
-            }
-            head = updateEnemyHealth(target, head);
-            cooldown = getRechargeTime();
-        }
-        return head;
-    }
-
     public void setTargetOption(TargetOption targetOption) {
         this.targetOption = targetOption;
+    }
+
+    /**
+     * Gibt die Anzahl der Türme in Reichweite zurück
+     *
+     * @param cap maximale Anzahl der zu berückstichtigenden Türme
+     * @return Anzahl der Tümrme in Reichweite
+     */
+    protected int catsInRange(int cap) {
+        return (int) getNeighbours(getRange(), playerState.getBoard()).stream()
+                .filter(tile -> tile instanceof TowerTile)
+                .map(tile -> (TowerTile) tile)
+                .filter(towerTile -> towerTile.getTower().getType() == type)
+                .limit(cap)
+                .count();
     }
 
     /**

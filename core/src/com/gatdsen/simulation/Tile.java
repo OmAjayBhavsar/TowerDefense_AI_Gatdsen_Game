@@ -58,7 +58,7 @@ public abstract class Tile implements Serializable {
         IntRectangle rec = new IntRectangle(0, 0, board.length - 1, board[0].length - 1);
         for (int i = 0; i < diameter; i++) {
             for (int j = 0; j < diameter; j++) {
-                if (rec.contains(pos.x - range + i, pos.y - range + j)) {
+                if (rec.contains(pos.x - range + i, pos.y - range + j) && !(i == range && j == range)) {
                     neighbours.add(board[pos.x - range + i][pos.y - range + j]);
                 }
             }
