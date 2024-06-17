@@ -84,7 +84,7 @@ public abstract class Enemy implements Serializable {
             Action updateHealthAction = new EnemyUpdateHealthAction(0, posTile.getPosition(), 0, level, team, enemyType, id);
             head.addChild(updateHealthAction);
             updateHealthAction.addChild(new EnemyDefeatAction(0, posTile.getPosition(), level, team, enemyType, id));
-            head = playerState.updateMoney(30 * level, updateHealthAction);
+            head = playerState.updateMoney(30 + (level-1) * 5, updateHealthAction);
         } else {
             health -= damage;
             head.addChild(new EnemyUpdateHealthAction(0, posTile.getPosition(), health, level, team, enemyType, id));
