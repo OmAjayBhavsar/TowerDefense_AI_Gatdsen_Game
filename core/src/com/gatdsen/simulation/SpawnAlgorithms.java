@@ -3,6 +3,8 @@ package com.gatdsen.simulation;
 public class SpawnAlgorithms {
     static int getSpawnLevel(int wave, int id) {
         switch (id) {
+            case 11:
+                return campaign1_2(wave);
             case 12:
                 return campaign1_2(wave);
             default:
