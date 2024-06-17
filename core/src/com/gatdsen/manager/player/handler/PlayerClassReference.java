@@ -28,10 +28,12 @@ public final class PlayerClassReference implements Serializable {
     public static final PlayerClassReference HUMAN_PLAYER = new PlayerClassReference("HumanPlayer", HumanPlayer.class);
     /** Die Referenz auf den {@link IdleBot} */
     public static final PlayerClassReference IDLE_BOT = new PlayerClassReference("IdleBot", IdleBot.class);
+
+    public static final PlayerClassReference CAMPAIGN_22_BOT = new PlayerClassReference("Campaign_22_Bot", Campaign2_2Bot.class);
     /** Die Referenz auf den {@link IdleBot} */
     public static final PlayerClassReference EXAM_ADMISSION_BOT = new PlayerClassReference("ExamAdmissionBot", ExamAdmissionBot.class);
     /** Alle Referenzen auf die intern existierenden Spielerklassen */
-    public static final Map<String, PlayerClassReference> INTERNAL_PLAYER_CLASS_REFERENCES = Map.of(HUMAN_PLAYER.fileName, HUMAN_PLAYER, IDLE_BOT.fileName, IDLE_BOT, EXAM_ADMISSION_BOT.fileName, EXAM_ADMISSION_BOT);
+    public static final Map<String, PlayerClassReference> INTERNAL_PLAYER_CLASS_REFERENCES = Map.of(HUMAN_PLAYER.fileName, HUMAN_PLAYER, IDLE_BOT.fileName, IDLE_BOT, CAMPAIGN_22_BOT.fileName, CAMPAIGN_22_BOT,EXAM_ADMISSION_BOT.fileName, EXAM_ADMISSION_BOT);
 
     /** Der Dateiname der Klasse - ohne Angabe des Dateipfades oder ".class" Endung */
     private final String fileName;

@@ -1,5 +1,7 @@
 package com.gatdsen.simulation.gamemode.campaign;
 
+import com.gatdsen.manager.player.handler.LocalPlayerHandlerFactory;
+
 import java.time.LocalDateTime;
 
 public class CampaignMode2_2 extends CampaignMode {
@@ -8,6 +10,7 @@ public class CampaignMode2_2 extends CampaignMode {
         super();
         setPlayerHealth(1, 100);
         setMap("Campaign2_2");
+        setPlayerFactory(1, LocalPlayerHandlerFactory.CAMPAIGN_22_BOT);
     }
 
     @Override
