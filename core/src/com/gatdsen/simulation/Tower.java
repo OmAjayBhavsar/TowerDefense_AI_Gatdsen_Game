@@ -186,7 +186,12 @@ public abstract class Tower implements Serializable {
     /**
      * Erhöht die RechargeTime des Towers
      */
-    public abstract void incrementRechargeTime();
+    public abstract void incrementCooldown();
+
+
+    public int getCooldown() {
+        return cooldown;
+    }
 
     /**
      * Gibt den Preis des Towers zurück
@@ -339,7 +344,7 @@ public abstract class Tower implements Serializable {
             return head;
         }
 
-        if (cooldown > 0) {
+        if (getCooldown() > 0) {
             --cooldown;
             return head;
         }

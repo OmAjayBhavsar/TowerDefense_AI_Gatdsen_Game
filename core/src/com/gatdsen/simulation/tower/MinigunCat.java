@@ -95,7 +95,7 @@ public class MinigunCat extends Tower {
     }
 
     @Override
-    public void incrementRechargeTime() {
+    public void incrementCooldown() {
         cooldown += 2;
     }
 

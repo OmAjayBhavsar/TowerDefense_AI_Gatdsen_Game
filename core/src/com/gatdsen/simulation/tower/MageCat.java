@@ -69,7 +69,7 @@ public class MageCat extends Tower {
     }
 
     @Override
-    public void incrementRechargeTime() {
+    public void incrementCooldown() {
         cooldown += 3;
     }
 
