@@ -417,13 +417,13 @@ public class PlayerState implements Serializable {
     void spawnEnemy(Enemy.EnemyType type) {
         switch (type) {
             case EMP_ENEMY:
-                spawnEnemies.add(new EmpEnemy(this, enemyLevel, spawnTile));
+                spawnEnemies.add(new EmpEnemy(this, enemyLevel * 2, spawnTile));
                 break;
             case SHIELD_ENEMY:
-                spawnEnemies.add(new ShieldEnemy(this, enemyLevel, spawnTile));
+                spawnEnemies.add(new ShieldEnemy(this, enemyLevel * 2, spawnTile));
                 break;
             case ARMOR_ENEMY:
-                spawnEnemies.add(new ArmorEnemy(this, enemyLevel, spawnTile));
+                spawnEnemies.add(new ArmorEnemy(this, enemyLevel * 2, spawnTile));
         }
         cooldown = 3;
     }
