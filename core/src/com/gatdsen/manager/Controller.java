@@ -118,4 +118,8 @@ public final class Controller {
     private void deactivate() {
         uses = -1;
     }
+
+    public void buyOpponent(Enemy.EnemyType enemyType) {
+        sendEnemyToPlayer(enemyType);
+    }
 }

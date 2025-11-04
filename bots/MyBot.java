@@ -4,6 +4,7 @@ import com.gatdsen.manager.Controller;
 import com.gatdsen.manager.StaticGameState;
 import com.gatdsen.manager.player.Bot;
 import com.gatdsen.simulation.Tower;
+import java.util.Random;
 
 /**
  * In dieser Klasse implementiert ihr euren Bot.
@@ -16,7 +17,7 @@ public class MyBot extends Bot {
      */
     @Override
     public String getStudentName() {
-        return "Max Musterstudent";
+        return "Om Ajay Bhavsar";
     }
 
     /**
@@ -25,7 +26,7 @@ public class MyBot extends Bot {
      */
     @Override
     public int getMatrikel() {
-        return 1337;
+        return 231781;
     }
 
     /**
@@ -34,7 +35,7 @@ public class MyBot extends Bot {
      */
     @Override
     public String getName() {
-        return "Beathe Beispiel-Bot";
+        return "The_Prediator";
     }
 
     /**
@@ -61,13 +62,49 @@ public class MyBot extends Bot {
      * @param state Der {@link StaticGameState Spielzustand} vor der Ausführung des aktuellen Zuges
      * @param controller Der {@link Controller Controller}, um Aktionen auszuführen
      */
+
+    private  Random random = new Random();
+
     @Override
     public void executeTurn(StaticGameState state, Controller controller) {
         System.out.println("Der Bot \"" + getName() + "\" ist am Zug in Runde " + state.getTurn() + "!");
-        controller.placeTower(
-                random.nextInt(0, state.getBoardSizeX()),
-                random.nextInt(0, state.getBoardSizeY()),
-                Tower.TowerType.MINIGUN_CAT
-        );
+        if (state.getTurn() % 3 == 0) {
+            controller.placeTower(
+                    state.getBoardSizeX() / 2,
+                    state.getBoardSizeY() / 2,
+                    Tower.TowerType.MAGE_CAT
+            );
+        } else if (state.getTurn() % 2 == 0) {
+            controller.placeTower(
+                    random.nextInt(state.getBoardSizeX()),
+                    random.nextInt(state.getBoardSizeY()),
+                    Tower.TowerType.CATANA_CAT
+            );
+        } else {
+            controller.placeTower(
+                    random.nextInt(state.getBoardSizeX()),
+                    random.nextInt(state.getBoardSizeY()),
+                    Tower.TowerType.MINIGUN_CAT
+            );
+        }
+
+        if (state.getTurn() > 5 && state.getTurn() % 3 == 0) {
+            controller.buyOpponent(StaticGameState.OpponentType.SHIELD_MOUSE);
+        } else if (state.getTurn() > 10 && state.getTurn() % 2 == 0) {
+            controller.buyOpponent(StaticGameState.OpponentType.EMP_ENEMY);
+        } else {
+            controller.buyOpponent(StaticGameState.OpponentType.ARMOR_ENEMY);
+        }
+
+        if (state.getTurn() % 4 == 0) {
+            for (int x = 0; x < state.getBoardSizeX(); x++) {
+                for (int y = 0; y < state.getBoardSizeY(); y++) {
+                    Tower tower = state.getTower(x, y);
+                    if (tower != null && tower.getLevel() < 2) {
+                        controller.upgradeTower(x, y);
+                    }
+                }
+            }
+        }
     }
 }

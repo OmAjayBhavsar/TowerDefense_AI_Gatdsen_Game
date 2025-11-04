@@ -1,7 +1,7 @@
 package com.gatdsen.manager.player;
 
 import com.gatdsen.manager.Controller;
-import com.gatdsen.manager.StaticGameState;
+import com.gatdsen.manager.state;
 
 /**
  * Die Basisklasse für alle Implementierungen von Spielern.
@@ -18,21 +18,21 @@ public abstract class Player {
      * Wird vor Beginn des Spiels aufgerufen.
      * Diese Methode kann daher verwendet werden, um Variablen zu initialisieren und einmalig, sehr rechenaufwändige
      * Operationen durchzuführen.
-     * @param state Der {@link StaticGameState Spielzustand} zu Beginn des Spiels
+     * @param state Der {@link state Spielzustand} zu Beginn des Spiels
      */
-    public abstract void init(StaticGameState state);
+    public abstract void init(state state);
 
     /**
      * Wird aufgerufen, wenn der Spieler seinen Zug für die aktuelle Runde durchführen soll.
      * <p>
-     * Der {@link StaticGameState Spielzustand} reflektiert dabei den Zustand des Spiels vor dem Zug des Spielers. Der
+     * Der {@link state Spielzustand} reflektiert dabei den Zustand des Spiels vor dem Zug des Spielers. Der
      * Zustand ist statisch, das heißt bei Aufrufen des {@link Controller Controllers} werden diese Änderungen nicht im
      * Spielzustand in dieser Runde reflektiert, sondern erst in der nächsten Runde, wenn man den neuen Spielzustand erhält.
      * <p>
      * Der Controller ermöglicht dir die Steuerung, um Aktionen, wie bspw. das Platzieren von Türmen, auszuführen. Die
      * übergebene Controller-Instanz deaktiviert sich nach Ende des Zuges permanent.
-     * @param state Der {@link StaticGameState Spielzustand} vor der Ausführung des aktuellen Zuges
+     * @param state Der {@link state Spielzustand} vor der Ausführung des aktuellen Zuges
      * @param controller Der {@link Controller Controller}, um Aktionen auszuführen
      */
-    public abstract void executeTurn(StaticGameState state, Controller controller);
+    public abstract void executeTurn(state state, Controller controller);
 }

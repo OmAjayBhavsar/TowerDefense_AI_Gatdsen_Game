@@ -1,8 +1,7 @@
 package com.gatdsen.manager.player;
 
 import com.gatdsen.manager.Controller;
-import com.gatdsen.manager.StaticGameState;
-import com.gatdsen.simulation.*;
+import com.gatdsen.manager.state;
 import com.gatdsen.simulation.Tower.TowerType;
 
 /**
@@ -37,10 +36,10 @@ public final class Campaign3_1Bot extends Bot {
      * Diese Methode kann daher verwendet werden, um Variablen zu initialisieren und einmalig, sehr rechenaufwändige
      * Operationen durchzuführen.
      *
-     * @param state Der {@link StaticGameState Spielzustand} zu Beginn des Spiels
+     * @param state Der {@link state Spielzustand} zu Beginn des Spiels
      */
     @Override
-    public void init(StaticGameState state) {
+    public void init(state state) {
 
     }
 
@@ -50,18 +49,18 @@ public final class Campaign3_1Bot extends Bot {
      * Wird aufgerufen, wenn der Spieler seinen Zug für die aktuelle Runde durchführen soll. Die erlaubte
      * Berechnungszeit für diese Methode beträgt 0,5 Sekunden bzw. 500 Millisekunden.
      * <p>
-     * Der {@link StaticGameState Spielzustand} reflektiert dabei den Zustand des Spiels vor dem Zug des Spielers. Der
+     * Der {@link state Spielzustand} reflektiert dabei den Zustand des Spiels vor dem Zug des Spielers. Der
      * Zustand ist statisch, das heißt bei Aufrufen des {@link Controller Controllers} werden diese Änderungen nicht im
      * Spielzustand in dieser Runde reflektiert, sondern erst in der nächsten Runde, wenn man den neuen Spielzustand erhält.
      * <p>
      * Der Controller ermöglicht dir die Steuerung, um Aktionen, wie bspw. das Platzieren von Türmen, auszuführen. Die
      * übergebene Controller-Instanz deaktiviert sich nach Ende des Zuges permanent.
      *
-     * @param state      Der {@link StaticGameState Spielzustand} vor der Ausführung des aktuellen Zuges
+     * @param state      Der {@link state Spielzustand} vor der Ausführung des aktuellen Zuges
      * @param controller Der {@link Controller Controller}, um Aktionen auszuführen
      */
     @Override
-    public void executeTurn(StaticGameState state, Controller controller) {
+    public void executeTurn(state state, Controller controller) {
         if (counter == 0) {
             controller.placeTower(7, 6, TowerType.MINIGUN_CAT);
             controller.upgradeTower(7, 6);

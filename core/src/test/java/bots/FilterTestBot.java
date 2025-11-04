@@ -1,6 +1,6 @@
 package bots;
 
-import com.gatdsen.manager.StaticGameState;
+import com.gatdsen.manager.state;
 import com.gatdsen.manager.player.Bot;
 import com.gatdsen.manager.Controller;
 
@@ -27,12 +27,12 @@ public class FilterTestBot extends Bot {
     }
 
     @Override
-    public void init(StaticGameState state) {
+    public void init(state state) {
         new Thread();
     }
 
     @Override
-    public void executeTurn(StaticGameState state, Controller controller) {
+    public void executeTurn(state state, Controller controller) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
     }
 }

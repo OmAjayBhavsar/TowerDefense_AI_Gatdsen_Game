@@ -1,6 +1,7 @@
 package com.gatdsen.simulation;
 
 import com.gatdsen.manager.map.MapRetriever;
+import com.gatdsen.simulation.action.Action;
 import com.gatdsen.simulation.gamemode.PlayableGameMode;
 
 import java.io.Serializable;
@@ -10,6 +11,71 @@ import java.util.*;
  * Repräsentiert ein laufendes Spiel mit allen dazugehörigen Daten
  */
 public class GameState implements Serializable {
+
+    public Tower getTower(int x, int y) {
+        if (isValidCoordinates(x, y)) {
+            return towers[x][y];
+        }
+        return null;
+    }
+
+    public void placeTower(int x, int y, Tower.TowerType type) {
+        if (isValidCoordinates(x, y)) {
+            towers[x][y] = new Tower(type) {
+                @Override
+                protected Tower copy(PlayerState NewPlayerstate) {
+                    return null;
+                }
+
+                @Override
+                public int getDamage() {
+                    return 0;
+                }
+
+                @Override
+                public int getRange() {
+                    return 0;
+                }
+
+                @Override
+                public int getRechargeTime() {
+                    return 0;
+                }
+
+                @Override
+                public void incrementCooldown() {
+
+                }
+
+                @Override
+                protected Action attack(Action head) {
+                    return null;
+                }
+
+                @Override
+                public int getUpgradePrice() {
+                    return 0;
+                }
+            };
+        }
+    }
+
+    public void upgradeTower(int x, int y) {
+        if (isValidCoordinates(x, y) && towers[x][y] != null) {
+            towers[x][y].upgrade();
+        }
+    }
+
+    public void sellTower(int x, int y) {
+        if (isValidCoordinates(x, y)) {
+            towers[x][y] = null;
+        }
+    }
+
+    private boolean isValidCoordinates(int x, int y) {
+        return x >= 0 && x < boardSizeX && y >= 0 && y < boardSizeY;
+    }
+
 
     /**
      * Enum für die verschiedenen Feldtypen
@@ -30,6 +96,12 @@ public class GameState implements Serializable {
     private final transient Simulation sim;
     private int turn;
     private boolean active;
+
+    private final int boardSizeX;
+
+    private final int boardSizeY;
+
+    private final Tower[][] towers;
 
     /**
      * Erstellt ein neues GameState-Objekt mit den angegebenen Attributen.
@@ -57,6 +129,9 @@ public class GameState implements Serializable {
                 )
         );
         this.turn = gameMode.getStartTurn();
+        this.boardSizeX = map.length; // Initialize boardSizeX based on map size
+        this.boardSizeY = map[0].length; // Initialize boardSizeY based on map size
+        this.towers = new Tower[boardSizeX][boardSizeY]; // Initialize towers array based on board size
         /*
         if (gameMode == GameMode.Christmas_Task) {
             playerStates[1] = new PlayerState(this, 1, 500, 0);
@@ -80,6 +155,16 @@ public class GameState implements Serializable {
         playerCount = original.playerCount;
         active = original.active;
         sim = null;
+
+        // Copy board size and towers array
+        this.boardSizeX = original.boardSizeX;
+        this.boardSizeY = original.boardSizeY;
+        this.towers = new Tower[boardSizeX][boardSizeY];
+        for (int i = 0; i < boardSizeX; i++) {
+            for (int j = 0; j < boardSizeY; j++) {
+                this.towers[i][j] = original.towers[i][j];
+            }
+        }
     }
 
     /**

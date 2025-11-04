@@ -3,7 +3,6 @@ package com.gatdsen.manager.player;
 import com.badlogic.gdx.Input;
 import com.gatdsen.manager.Controller;
 import com.gatdsen.manager.PlayerExecutor;
-import com.gatdsen.manager.StaticGameState;
 import com.gatdsen.simulation.Enemy;
 import com.gatdsen.simulation.IntVector2;
 import com.gatdsen.simulation.Tower;
@@ -80,7 +79,7 @@ public final class HumanPlayer extends Player {
 
     private final IntVector2 selectedTile = new IntVector2(0, 0);
 
-    private StaticGameState state;
+    private com.gatdsen.manager.state state;
     private Controller controller;
 
     @Override
@@ -89,18 +88,18 @@ public final class HumanPlayer extends Player {
     }
 
     @Override
-    public void init(StaticGameState state) {
+    public void init(com.gatdsen.manager.state state) {
     }
 
     /**
      * Started den Zug des {@link HumanPlayer} und erlaubt es diesem mithilfe von Tasteneingaben, zu bewegen.
      * Der Zug dauert {@link HumanPlayer#turnDuration} Sekunden.
      *
-     * @param state      Der {@link StaticGameState Spielzustand} während des Zuges
+     * @param state      Der {@link com.gatdsen.manager.state Spielzustand} während des Zuges
      * @param controller Der {@link Controller Controller}, der zum Charakter gehört
      */
     @Override
-    public void executeTurn(StaticGameState state, Controller controller) {
+    public void executeTurn(com.gatdsen.manager.state state, Controller controller) {
         this.state = state;
         this.controller = controller;
         Arrays.fill(lastTick, NO_TICK);

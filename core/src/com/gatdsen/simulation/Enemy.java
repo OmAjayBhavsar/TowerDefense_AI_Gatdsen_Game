@@ -17,7 +17,7 @@ public abstract class Enemy implements Serializable {
         BASIC_ENEMY,
         EMP_ENEMY,
         SHIELD_ENEMY,
-        ARMOR_ENEMY
+        SHIELD_MOUSE, ARMOR_ENEMY
     }
 
     protected final PlayerState playerState;

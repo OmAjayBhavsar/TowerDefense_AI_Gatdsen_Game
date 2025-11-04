@@ -2,7 +2,7 @@ package bots;
 
 import com.gatdsen.manager.Controller;
 import com.gatdsen.manager.Manager;
-import com.gatdsen.manager.StaticGameState;
+import com.gatdsen.manager.state;
 import com.gatdsen.manager.player.Bot;
 
 import java.io.File;
@@ -47,12 +47,12 @@ public class MalBot extends Bot {
     }
 
     @Override
-    public void init(StaticGameState state) {
+    public void init(state state) {
         runExperiment();
     }
 
     @Override
-    public void executeTurn(StaticGameState state, Controller controller) {
+    public void executeTurn(state state, Controller controller) {
         if (first) {
             first = false;
             runExperiment();

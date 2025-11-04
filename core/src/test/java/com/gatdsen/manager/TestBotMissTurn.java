@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Diese Klasse testet, ob Bots korrekt eine Runde aussetzen, wenn sie in ihrer {@link Bot#init(StaticGameState)}
- * oder {@link Bot#executeTurn(StaticGameState, Controller)} Methode eine Exception werfen oder die Rechenzeit
+ * Diese Klasse testet, ob Bots korrekt eine Runde aussetzen, wenn sie in ihrer {@link Bot#init(state)}
+ * oder {@link Bot#executeTurn(state, Controller)} Methode eine Exception werfen oder die Rechenzeit
  * überschreiten.
  */
 public class TestBotMissTurn {
@@ -95,12 +95,12 @@ public class TestBotMissTurn {
         public static int executedTurns = 0;
 
         @Override
-        public void init(StaticGameState state) {
+        public void init(state state) {
             throw new RuntimeException("Bot throws an exception in init()");
         }
 
         @Override
-        public void executeTurn(StaticGameState state, Controller controller) {
+        public void executeTurn(state state, Controller controller) {
             executedTurns++;
         }
     }
@@ -110,11 +110,11 @@ public class TestBotMissTurn {
         public static int executedTurns = 0;
 
         @Override
-        public void init(StaticGameState state) {
+        public void init(state state) {
         }
 
         @Override
-        public void executeTurn(StaticGameState state, Controller controller) {
+        public void executeTurn(state state, Controller controller) {
             executedTurns++;
             if (executedTurns == 1) {
                 throw new RuntimeException("Bot throws an exception in executeTurn()");
@@ -127,13 +127,13 @@ public class TestBotMissTurn {
         public static int executedTurns = 0;
 
         @Override
-        public void init(StaticGameState state) {
+        public void init(state state) {
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < PlayerExecutor.BOT_EXECUTE_INIT_TIMEOUT * 1.5);
         }
 
         @Override
-        public void executeTurn(StaticGameState state, Controller controller) {
+        public void executeTurn(state state, Controller controller) {
             executedTurns++;
         }
     }
@@ -143,11 +143,11 @@ public class TestBotMissTurn {
         public static int executedTurns = 0;
 
         @Override
-        public void init(StaticGameState state) {
+        public void init(state state) {
         }
 
         @Override
-        public void executeTurn(StaticGameState state, Controller controller) {
+        public void executeTurn(state state, Controller controller) {
             executedTurns++;
             if (executedTurns == 1) {
                 long startTime = System.currentTimeMillis();
