@@ -27,9 +27,9 @@ jobs:
         run: gradle --build-cache core:build
       - name: Build Desktop
         run: gradle --build-cache desktop:build
-      - name: Upload Test Results
+      - name: Upload Build Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-results
           path: core/build/reports/tests/test/
@@ -54,7 +54,7 @@ jobs:
 
       - name: Upload Test Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: core/build/reports/tests/test/
