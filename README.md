@@ -1,19 +1,36 @@
-# Tower Defense Bot – Gadsen Game AI 🎮🤖
+# GATDSEN Tower Defense Bot
 
-This project contains a custom AI bot ("The_Predator") developed as part of a university Tower Defense game competition. The objective was to create a strategy bot that places towers, upgrades defenses, and attacks the enemy based on the game's evolving state.
+A rule-based Java game bot developed as part of a university programming assignment at Otto-von-Guericke University Magdeburg.
 
-## 🧠 What the Bot Does
-- Places the initial tower based on the board center
-- Dynamically chooses tower types based on round count
-- Sends enemies tactically to overwhelm the opponent
-- Upgrades towers at regular intervals
-- Utilizes randomness and game-state data for positioning logic
+The GATDSEN game environment and framework were provided as part of the course. My contribution was the implementation of the bot logic in `MyBot.java`.
 
-## 📦 Technologies
+## My Contribution
+
+The bot uses the provided `StaticGameState` and `Controller` interfaces to make automated decisions during each game turn.
+
+My implementation includes:
+
+- Initial tower placement based on the board dimensions
+- Selection of new tower positions
+- Rule-based selection between different tower types
+- Automated enemy deployment
+- Periodic tower upgrade attempts
+- Integration with the provided GATDSEN game framework
+
+## Technologies & Concepts
+
 - Java
-- Gradle
-- OOP
-- Game AI strategy
+- Object-Oriented Programming
+- Inheritance
+- Rule-based decision logic
+- Existing API/framework integration
+- Git
 
-## 📁 Location
-The core bot implementation is inside:
+## Bot Structure
+
+The custom bot extends the provided `Bot` class:
+
+```java
+public class MyBot extends Bot {
+    // Custom decision-making logic
+}
